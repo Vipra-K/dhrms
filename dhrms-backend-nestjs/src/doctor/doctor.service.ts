@@ -24,6 +24,8 @@ export class DoctorService {
       department: doctor.department,
       role: doctor.role,
       status: doctor.status,
+      workingHoursStart: doctor.workingHoursStart,
+      workingHoursEnd: doctor.workingHoursEnd,
       hospitalId: Number(doctor.hospitalId),
     };
   }
@@ -50,6 +52,8 @@ export class DoctorService {
         department: request.department,
         role: request.role ?? DoctorRole.JUNIOR_DOCTOR,
         status: 'ACTIVE',
+        workingHoursStart: request.workingHoursStart,
+        workingHoursEnd: request.workingHoursEnd,
       },
       include: { user: true },
     });
