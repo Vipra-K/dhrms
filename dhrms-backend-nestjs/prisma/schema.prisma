@@ -1,0 +1,12 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// The existing PostgreSQL schema will be introspected with:
+// npm run prisma:pull
+// No schema changes are performed by this migration at this stage.
