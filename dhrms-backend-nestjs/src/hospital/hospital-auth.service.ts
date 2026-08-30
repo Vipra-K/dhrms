@@ -11,7 +11,7 @@ export class HospitalAuthService {
     if (await this.prisma.user.findUnique({ where: { email: request.email } })) {
       throw new BadRequestException('Email is already registered');
     }
-    if (await this.prisma.hospital.findUnique({ where: { hospitalCode: request.hospitalCode } })) {
+    if (await this.prisma.hospital.findFirst({ where: { hospitalCode: request.hospitalCode } })) {
       throw new BadRequestException('Hospital code is already registered');
     }
 

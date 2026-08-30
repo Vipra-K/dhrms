@@ -27,7 +27,7 @@ export class WorkerQrService {
     });
 
     const qrContent = `DHRMS:${rawToken}`;
-    const qrImage = await QRCode.toDataURL(qrContent, { width: 400, height: 400 });
+    const qrImage = await QRCode.toDataURL(qrContent, { width: 400});
 
     return {
       workerId: Number(worker.id),

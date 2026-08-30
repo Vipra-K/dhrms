@@ -6,7 +6,7 @@ import { HospitalAuthService } from './hospital-auth.service';
 export class HospitalAuthController {
   constructor(private readonly hospitalAuthService: HospitalAuthService) {}
 
-  @Post('register')
+  @Post('/register')
   register(@Body() body: RegisterHospitalDto) {
     return this.hospitalAuthService.registerHospital(body);
   }
