@@ -6,6 +6,7 @@ import {
   activateWorker,
   deactivateWorker,
   generateWorkerQr,
+  viewWorkerQr,
 } from "../../services/workerService";
 
 const WorkerManagement = () => {
@@ -30,10 +31,21 @@ const WorkerManagement = () => {
 
   const handleGenerateQr = async (workerId) => {
     try {
+      setError("");
       const data = await generateWorkerQr(workerId);
       setSelectedQr(data);
     } catch (error) {
       setError(error.response?.data?.error || "Failed to generate QR");
+    }
+  };
+
+  const handleViewQr = async (workerId) => {
+    try {
+      setError("");
+      const data = await viewWorkerQr(workerId);
+      setSelectedQr(data);
+    } catch (error) {
+      setError(error.response?.data?.error || "QR code not found");
     }
   };
 
@@ -224,9 +236,14 @@ const WorkerManagement = () => {
                       </div>
                     </td>
                     <td>
-                      <button className="button button-secondary text-xs" onClick={() => handleGenerateQr(worker.id)}>
-                        Generate QR
-                      </button>
+                      <div className="flex gap-2">
+                        <button className="button button-secondary text-xs" onClick={() => handleGenerateQr(worker.id)}>
+                          Generate QR
+                        </button>
+                        <button className="button button-ghost text-xs" onClick={() => handleViewQr(worker.id)}>
+                          View QR
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
