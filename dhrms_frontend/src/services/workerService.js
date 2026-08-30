@@ -41,8 +41,15 @@ export const deactivateWorker = async (workerId) => {
 
   return response.data;
 };
+
 export const generateWorkerQr = async (workerId) => {
   const response = await api.post(`/hospitals/workers/${workerId}/qr`);
+
+  return response.data;
+};
+
+export const viewWorkerQr = async (workerId) => {
+  const response = await api.get(`/hospitals/workers/${workerId}/qr`);
 
   return response.data;
 };
@@ -68,6 +75,7 @@ export const assignWorkerToDoctor = async (workerId, doctorId) => {
 
   return response.data;
 };
+
 export const getMyWorker = async (workerId) => {
   const response = await api.get(`/doctors/me/workers/${workerId}`);
 
