@@ -1,269 +1,32 @@
 import { useEffect, useState } from "react";
 import RoleLayout from "../../components/RoleLayout";
-import {
-  getWorkers,
-  createWorker,
-  activateWorker,
-  deactivateWorker,
-  generateWorkerQr,
-  viewWorkerQr,
-} from "../../services/workerService";
+import { getWorkers, createWorker, activateWorker, deactivateWorker, generateWorkerQr, viewWorkerQr } from "../../services/workerService";
+
+const emptyForm = { fullName: "", email: "", password: "", dateOfBirth: "", gender: "", bloodGroup: "", phone: "", address: "", emergencyContactName: "", emergencyContactPhone: "", emergencyContactRelation: "" };
 
 const WorkerManagement = () => {
-  const [workers, setWorkers] = useState([]);
-  const [selectedQr, setSelectedQr] = useState(null);
-  const [form, setForm] = useState({
-    fullName: "",
-    email: "",
-    password: "",
-    dateOfBirth: "",
-    gender: "",
-    bloodGroup: "",
-    phone: "",
-    address: "",
-    emergencyContactName: "",
-    emergencyContactPhone: "",
-    emergencyContactRelation: "",
-  });
+  const [workers, setWorkers] = useState([]); const [selectedQr, setSelectedQr] = useState(null); const [showForm, setShowForm] = useState(false); const [search, setSearch] = useState(""); const [statusFilter, setStatusFilter] = useState("ALL"); const [form, setForm] = useState(emptyForm); const [error, setError] = useState(""); const [success, setSuccess] = useState(""); const [loading, setLoading] = useState(false);
 
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const loadWorkers = async () => { try { setError(""); setWorkers(await getWorkers()); } catch (err) { setError(err.response?.data?.error || "Unable to load workers."); } };
+  useEffect(() => { loadWorkers(); }, []);
 
-  const handleGenerateQr = async (workerId) => {
-    try {
-      setError("");
-      const data = await generateWorkerQr(workerId);
-      setSelectedQr(data);
-    } catch (error) {
-      setError(error.response?.data?.error || "Failed to generate QR");
-    }
-  };
+  const handleCreate = async (event) => { event.preventDefault(); setError(""); setSuccess(""); setLoading(true); try { await createWorker(form); setForm(emptyForm); setShowForm(false); setSuccess("Worker registered successfully."); await loadWorkers(); } catch (err) { setError(err.response?.data?.error || "Unable to register worker."); } finally { setLoading(false); } };
+  const runAction = async (action, message) => { try { setError(""); await action(); setSuccess(message); await loadWorkers(); } catch (err) { setError(err.response?.data?.error || "The action could not be completed."); } };
+  const showQr = async (action) => { try { setError(""); setSelectedQr(await action()); } catch (err) { setError(err.response?.data?.error || "Unable to load QR code."); } };
+  const downloadQr = () => { if (!selectedQr?.qrImage) return; const link = document.createElement("a"); link.href = selectedQr.qrImage; link.download = `${selectedQr.workerCode || "worker"}-qr.png`; link.click(); };
+  const printCard = () => { const card = document.getElementById("worker-id-card"); if (!card) return; const win = window.open("", "_blank", "width=700,height=800"); win.document.write(`<html><head><title>${selectedQr.workerCode} - Worker ID</title><style>body{font-family:Arial;padding:40px} .card{width:420px;border:1px solid #ddd;border-radius:18px;padding:28px;text-align:center;margin:auto}img{width:220px}h1{margin:8px 0}p{color:#555}</style></head><body>${card.outerHTML}</body></html>`); win.document.close(); win.focus(); win.print(); win.close(); };
 
-  const handleViewQr = async (workerId) => {
-    try {
-      setError("");
-      const data = await viewWorkerQr(workerId);
-      setSelectedQr(data);
-    } catch (error) {
-      setError(error.response?.data?.error || "QR code not found");
-    }
-  };
+  const filteredWorkers = workers.filter((worker) => { const matchesSearch = `${worker.workerCode} ${worker.fullName} ${worker.phone || ""}`.toLowerCase().includes(search.toLowerCase()); const matchesStatus = statusFilter === "ALL" || (statusFilter === "ACTIVE" ? worker.active : !worker.active); return matchesSearch && matchesStatus; });
 
-  const loadWorkers = async () => {
-    try {
-      const data = await getWorkers();
-      setWorkers(data);
-    } catch (error) {
-      setError(error.response?.data?.error || "Failed to load workers");
-    }
-  };
+  return <RoleLayout title="Workers" description="Register, identify and manage workers assigned to this hospital.">
+    {(error || success) && <div className={`alert ${error ? "error" : "success"}`} role="alert">{error || success}</div>}
+    <div className="section-toolbar"><div><h2>Worker directory</h2><p>{workers.length} worker{workers.length === 1 ? "" : "s"} in your hospital</p></div><div className="toolbar-actions"><input className="input search-input" placeholder="Search ID, name or phone..." value={search} onChange={(e) => setSearch(e.target.value)} /><select className="select compact-select" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}><option value="ALL">All statuses</option><option value="ACTIVE">Active</option><option value="INACTIVE">Inactive</option></select><button className="button button-primary" onClick={() => setShowForm(true)}>+ Register worker</button></div></div>
 
-  useEffect(() => {
-    loadWorkers();
-  }, []);
+    <div className="panel table-panel">{filteredWorkers.length === 0 ? <div className="empty-state-card"><span className="empty-icon">W</span><h3>{search || statusFilter !== "ALL" ? "No matching workers" : "No workers registered yet"}</h3><p>{search || statusFilter !== "ALL" ? "Try changing your search or status filter." : "Register a worker to create their health record and QR identity."}</p>{!search && statusFilter === "ALL" && <button className="button button-primary" onClick={() => setShowForm(true)}>Register first worker</button>}</div> : <div className="table-card"><table className="table"><thead><tr><th>Worker</th><th>Contact</th><th>Blood group</th><th>Status</th><th>QR identity</th><th>Actions</th></tr></thead><tbody>{filteredWorkers.map((worker) => <tr key={worker.id}><td><div className="person-cell"><span className="avatar">{(worker.fullName || "W").charAt(0)}</span><div><strong>{worker.fullName}</strong><small>{worker.workerCode}</small></div></div></td><td>{worker.phone || "—"}</td><td>{worker.bloodGroup || "—"}</td><td><span className={`status-badge ${worker.active ? "status-active" : "status-inactive"}`}>{worker.active ? "ACTIVE" : "INACTIVE"}</span></td><td><div className="row-actions"><button className="button button-secondary button-small" onClick={() => showQr(() => generateWorkerQr(worker.id))}>Generate / View</button><button className="button button-ghost button-small" onClick={() => showQr(() => viewWorkerQr(worker.id))}>View</button></div></td><td><div className="row-actions">{worker.active ? <button className="button button-ghost button-small" onClick={() => runAction(() => deactivateWorker(worker.id), "Worker deactivated.")}>Deactivate</button> : <button className="button button-secondary button-small" onClick={() => runAction(() => activateWorker(worker.id), "Worker activated.")}>Activate</button>}</div></td></tr>)}</tbody></table></div>}</div>
 
-  const handleChange = (event) => {
-    setForm({
-      ...form,
-      [event.target.name]: event.target.value,
-    });
-  };
+    {showForm && <div className="modal-backdrop" onMouseDown={(e) => e.target === e.currentTarget && setShowForm(false)}><div className="modal modal-large"><div className="modal-header"><div><span className="eyebrow">New worker</span><h2>Register worker</h2><p>Create the worker's DHRMS profile.</p></div><button className="modal-close" onClick={() => setShowForm(false)} aria-label="Close">×</button></div><form onSubmit={handleCreate} className="form-grid"><div className="field"><label>Full name</label><input className="input" name="fullName" value={form.fullName} onChange={(e) => setForm({ ...form, fullName: e.target.value })} required /></div><div className="field"><label>Email</label><input className="input" type="email" name="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required /></div><div className="field"><label>Temporary password</label><input className="input" type="password" name="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required /></div><div className="field"><label>Date of birth</label><input className="input" type="date" name="dateOfBirth" value={form.dateOfBirth} onChange={(e) => setForm({ ...form, dateOfBirth: e.target.value })} /></div><div className="field"><label>Gender</label><select className="select" name="gender" value={form.gender} onChange={(e) => setForm({ ...form, gender: e.target.value })}><option value="">Select gender</option><option value="MALE">Male</option><option value="FEMALE">Female</option><option value="OTHER">Other</option></select></div><div className="field"><label>Blood group</label><input className="input" name="bloodGroup" value={form.bloodGroup} onChange={(e) => setForm({ ...form, bloodGroup: e.target.value })} /></div><div className="field"><label>Phone</label><input className="input" name="phone" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></div><div className="field full"><label>Address</label><input className="input" name="address" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} /></div><div className="field"><label>Emergency contact</label><input className="input" name="emergencyContactName" value={form.emergencyContactName} onChange={(e) => setForm({ ...form, emergencyContactName: e.target.value })} /></div><div className="field"><label>Emergency phone</label><input className="input" name="emergencyContactPhone" value={form.emergencyContactPhone} onChange={(e) => setForm({ ...form, emergencyContactPhone: e.target.value })} /></div><div className="field"><label>Relationship</label><input className="input" name="emergencyContactRelation" value={form.emergencyContactRelation} onChange={(e) => setForm({ ...form, emergencyContactRelation: e.target.value })} /></div><div className="field full"><div className="modal-actions"><button type="button" className="button button-secondary" onClick={() => setShowForm(false)}>Cancel</button><button type="submit" className="button button-primary" disabled={loading}>{loading ? "Registering..." : "Register worker"}</button></div></div></form></div></div>}
 
-  const handleCreate = async (event) => {
-    event.preventDefault();
-    setError("");
-    setLoading(true);
-
-    try {
-      await createWorker(form);
-      setForm({
-        fullName: "",
-        email: "",
-        password: "",
-        dateOfBirth: "",
-        gender: "",
-        bloodGroup: "",
-        phone: "",
-        address: "",
-        emergencyContactName: "",
-        emergencyContactPhone: "",
-        emergencyContactRelation: "",
-      });
-      await loadWorkers();
-    } catch (error) {
-      setError(error.response?.data?.error || "Failed to create worker");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDeactivate = async (id) => {
-    try {
-      await deactivateWorker(id);
-      await loadWorkers();
-    } catch (error) {
-      setError(error.response?.data?.error || "Failed to deactivate worker");
-    }
-  };
-
-  const handleActivate = async (id) => {
-    try {
-      await activateWorker(id);
-      await loadWorkers();
-    } catch (error) {
-      setError(error.response?.data?.error || "Failed to activate worker");
-    }
-  };
-
-  return (
-    <RoleLayout
-      title="Worker Management"
-      description="Register and manage migration workers within your hospital."
-    >
-      {error && <div className="alert error">{error}</div>}
-
-      <div className="panel">
-        <h2>Register Worker</h2>
-        <form onSubmit={handleCreate} className="form-grid">
-          <div className="field">
-            <label>Full Name</label>
-            <input className="input" name="fullName" value={form.fullName} onChange={handleChange} required />
-          </div>
-
-          <div className="field">
-            <label>Worker Email</label>
-            <input className="input" type="email" name="email" value={form.email} onChange={handleChange} required />
-          </div>
-
-          <div className="field">
-            <label>Worker Password</label>
-            <input className="input" type="password" name="password" value={form.password} onChange={handleChange} required />
-          </div>
-
-          <div className="field">
-            <label>Date of Birth</label>
-            <input className="input" type="date" name="dateOfBirth" value={form.dateOfBirth} onChange={handleChange} />
-          </div>
-
-          <div className="field">
-            <label>Gender</label>
-            <select className="select" name="gender" value={form.gender} onChange={handleChange}>
-              <option value="">Select Gender</option>
-              <option value="MALE">Male</option>
-              <option value="FEMALE">Female</option>
-              <option value="OTHER">Other</option>
-            </select>
-          </div>
-
-          <div className="field">
-            <label>Blood Group</label>
-            <input className="input" name="bloodGroup" value={form.bloodGroup} onChange={handleChange} />
-          </div>
-
-          <div className="field">
-            <label>Phone</label>
-            <input className="input" name="phone" value={form.phone} onChange={handleChange} />
-          </div>
-
-          <div className="field">
-            <label>Address</label>
-            <input className="input" name="address" value={form.address} onChange={handleChange} />
-          </div>
-
-          <div className="field">
-            <label>Emergency Contact Name</label>
-            <input className="input" name="emergencyContactName" value={form.emergencyContactName} onChange={handleChange} />
-          </div>
-
-          <div className="field">
-            <label>Emergency Contact Phone</label>
-            <input className="input" name="emergencyContactPhone" value={form.emergencyContactPhone} onChange={handleChange} />
-          </div>
-
-          <div className="field">
-            <label>Emergency Contact Relation</label>
-            <input className="input" name="emergencyContactRelation" value={form.emergencyContactRelation} onChange={handleChange} />
-          </div>
-
-          <div className="field full">
-            <button type="submit" className="button button-primary" disabled={loading}>
-              {loading ? "Registering..." : "Register Worker"}
-            </button>
-          </div>
-        </form>
-      </div>
-
-      <div className="panel">
-        <h2>Workers List</h2>
-
-        {workers.length === 0 ? (
-          <div className="empty-state-card">
-            <p className="empty-state-title">No workers found.</p>
-          </div>
-        ) : (
-          <div className="table-card">
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>Worker ID</th>
-                  <th>Name</th>
-                  <th>Blood Group</th>
-                  <th>Phone</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                  <th>QR</th>
-                </tr>
-              </thead>
-              <tbody>
-                {workers.map((worker) => (
-                  <tr key={worker.id}>
-                    <td>{worker.workerCode}</td>
-                    <td>{worker.fullName}</td>
-                    <td>{worker.bloodGroup || "-"}</td>
-                    <td>{worker.phone || "-"}</td>
-                    <td>
-                      <span className={`status-badge ${worker.active ? 'status-active' : 'status-inactive'}`}>
-                        {worker.active ? "ACTIVE" : "INACTIVE"}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="flex gap-2">
-                        {worker.active ? (
-                          <button className="button button-ghost text-xs" onClick={() => handleDeactivate(worker.id)}>Deactivate</button>
-                        ) : (
-                          <button className="button button-secondary text-xs" onClick={() => handleActivate(worker.id)}>Activate</button>
-                        )}
-                      </div>
-                    </td>
-                    <td>
-                      <div className="flex gap-2">
-                        <button className="button button-secondary text-xs" onClick={() => handleGenerateQr(worker.id)}>
-                          Generate QR
-                        </button>
-                        <button className="button button-ghost text-xs" onClick={() => handleViewQr(worker.id)}>
-                          View QR
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {selectedQr && (
-          <div className="card mt-4 text-center">
-            <h3>Worker ID Card QR</h3>
-            <p className="mb-4">Worker ID: {selectedQr.workerCode}</p>
-            <img src={selectedQr.qrImage} alt="Worker QR Code" style={{ maxWidth: '200px', borderRadius: '12px', border: '2px solid var(--border)', marginBottom: '16px' }} />
-            <br />
-            <button className="button button-secondary" onClick={() => setSelectedQr(null)}>Close QR</button>
-          </div>
-        )}
-      </div>
-    </RoleLayout>
-  );
+    {selectedQr && <div className="modal-backdrop" onMouseDown={(e) => e.target === e.currentTarget && setSelectedQr(null)}><div className="modal qr-modal"><div className="modal-header"><div><span className="eyebrow">Worker identity</span><h2>{selectedQr.workerCode}</h2><p>Save or print this card for the worker.</p></div><button className="modal-close" onClick={() => setSelectedQr(null)} aria-label="Close">×</button></div><div className="worker-id-card" id="worker-id-card"><div className="id-card-brand">DHRMS <span>WORKER ID</span></div><div className="id-card-person"><div className="id-card-avatar">{(selectedQr.workerCode || "W").charAt(0)}</div><div><small>Worker ID</small><strong>{selectedQr.workerCode}</strong></div></div><img src={selectedQr.qrImage} alt={`QR code for ${selectedQr.workerCode}`} /><p>Scan this QR code to identify the worker in DHRMS.</p></div><div className="modal-actions"><button className="button button-secondary" onClick={downloadQr}>Download QR</button><button className="button button-secondary" onClick={printCard}>Print ID card</button><button className="button button-primary" onClick={() => setSelectedQr(null)}>Done</button></div></div></div>}
+  </RoleLayout>;
 };
-
 export default WorkerManagement;
