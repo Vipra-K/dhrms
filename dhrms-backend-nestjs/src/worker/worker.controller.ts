@@ -22,6 +22,11 @@ export class WorkerController {
     return this.workerQrService.generateQr(BigInt(workerId));
   }
 
+  @Get('/:workerId/qr')
+  viewQr(@Param('workerId') workerId: string) {
+    return this.workerQrService.viewQr(BigInt(workerId));
+  }
+
   @Post('/qr/lookup')
   async lookupWorkerByQr(@Req() req: AuthenticatedRequest, @Body() body: WorkerQrLookupDto) {
     const worker = await this.workerQrService.getWorkerFromQr(body.qrContent);
