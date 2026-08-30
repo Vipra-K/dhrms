@@ -1,55 +1,12 @@
 import api from "./api";
 
-export const getDoctors = async () => {
-  const response = await api.get("/hospitals/doctors");
-
-  return response.data;
-};
-
-export const createDoctor = async (doctor) => {
-  const response = await api.post("/hospitals/doctors", doctor);
-
-  return response.data;
-};
-
-export const updateDoctor = async (doctorId, doctor) => {
-  const response = await api.put(`/hospitals/doctors/${doctorId}`, doctor);
-
-  return response.data;
-};
-
-export const activateDoctor = async (doctorId) => {
-  const response = await api.patch(`/hospitals/doctors/${doctorId}/activate`);
-
-  return response.data;
-};
-
-export const suspendDoctor = async (doctorId) => {
-  const response = await api.patch(`/hospitals/doctors/${doctorId}/suspend`);
-
-  return response.data;
-};
-
-export const deactivateDoctor = async (doctorId) => {
-  const response = await api.patch(`/hospitals/doctors/${doctorId}/deactivate`);
-
-  return response.data;
-};
-
-export const getMyDoctorProfile = async () => {
-  const response = await api.get("/doctors/me");
-
-  return response.data;
-};
-
-export const getHospitalDoctors = async () => {
-  const response = await api.get("/hospitals/doctors");
-
-  return response.data;
-};
-
-export const getMyWorkers = async () => {
-  const response = await api.get("/doctors/me/workers");
-
-  return response.data;
-};
+export const getDoctors = async () => (await api.get("/hospitals/doctors")).data;
+export const getDoctor = async (doctorId) => (await api.get(`/hospitals/doctors/${doctorId}`)).data;
+export const createDoctor = async (doctor) => (await api.post("/hospitals/doctors", doctor)).data;
+export const updateDoctor = async (doctorId, doctor) => (await api.put(`/hospitals/doctors/${doctorId}`, doctor)).data;
+export const activateDoctor = async (doctorId) => (await api.patch(`/hospitals/doctors/${doctorId}/activate`)).data;
+export const suspendDoctor = async (doctorId) => (await api.patch(`/hospitals/doctors/${doctorId}/suspend`)).data;
+export const deactivateDoctor = async (doctorId) => (await api.patch(`/hospitals/doctors/${doctorId}/deactivate`)).data;
+export const getMyDoctorProfile = async () => (await api.get("/doctors/me")).data;
+export const getHospitalDoctors = async () => (await api.get("/hospitals/doctors")).data;
+export const getMyWorkers = async () => (await api.get("/doctors/me/workers")).data;
