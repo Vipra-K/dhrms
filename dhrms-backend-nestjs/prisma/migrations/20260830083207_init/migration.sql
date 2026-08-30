@@ -130,6 +130,7 @@ CREATE TABLE "worker_qr_codes" (
     "id" BIGSERIAL NOT NULL,
     "worker_id" BIGINT NOT NULL,
     "token_hash" VARCHAR(255) NOT NULL,
+    "qr_content" VARCHAR(500),
     "status" VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "revoked_at" TIMESTAMP(3),
