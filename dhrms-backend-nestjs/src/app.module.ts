@@ -9,6 +9,15 @@ import { AssignmentModule } from './assignment/assignment.module';
 import { MedicalModule } from './medical/medical.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), PrismaModule, AuthModule, HospitalModule, WorkerModule, DoctorModule, AssignmentModule, MedicalModule],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    PrismaModule,
+    AuthModule,
+    HospitalModule,
+    WorkerModule,
+    DoctorModule,
+    AssignmentModule,
+    MedicalModule,
+  ],
 })
 export class AppModule {}
