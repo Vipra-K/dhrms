@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-
 import Login from "./pages/Login";
+import RoleLogin from "./pages/RoleLogin";
 import Home from "./pages/Home";
 import HospitalRegister from "./pages/HospitalRegister";
 import HospitalDashboard from "./pages/HospitalDashboard";
@@ -17,120 +17,37 @@ import MyProfile from "./pages/worker/MyProfile";
 import MedicalHistory from "./pages/worker/MedicalHistory";
 import DoctorWorkerProfile from "./pages/doctor/DoctorWorkerProfile";
 
-const App = () => {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route
-          path="/hospital/find-worker"
-          element={
-            <ProtectedRoute allowedRoles={["HOSPITAL"]}>
-              <FindWorker />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/worker"
-          element={
-            <ProtectedRoute allowedRoles={["WORKER"]}>
-              <WorkerDashboard />
-            </ProtectedRoute>
-          }
-        />
+const Protected = ({ role, children }) => <ProtectedRoute allowedRoles={[role]}>{children}</ProtectedRoute>;
 
-        <Route
-          path="/worker/profile"
-          element={
-            <ProtectedRoute allowedRoles={["WORKER"]}>
-              <MyProfile />
-            </ProtectedRoute>
-          }
-        />
+const App = () => (
+  <BrowserRouter>
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/home" element={<Home />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/login/hospital" element={<RoleLogin role="HOSPITAL" />} />
+      <Route path="/login/doctor" element={<RoleLogin role="DOCTOR" />} />
+      <Route path="/login/worker" element={<RoleLogin role="WORKER" />} />
+      <Route path="/hospital/register" element={<HospitalRegister />} />
 
-        <Route
-          path="/worker/medical-history"
-          element={
-            <ProtectedRoute allowedRoles={["WORKER"]}>
-              <MedicalHistory />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/hospital/workers/:workerId"
-          element={
-            <ProtectedRoute allowedRoles={["HOSPITAL"]}>
-              <WorkerProfile />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/" element={<Home />} />
-        <Route path="/home" element={<Home />} />
-        <Route
-          path="/hospital/doctors"
-          element={
-            <ProtectedRoute allowedRoles={["HOSPITAL"]}>
-              <DoctorManagement />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/doctor/workers"
-          element={
-            <ProtectedRoute allowedRoles={["DOCTOR"]}>
-              <MyWorkers />
-            </ProtectedRoute>
-          }
-        />
+      <Route path="/hospital" element={<Protected role="HOSPITAL"><HospitalDashboard /></Protected>} />
+      <Route path="/hospital/doctors" element={<Protected role="HOSPITAL"><DoctorManagement /></Protected>} />
+      <Route path="/hospital/workers" element={<Protected role="HOSPITAL"><WorkerManagement /></Protected>} />
+      <Route path="/hospital/workers/scan" element={<Protected role="HOSPITAL"><WorkerQrScanner /></Protected>} />
+      <Route path="/hospital/find-worker" element={<Protected role="HOSPITAL"><FindWorker /></Protected>} />
+      <Route path="/hospital/workers/:workerId" element={<Protected role="HOSPITAL"><WorkerProfile /></Protected>} />
 
-        <Route
-          path="/doctor/workers/:workerId"
-          element={
-            <ProtectedRoute allowedRoles={["DOCTOR"]}>
-              <DoctorWorkerProfile />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/hospital/workers/scan"
-          element={
-            <ProtectedRoute allowedRoles={["HOSPITAL"]}>
-              <WorkerQrScanner />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/hospital/workers"
-          element={
-            <ProtectedRoute allowedRoles={["HOSPITAL"]}>
-              <WorkerManagement />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/doctor"
-          element={
-            <ProtectedRoute allowedRoles={["DOCTOR"]}>
-              <DoctorDashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/login" element={<Login />} />
+      <Route path="/doctor" element={<Protected role="DOCTOR"><DoctorDashboard /></Protected>} />
+      <Route path="/doctor/workers" element={<Protected role="DOCTOR"><MyWorkers /></Protected>} />
+      <Route path="/doctor/workers/:workerId" element={<Protected role="DOCTOR"><DoctorWorkerProfile /></Protected>} />
 
-        <Route path="/hospital/register" element={<HospitalRegister />} />
+      <Route path="/worker" element={<Protected role="WORKER"><WorkerDashboard /></Protected>} />
+      <Route path="/worker/profile" element={<Protected role="WORKER"><MyProfile /></Protected>} />
+      <Route path="/worker/medical-history" element={<Protected role="WORKER"><MedicalHistory /></Protected>} />
 
-        <Route
-          path="/hospital"
-          element={
-            <ProtectedRoute allowedRoles={["HOSPITAL"]}>
-              <HospitalDashboard />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </BrowserRouter>
-  );
-};
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  </BrowserRouter>
+);
 
 export default App;
