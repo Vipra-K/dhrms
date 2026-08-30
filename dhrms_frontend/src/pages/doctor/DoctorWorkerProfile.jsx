@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import RoleLayout from "../../components/RoleLayout";
 import { getMyWorker } from "../../services/workerService";
 import MedicalRecords from "./MedicalRecords";
+import "./medical-records.css";
 
 const DoctorWorkerProfile = () => {
   const { workerId } = useParams(); const navigate = useNavigate(); const [worker, setWorker] = useState(null); const [loading, setLoading] = useState(true); const [error, setError] = useState("");
