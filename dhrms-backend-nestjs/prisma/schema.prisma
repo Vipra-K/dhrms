@@ -9,38 +9,33 @@ datasource db {
 
 model User {
   id BigInt @id @default(autoincrement())
-  email String @unique @db.VarChar(150)
-  passwordHash String @map("password_hash")
-  role String @default("DOCTOR") @db.VarChar(30)
+  email String @unique @db.VarChar(255)
+  passwordHash String @map("password_hash") @db.VarChar(255)
+  role String @db.VarChar(30)
   status String @default("ACTIVE") @db.VarChar(20)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
   hospital Hospital?
   doctor Doctor?
   worker Worker?
-  @@index([email], map: "idx_users_email")
   @@map("users")
 }
 
 model HfrFacility {
   id BigInt @id @default(autoincrement())
-  hfrId String @unique @map("hfr_id") @db.VarChar(50)
-  facilityName String @map("facility_name") @db.VarChar(200)
-  facilityType String @map("facility_type") @db.VarChar(100)
-  district String @db.VarChar(100)
+  hfrId String @unique @map("hfr_id") @db.VarChar(100)
+  name String @db.VarChar(255)
   status String @default("ACTIVE") @db.VarChar(20)
-  createdAt DateTime @default(now()) @map("created_at")
-  hospital Hospital?
-  @@index([hfrId], map: "idx_hfr_id")
+  hospitals Hospital[]
   @@map("hfr_facilities")
 }
 
 model Hospital {
   id BigInt @id @default(autoincrement())
   userId BigInt @unique @map("user_id")
-  hfrFacilityId BigInt @unique @map("hfr_facility_id")
-  hospitalCode String @unique @map("hospital_code") @db.VarChar(50)
-  name String @db.VarChar(200)
+  hfrFacilityId BigInt @map("hfr_facility_id")
+  hospitalCode String @map("hospital_code") @db.VarChar(50)
+  name String @db.VarChar(255)
   address String? @db.VarChar(300)
   city String? @db.VarChar(100)
   district String? @db.VarChar(100)
@@ -76,6 +71,7 @@ model Doctor {
   hospital Hospital @relation(fields: [hospitalId], references: [id])
   assignments DoctorWorkerAssignment[]
   medicalRecords MedicalRecord[]
+  prescriptions Prescription[]
   @@index([licenseNumber], map: "idx_doctor_license")
   @@index([hospitalId], map: "idx_doctor_hospital")
   @@map("doctors")
@@ -175,6 +171,5 @@ model WorkerQrCode {
   createdAt DateTime @default(now()) @map("created_at")
   revokedAt DateTime? @map("revoked_at")
   worker Worker @relation(fields: [workerId], references: [id])
-  @@index([tokenHash], map: "idx_qr_token_hash")
   @@map("worker_qr_codes")
 }
