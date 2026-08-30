@@ -12,7 +12,7 @@ async function bootstrap() {
     credentials: true,
   });
 
-  app.useGlobalPipes(new ValidationPipe({ whitelist: false, transform: true }));
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   await app.listen(Number(process.env.PORT ?? 8080));
 }
 
