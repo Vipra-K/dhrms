@@ -48,8 +48,15 @@ export class AssignmentService {
 
   async getMyWorkers(doctorUserId: bigint) {
     const doctor = await this.doctorByUser(doctorUserId);
-    const assignments = await this.prisma.doctorWorkerAssignment.findMany({ where: { doctorId: doctor.id, active: true }, include: { worker: true, doctor: true }, orderBy: { assignedAt: 'desc' } });
+    const assignments = await this.prisma.doctorWorkerAssignment.findMany({ where: { doctorId: doctor.id, active: true }, include: { worker: true }, orderBy: { assignedAt: 'desc' } });
     return assignments.map(a => this.workerResponse(a.worker));
+  }
+
+  async getMyWorker(doctorUserId: bigint, workerId: bigint) {
+    await this.verifyDoctorWorkerAccess(doctorUserId, workerId);
+    const worker = await this.prisma.worker.findUnique({ where: { id: workerId } });
+    if (!worker) throw new NotFoundException('Worker not found');
+    return { id: Number(worker.id), workerCode: worker.workerCode, fullName: worker.fullName, dateOfBirth: worker.dateOfBirth, gender: worker.gender, bloodGroup: worker.bloodGroup, phone: worker.phone, address: worker.address, emergencyContactName: worker.emergencyContactName, emergencyContactPhone: worker.emergencyContactPhone, emergencyContactRelation: worker.emergencyContactRelation, active: worker.active, createdAt: worker.createdAt };
   }
 
   async verifyDoctorWorkerAccess(doctorUserId: bigint, workerId: bigint) {
