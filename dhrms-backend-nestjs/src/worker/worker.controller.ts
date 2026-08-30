@@ -23,8 +23,8 @@ export class WorkerController {
   }
 
   @Get('/:workerId/qr')
-  viewQr(@Param('workerId') workerId: string) {
-    return this.workerQrService.viewQr(BigInt(workerId));
+  getWorkerQr(@Param('workerId') workerId: string) {
+    return this.workerQrService.getWorkerFromQr(workerId);
   }
 
   @Post('/qr/lookup')

@@ -6,6 +6,7 @@ import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class WorkerQrService {
+  
   constructor(private readonly prisma: PrismaService) {}
 
   async generateQr(workerId: bigint) {
@@ -13,42 +14,94 @@ export class WorkerQrService {
     if (!worker) throw new NotFoundException('Worker not found');
 
     const existing = await this.prisma.workerQrCode.findUnique({ where: { workerId } });
-    if (existing?.status === 'ACTIVE' && existing.qrContent) {
-      const qrImage = await QRCode.toDataURL(existing.qrContent, { width: 400 });
-      return { workerId: Number(worker.id), workerCode: worker.workerCode, qrContent: existing.qrContent, qrImage };
-    }
-
-    const rawToken = randomUUID().replace(/-/g, '');
-    const qrContent = `DHRMS:${rawToken}`;
-    const tokenHash = this.hashToken(rawToken);
-
     if (existing) {
       await this.prisma.workerQrCode.update({
         where: { id: existing.id },
-        data: { tokenHash, qrContent, status: 'ACTIVE', revokedAt: null },
-      });
-    } else {
-      await this.prisma.workerQrCode.create({
-        data: { workerId, tokenHash, qrContent, status: 'ACTIVE' },
+        data: { status: 'REVOKED', revokedAt: new Date() },
       });
     }
 
-    const qrImage = await QRCode.toDataURL(qrContent, { width: 400 });
-    return { workerId: Number(worker.id), workerCode: worker.workerCode, qrContent, qrImage };
+    const rawToken = randomUUID().replace(/-/g, '');
+    const tokenHash = this.hashToken(rawToken);
+    await this.prisma.workerQrCode.create({
+      data: { workerId, tokenHash, status: 'ACTIVE' },
+    });
+
+    const qrContent = `DHRMS:${rawToken}`;
+    const qrImage = await QRCode.toDataURL(qrContent, { width: 400});
+
+    return {
+      workerId: Number(worker.id),
+      workerCode: worker.workerCode,
+      qrContent,
+      qrImage,
+    };
   }
 
-  async viewQr(workerId: bigint) {
-    const worker = await this.prisma.worker.findUnique({ where: { id: workerId } });
-    if (!worker) throw new NotFoundException('Worker not found');
+  async generateQr(workerId: bigint) {
+  const worker = await this.prisma.worker.findUnique({
+    where: { id: workerId },
+  });
 
-    const existing = await this.prisma.workerQrCode.findUnique({ where: { workerId } });
-    if (!existing || existing.status !== 'ACTIVE' || !existing.qrContent) {
-      throw new NotFoundException('QR code not found');
-    }
-
-    const qrImage = await QRCode.toDataURL(existing.qrContent, { width: 400 });
-    return { workerId: Number(worker.id), workerCode: worker.workerCode, qrContent: existing.qrContent, qrImage };
+  if (!worker) {
+    throw new NotFoundException('Worker not found');
   }
+
+  const existing = await this.prisma.workerQrCode.findUnique({
+    where: { workerId },
+  });
+
+  // QR already exists → return the same QR
+  if (existing && existing.status === 'ACTIVE') {
+    const qrImage = await QRCode.toDataURL(existing.qrContent, {
+      width: 400,
+    });
+
+    return {
+      workerId: Number(worker.id),
+      workerCode: worker.workerCode,
+      qrContent: existing.qrContent,
+      qrImage,
+    };
+  }
+
+  // No active QR → create one
+  const rawToken = randomUUID().replace(/-/g, '');
+  const qrContent = `DHRMS:${rawToken}`;
+  const tokenHash = this.hashToken(rawToken);
+
+  if (existing) {
+    await this.prisma.workerQrCode.update({
+      where: { id: existing.id },
+      data: {
+        tokenHash,
+        qrContent,
+        status: 'ACTIVE',
+        revokedAt: null,
+      },
+    });
+  } else {
+    await this.prisma.workerQrCode.create({
+      data: {
+        workerId,
+        tokenHash,
+        qrContent,
+        status: 'ACTIVE',
+      },
+    });
+  }
+
+  const qrImage = await QRCode.toDataURL(qrContent, {
+    width: 400,
+  });
+
+  return {
+    workerId: Number(worker.id),
+    workerCode: worker.workerCode,
+    qrContent,
+    qrImage,
+  };
+}
 
   async getWorkerFromQr(qrContent: string) {
     if (!qrContent || !qrContent.startsWith('DHRMS:')) {
