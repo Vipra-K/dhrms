@@ -30,10 +30,7 @@ export class AssignmentController {
 
   @Get('doctors/me/workers/:workerId')
   @Roles('DOCTOR')
-  async getMyWorker(@Req() req: AuthenticatedRequest, @Param('workerId') workerId: string) {
-    await this.service.verifyDoctorWorkerAccess(req.user!.id, BigInt(workerId));
-    const worker = await this.service['prisma'].worker.findUnique({ where: { id: BigInt(workerId) } });
-    if (!worker) throw new Error('Worker not found');
-    return { id: Number(worker.id), workerCode: worker.workerCode, fullName: worker.fullName, dateOfBirth: worker.dateOfBirth, gender: worker.gender, bloodGroup: worker.bloodGroup, phone: worker.phone, address: worker.address, emergencyContactName: worker.emergencyContactName, emergencyContactPhone: worker.emergencyContactPhone, emergencyContactRelation: worker.emergencyContactRelation, active: worker.active, createdAt: worker.createdAt };
+  getMyWorker(@Req() req: AuthenticatedRequest, @Param('workerId') workerId: string) {
+    return this.service.getMyWorker(req.user!.id, BigInt(workerId));
   }
 }
