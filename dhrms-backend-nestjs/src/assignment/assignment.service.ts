@@ -31,24 +31,11 @@ export class AssignmentService {
     if (current?.doctorId === doctor.id) return this.response(current);
 
     const assignment = await this.prisma.$transaction(async (tx) => {
-      if (current) {
-        await tx.doctorWorkerAssignment.update({ where: { id: current.id }, data: { active: false, endedAt: new Date() } });
-      }
-
-      const existing = await tx.doctorWorkerAssignment.findUnique({
-        where: { doctorId_workerId_hospitalId: { doctorId, workerId, hospitalId: hospital.id } },
+      if (current) await tx.doctorWorkerAssignment.update({ where: { id: current.id }, data: { active: false, endedAt: new Date() } });
+      return tx.doctorWorkerAssignment.create({
+        data: { doctorId, workerId, hospitalId: hospital.id, assignedBy: hospitalUserId, active: true },
+        include: { doctor: true, worker: true },
       });
-
-      return existing
-        ? tx.doctorWorkerAssignment.update({
-            where: { id: existing.id },
-            data: { active: true, endedAt: null, assignedAt: new Date(), assignedBy: hospitalUserId },
-            include: { doctor: true, worker: true },
-          })
-        : tx.doctorWorkerAssignment.create({
-            data: { doctorId, workerId, hospitalId: hospital.id, assignedBy: hospitalUserId, active: true },
-            include: { doctor: true, worker: true },
-          });
     });
 
     return this.response(assignment);
@@ -66,11 +53,7 @@ export class AssignmentService {
     const hospital = await this.hospital(hospitalUserId);
     const worker = await this.prisma.worker.findFirst({ where: { id: workerId, hospitalId: hospital.id } });
     if (!worker) throw new NotFoundException('Worker not found in this hospital');
-    const assignments = await this.prisma.doctorWorkerAssignment.findMany({
-      where: { workerId, hospitalId: hospital.id },
-      include: { doctor: true },
-      orderBy: { assignedAt: 'desc' },
-    });
+    const assignments = await this.prisma.doctorWorkerAssignment.findMany({ where: { workerId, hospitalId: hospital.id }, include: { doctor: true }, orderBy: { assignedAt: 'desc' } });
     return assignments.map((assignment) => this.historyResponse(assignment));
   }
 
@@ -94,18 +77,9 @@ export class AssignmentService {
   }
 
   private response(a: any) {
-    return {
-      id: Number(a.id), workerId: Number(a.workerId), workerCode: a.worker.workerCode,
-      doctorId: Number(a.doctorId), doctorName: a.doctor.fullName, doctorSpecialization: a.doctor.specialization,
-      hospitalId: Number(a.hospitalId), active: a.active, assignedAt: a.assignedAt, endedAt: a.endedAt,
-    };
+    return { id: Number(a.id), workerId: Number(a.workerId), workerCode: a.worker.workerCode, doctorId: Number(a.doctorId), doctorName: a.doctor.fullName, doctorSpecialization: a.doctor.specialization, hospitalId: Number(a.hospitalId), active: a.active, assignedAt: a.assignedAt, endedAt: a.endedAt };
   }
 
-  private historyResponse(a: any) {
-    return { ...this.response(a), status: a.active ? 'CURRENT' : 'ENDED' };
-  }
-
-  private workerResponse(w: any) {
-    return { workerId: Number(w.id), workerCode: w.workerCode, fullName: w.fullName, dateOfBirth: w.dateOfBirth, gender: w.gender, bloodGroup: w.bloodGroup, phone: w.phone };
-  }
+  private historyResponse(a: any) { return { ...this.response(a), status: a.active ? 'CURRENT' : 'ENDED' }; }
+  private workerResponse(w: any) { return { workerId: Number(w.id), workerCode: w.workerCode, fullName: w.fullName, dateOfBirth: w.dateOfBirth, gender: w.gender, bloodGroup: w.bloodGroup, phone: w.phone }; }
 }
