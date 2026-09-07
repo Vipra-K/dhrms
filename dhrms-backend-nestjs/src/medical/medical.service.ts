@@ -20,8 +20,7 @@ export class MedicalService {
   }
 
   async listWorkerRecords(userId: bigint, workerId: bigint) {
-    const doctor = await this.doctor(userId);
-    await this.access(doctor.id, workerId);
+    const doctor = await this.doctor(userId); await this.access(doctor.id, workerId);
     const records = await this.prisma.medicalRecord.findMany({ where: { workerId, doctorId: doctor.id }, orderBy: { visitDate: 'desc' }, include: { prescriptions: true } });
     return records.map(r => this.recordResponse(r));
   }
@@ -35,8 +34,7 @@ export class MedicalService {
   }
 
   async createRecord(userId: bigint, workerId: bigint, dto: MedicalRecordDto) {
-    const doctor = await this.doctor(userId);
-    const assignment = await this.access(doctor.id, workerId);
+    const doctor = await this.doctor(userId); const assignment = await this.access(doctor.id, workerId);
     const record = await this.prisma.medicalRecord.create({ data: { workerId, doctorId: doctor.id, hospitalId: assignment.hospitalId, visitDate: new Date(dto.visitDate), symptoms: dto.symptoms, diagnosis: dto.diagnosis, treatment: dto.treatment, notes: dto.notes }, include: { prescriptions: true } });
     return this.recordResponse(record);
   }
@@ -50,20 +48,13 @@ export class MedicalService {
     return this.recordResponse(updated);
   }
 
-  async deleteRecord(userId: bigint, recordId: bigint) {
-    const doctor = await this.doctor(userId);
-    const record = await this.prisma.medicalRecord.findUnique({ where: { id: recordId } });
-    if (!record || record.doctorId !== doctor.id) throw new NotFoundException('Medical record not found');
-    await this.access(doctor.id, record.workerId);
-    await this.prisma.medicalRecord.delete({ where: { id: recordId } });
-  }
-
   async listPrescriptions(userId: bigint, recordId: bigint) {
     const doctor = await this.doctor(userId);
     const record = await this.prisma.medicalRecord.findUnique({ where: { id: recordId } });
     if (!record || record.doctorId !== doctor.id) throw new NotFoundException('Medical record not found');
     await this.access(doctor.id, record.workerId);
-    return this.prisma.prescription.findMany({ where: { medicalRecordId: recordId }, orderBy: { createdAt: 'desc' } }).then(x => x.map(p => this.prescriptionResponse(p)));
+    const prescriptions = await this.prisma.prescription.findMany({ where: { medicalRecordId: recordId }, orderBy: { createdAt: 'desc' } });
+    return prescriptions.map(p => this.prescriptionResponse(p));
   }
 
   async createPrescription(userId: bigint, recordId: bigint, dto: PrescriptionDto) {
@@ -84,14 +75,11 @@ export class MedicalService {
     return this.prescriptionResponse(updated);
   }
 
-  async deletePrescription(userId: bigint, prescriptionId: bigint) {
-    const doctor = await this.doctor(userId);
-    const p = await this.prisma.prescription.findUnique({ where: { id: prescriptionId } });
-    if (!p || p.doctorId !== doctor.id) throw new NotFoundException('Prescription not found');
-    await this.access(doctor.id, p.workerId);
-    await this.prisma.prescription.delete({ where: { id: prescriptionId } });
+  private recordResponse(r: any) {
+    return { id: Number(r.id), workerId: Number(r.workerId), doctorId: Number(r.doctorId), hospitalId: Number(r.hospitalId), visitDate: r.visitDate, symptoms: r.symptoms, diagnosis: r.diagnosis, treatment: r.treatment, notes: r.notes, createdAt: r.createdAt, updatedAt: r.updatedAt, prescriptions: (r.prescriptions ?? []).map((p: any) => this.prescriptionResponse(p)) };
   }
 
-  private recordResponse(r: any) { return { id: Number(r.id), workerId: Number(r.workerId), doctorId: Number(r.doctorId), hospitalId: Number(r.hospitalId), visitDate: r.visitDate, symptoms: r.symptoms, diagnosis: r.diagnosis, treatment: r.treatment, notes: r.notes, createdAt: r.createdAt, prescriptions: (r.prescriptions ?? []).map((p: any) => this.prescriptionResponse(p)) }; }
-  private prescriptionResponse(p: any) { return { id: Number(p.id), medicalRecordId: Number(p.medicalRecordId), workerId: Number(p.workerId), doctorId: Number(p.doctorId), medicineName: p.medicineName, dosage: p.dosage, frequency: p.frequency, duration: p.duration, instructions: p.instructions, filePath: p.filePath, createdAt: p.createdAt }; }
+  private prescriptionResponse(p: any) {
+    return { id: Number(p.id), medicalRecordId: Number(p.medicalRecordId), workerId: Number(p.workerId), doctorId: Number(p.doctorId), medicineName: p.medicineName, dosage: p.dosage, frequency: p.frequency, duration: p.duration, instructions: p.instructions, filePath: p.filePath, createdAt: p.createdAt };
+  }
 }
