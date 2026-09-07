@@ -35,4 +35,6 @@ jobs:
           cache: npm
           cache-dependency-path: dhrms_frontend/package-lock.json
       - run: npm ci
+      - run: npm run check:imports
+      - run: npm run lint
       - run: npm run build
