@@ -22,6 +22,12 @@ export class AssignmentController {
     return this.service.getWorkerAssignment(req.user!.id, BigInt(workerId));
   }
 
+  @Get('hospitals/workers/:workerId/assignment/history')
+  @Roles('HOSPITAL')
+  getAssignmentHistory(@Req() req: AuthenticatedRequest, @Param('workerId') workerId: string) {
+    return this.service.getWorkerAssignmentHistory(req.user!.id, BigInt(workerId));
+  }
+
   @Get('doctors/me/workers')
   @Roles('DOCTOR')
   getMyWorkers(@Req() req: AuthenticatedRequest) {
