@@ -12,19 +12,16 @@ import { WorkerService } from './worker.service';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('HOSPITAL')
 export class WorkerController {
-  constructor(
-    private readonly workerService: WorkerService,
-    private readonly workerQrService: WorkerQrService,
-  ) {}
+  constructor(private readonly workerService: WorkerService, private readonly workerQrService: WorkerQrService) {}
 
   @Post('/:workerId/qr')
-  generateQr(@Param('workerId') workerId: string) {
-    return this.workerQrService.generateQr(BigInt(workerId));
+  generateQr(@Req() req: AuthenticatedRequest, @Param('workerId') workerId: string) {
+    return this.workerQrService.generateQr(req.user!.id, BigInt(workerId));
   }
 
   @Get('/:workerId/qr')
-  getWorkerQr(@Param('workerId') workerId: string) {
-    return this.workerQrService.getWorkerQr(BigInt(workerId));
+  getWorkerQr(@Req() req: AuthenticatedRequest, @Param('workerId') workerId: string) {
+    return this.workerQrService.getWorkerQr(req.user!.id, BigInt(workerId));
   }
 
   @Post('/qr/lookup')
@@ -34,37 +31,17 @@ export class WorkerController {
   }
 
   @Post()
-  createWorker(@Req() req: AuthenticatedRequest, @Body() body: CreateWorkerDto) {
-    return this.workerService.createWorker(req.user!.id, body);
-  }
-
+  createWorker(@Req() req: AuthenticatedRequest, @Body() body: CreateWorkerDto) { return this.workerService.createWorker(req.user!.id, body); }
   @Get()
-  getWorkers(@Req() req: AuthenticatedRequest) {
-    return this.workerService.getWorkers(req.user!.id);
-  }
-
+  getWorkers(@Req() req: AuthenticatedRequest) { return this.workerService.getWorkers(req.user!.id); }
   @Get('/code/:workerCode')
-  getWorkerByCode(@Req() req: AuthenticatedRequest, @Param('workerCode') workerCode: string) {
-    return this.workerService.getWorkerByCode(req.user!.id, workerCode);
-  }
-
+  getWorkerByCode(@Req() req: AuthenticatedRequest, @Param('workerCode') workerCode: string) { return this.workerService.getWorkerByCode(req.user!.id, workerCode); }
   @Get('/:workerId')
-  getWorker(@Req() req: AuthenticatedRequest, @Param('workerId') workerId: string) {
-    return this.workerService.getWorker(req.user!.id, BigInt(workerId));
-  }
-
+  getWorker(@Req() req: AuthenticatedRequest, @Param('workerId') workerId: string) { return this.workerService.getWorker(req.user!.id, BigInt(workerId)); }
   @Put('/:workerId')
-  updateWorker(@Req() req: AuthenticatedRequest, @Param('workerId') workerId: string, @Body() body: UpdateWorkerDto) {
-    return this.workerService.updateWorker(req.user!.id, BigInt(workerId), body);
-  }
-
+  updateWorker(@Req() req: AuthenticatedRequest, @Param('workerId') workerId: string, @Body() body: UpdateWorkerDto) { return this.workerService.updateWorker(req.user!.id, BigInt(workerId), body); }
   @Patch('/:workerId/activate')
-  activateWorker(@Req() req: AuthenticatedRequest, @Param('workerId') workerId: string) {
-    return this.workerService.activateWorker(req.user!.id, BigInt(workerId));
-  }
-
+  activateWorker(@Req() req: AuthenticatedRequest, @Param('workerId') workerId: string) { return this.workerService.activateWorker(req.user!.id, BigInt(workerId)); }
   @Patch('/:workerId/deactivate')
-  deactivateWorker(@Req() req: AuthenticatedRequest, @Param('workerId') workerId: string) {
-    return this.workerService.deactivateWorker(req.user!.id, BigInt(workerId));
-  }
+  deactivateWorker(@Req() req: AuthenticatedRequest, @Param('workerId') workerId: string) { return this.workerService.deactivateWorker(req.user!.id, BigInt(workerId)); }
 }
