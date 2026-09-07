@@ -10,7 +10,7 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import DoctorDashboard from "./pages/doctor/DoctorDashboard";
 import WorkerManagement from "./pages/hospital/WorkerManagement";
 import WorkerQrScanner from "./pages/hospital/WorkerQrScanner";
-import FindWorker from "./pages/hospital/FIndWorker";
+import FindWorker from "./pages/hospital/FindWorker";
 import WorkerProfile from "./pages/hospital/WorkerProfile";
 import MyWorkers from "./pages/doctor/MyWorkers";
 import WorkerDashboard from "./pages/worker/WorkerDashboard";
