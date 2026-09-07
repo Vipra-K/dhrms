@@ -22,11 +22,6 @@ export class DoctorController {
     return this.doctorService.getHospitalDoctors(req.user!.id);
   }
 
-  @Get('/hospital/doctors')
-  getHospitalDoctors(@Req() req: AuthenticatedRequest) {
-    return this.doctorService.getDoctorsForHospital(req.user!.id);
-  }
-
   @Get('/:doctorId')
   getDoctor(@Req() req: AuthenticatedRequest, @Param('doctorId') doctorId: string) {
     return this.doctorService.getDoctor(req.user!.id, BigInt(doctorId));
