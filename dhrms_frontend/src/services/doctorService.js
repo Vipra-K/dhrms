@@ -8,5 +8,6 @@ export const activateDoctor = async (doctorId) => (await api.patch(`/hospitals/d
 export const suspendDoctor = async (doctorId) => (await api.patch(`/hospitals/doctors/${doctorId}/suspend`)).data;
 export const deactivateDoctor = async (doctorId) => (await api.patch(`/hospitals/doctors/${doctorId}/deactivate`)).data;
 export const getMyDoctorProfile = async () => (await api.get("/doctors/me")).data;
+export const getMyDoctorDashboard = async () => (await api.get("/doctors/me/dashboard")).data;
 export const getHospitalDoctors = async () => (await api.get("/hospitals/doctors")).data;
 export const getMyWorkers = async () => (await api.get("/doctors/me/workers")).data;
