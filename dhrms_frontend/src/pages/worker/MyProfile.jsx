@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import RoleLayout from "../../components/RoleLayout";
 import { getApiError } from "../../services/api";
 import { getMyWorkerProfile, updateMyWorkerProfile } from "../../services/workerService";
@@ -24,18 +24,39 @@ const MyProfile = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const loadProfile = async () => {
-    try { setError(""); const data = await getMyWorkerProfile(); setWorker(data); setForm(data); }
-    catch (err) { setError(getApiError(err, "Failed to load profile.")); }
-    finally { setLoading(false); }
-  };
-  useEffect(() => { loadProfile(); }, []);
+  const loadProfile = useCallback(async () => {
+    try {
+      setError("");
+      const data = await getMyWorkerProfile();
+      setWorker(data);
+      setForm(data);
+    } catch (err) {
+      setError(getApiError(err, "Failed to load profile."));
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadProfile();
+  }, [loadProfile]);
 
   const save = async (event) => {
-    event.preventDefault(); setSaving(true); setError(""); setSuccess("");
-    try { const updated = await updateMyWorkerProfile(form); setWorker({ ...worker, ...updated }); setForm({ ...form, ...updated }); setEditing(false); setSuccess("Profile updated successfully."); }
-    catch (err) { setError(getApiError(err, "Unable to update profile.")); }
-    finally { setSaving(false); }
+    event.preventDefault();
+    setSaving(true);
+    setError("");
+    setSuccess("");
+    try {
+      const updated = await updateMyWorkerProfile(form);
+      setWorker((current) => ({ ...current, ...updated }));
+      setForm((current) => ({ ...current, ...updated }));
+      setEditing(false);
+      setSuccess("Profile updated successfully.");
+    } catch (err) {
+      setError(getApiError(err, "Unable to update profile."));
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (loading) return <RoleLayout title="My Profile"><div className="loading-card">Loading profile…</div></RoleLayout>;
