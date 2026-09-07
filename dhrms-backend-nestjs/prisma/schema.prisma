@@ -34,7 +34,7 @@ model Hospital {
   id BigInt @id @default(autoincrement())
   userId BigInt @unique @map("user_id")
   hfrFacilityId BigInt @map("hfr_facility_id")
-  hospitalCode String @map("hospital_code") @db.VarChar(50)
+  hospitalCode String @unique @map("hospital_code") @db.VarChar(50)
   name String @db.VarChar(255)
   address String? @db.VarChar(300)
   city String? @db.VarChar(100)

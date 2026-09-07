@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateWorkerDto } from './dto/create-worker.dto';
@@ -11,6 +11,7 @@ export class WorkerService {
   private async getHospitalByUserId(userId: bigint) {
     const hospital = await this.prisma.hospital.findUnique({ where: { userId } });
     if (!hospital) throw new NotFoundException('Hospital profile not found');
+    if (hospital.status !== 'ACTIVE') throw new ForbiddenException('Hospital account is not active');
     return hospital;
   }
 
@@ -26,34 +27,37 @@ export class WorkerService {
     const existing = await this.prisma.user.findUnique({ where: { email: request.email } });
     if (existing) throw new BadRequestException('Email is already registered');
 
-    const user = await this.prisma.user.create({
-      data: { email: request.email, passwordHash: await bcrypt.hash(request.password, 10), role: 'WORKER', status: 'ACTIVE' },
+    const result = await this.prisma.$transaction(async (tx) => {
+      const user = await tx.user.create({
+        data: { email: request.email, passwordHash: await bcrypt.hash(request.password, 10), role: 'WORKER', status: 'ACTIVE' },
+      });
+
+      let workerCode: string;
+      do {
+        workerCode = `DHRMS-WKR-${Math.floor(Math.random() * 100000000).toString().padStart(8, '0')}`;
+      } while (await tx.worker.findUnique({ where: { workerCode } }));
+
+      const worker = await tx.worker.create({
+        data: {
+          userId: user.id,
+          hospitalId: hospital.id,
+          workerCode,
+          fullName: request.fullName,
+          dateOfBirth: request.dateOfBirth ? new Date(request.dateOfBirth) : undefined,
+          gender: request.gender,
+          bloodGroup: request.bloodGroup,
+          phone: request.phone,
+          address: request.address,
+          emergencyContactName: request.emergencyContactName,
+          emergencyContactPhone: request.emergencyContactPhone,
+          emergencyContactRelation: request.emergencyContactRelation,
+          active: true,
+        },
+      });
+      return worker;
     });
 
-    let workerCode: string;
-    do {
-      workerCode = `DHRMS-WKR-${Math.floor(Math.random() * 100000000).toString().padStart(8, '0')}`;
-    } while (await this.prisma.worker.findUnique({ where: { workerCode } }));
-
-    const worker = await this.prisma.worker.create({
-      data: {
-        userId: user.id,
-        hospitalId: hospital.id,
-        workerCode,
-        fullName: request.fullName,
-        dateOfBirth: request.dateOfBirth ? new Date(request.dateOfBirth) : undefined,
-        gender: request.gender,
-        bloodGroup: request.bloodGroup,
-        phone: request.phone,
-        address: request.address,
-        emergencyContactName: request.emergencyContactName,
-        emergencyContactPhone: request.emergencyContactPhone,
-        emergencyContactRelation: request.emergencyContactRelation,
-        active: true,
-      },
-    });
-
-    return { ...this.toResponse(worker), hospitalId: Number(hospital.id), assignedDoctor: null };
+    return { ...this.toResponse(result), hospitalId: Number(hospital.id), assignedDoctor: null };
   }
 
   async getWorkers(hospitalUserId: bigint) {
@@ -85,7 +89,7 @@ export class WorkerService {
   async getWorkerForDoctor(doctorUserId: bigint, workerId: bigint) {
     const doctor = await this.prisma.doctor.findUnique({ where: { userId: doctorUserId } });
     if (!doctor) throw new NotFoundException('Doctor profile not found');
-    const assignment = await this.prisma.doctorWorkerAssignment.findFirst({ where: { doctorId: doctor.id, workerId, active: true } });
+    const assignment = await this.prisma.doctorWorkerAssignment.findFirst({ where: { doctorId: doctor.id, workerId, active: true }, include: { doctor: true } });
     if (!assignment) throw new NotFoundException('Worker is not assigned to you');
     const worker = await this.prisma.worker.findUnique({ where: { id: workerId } });
     if (!worker) throw new NotFoundException('Worker not found');
@@ -104,7 +108,11 @@ export class WorkerService {
   async deactivateWorker(hospitalUserId: bigint, workerId: bigint) {
     await this.getOwnedWorker(hospitalUserId, workerId);
     const updated = await this.prisma.$transaction(async (tx) => {
+      const worker = await tx.worker.findUnique({ where: { id: workerId } });
+      if (!worker) throw new NotFoundException('Worker not found');
       await tx.doctorWorkerAssignment.updateMany({ where: { workerId, active: true }, data: { active: false, endedAt: new Date() } });
+      await tx.workerQrCode.updateMany({ where: { workerId, status: 'ACTIVE' }, data: { status: 'REVOKED', revokedAt: new Date() } });
+      if (worker.userId) await tx.user.update({ where: { id: worker.userId }, data: { status: 'INACTIVE' } });
       return tx.worker.update({ where: { id: workerId }, data: { active: false } });
     });
     return this.toResponse(updated);
@@ -112,7 +120,12 @@ export class WorkerService {
 
   async activateWorker(hospitalUserId: bigint, workerId: bigint) {
     await this.getOwnedWorker(hospitalUserId, workerId);
-    return this.toResponse(await this.prisma.worker.update({ where: { id: workerId }, data: { active: true } }));
+    const updated = await this.prisma.$transaction(async (tx) => {
+      const worker = await tx.worker.update({ where: { id: workerId }, data: { active: true } });
+      if (worker.userId) await tx.user.update({ where: { id: worker.userId }, data: { status: 'ACTIVE' } });
+      return worker;
+    });
+    return this.toResponse(updated);
   }
 
   async getMyProfile(userId: bigint) {
@@ -131,6 +144,7 @@ export class WorkerService {
   async updateMyProfile(userId: bigint, request: UpdateWorkerDto) {
     const worker = await this.prisma.worker.findUnique({ where: { userId } });
     if (!worker) throw new NotFoundException('Worker profile not found');
+    if (!worker.active) throw new ForbiddenException('Worker account is inactive');
     const updated = await this.prisma.worker.update({ where: { id: worker.id }, data: { ...request, dateOfBirth: request.dateOfBirth ? new Date(request.dateOfBirth) : undefined } });
     return this.toResponse(updated);
   }

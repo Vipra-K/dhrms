@@ -8,6 +8,7 @@ export class AssignmentService {
   private async hospital(userId: bigint) {
     const hospital = await this.prisma.hospital.findUnique({ where: { userId } });
     if (!hospital) throw new NotFoundException('Hospital profile not found');
+    if (hospital.status !== 'ACTIVE') throw new ForbiddenException('Hospital account is not active');
     return hospital;
   }
 
@@ -25,6 +26,7 @@ export class AssignmentService {
     if (!doctor) throw new NotFoundException('Doctor not found');
     if (doctor.hospitalId !== hospital.id) throw new ForbiddenException('Doctor does not belong to this hospital');
     if (doctor.status !== 'ACTIVE') throw new BadRequestException('Doctor is not active');
+    if (doctor.role === 'READ_ONLY') throw new BadRequestException('Read-only doctors cannot be assigned to workers');
     if (!worker.active) throw new BadRequestException('Inactive workers cannot be assigned');
 
     const current = await this.prisma.doctorWorkerAssignment.findFirst({ where: { workerId, hospitalId: hospital.id, active: true }, include: { doctor: true, worker: true } });
@@ -53,7 +55,7 @@ export class AssignmentService {
     const hospital = await this.hospital(hospitalUserId);
     const worker = await this.prisma.worker.findFirst({ where: { id: workerId, hospitalId: hospital.id } });
     if (!worker) throw new NotFoundException('Worker not found in this hospital');
-    const assignments = await this.prisma.doctorWorkerAssignment.findMany({ where: { workerId, hospitalId: hospital.id }, include: { doctor: true }, orderBy: { assignedAt: 'desc' } });
+    const assignments = await this.prisma.doctorWorkerAssignment.findMany({ where: { workerId, hospitalId: hospital.id }, include: { doctor: true, worker: true }, orderBy: { assignedAt: 'desc' } });
     return assignments.map((assignment) => this.historyResponse(assignment));
   }
 

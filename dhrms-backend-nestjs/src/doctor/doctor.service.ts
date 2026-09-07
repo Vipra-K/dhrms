@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateDoctorDto, DoctorRole } from './dto/create-doctor.dto';
@@ -11,6 +11,7 @@ export class DoctorService {
   private async hospital(userId: bigint) {
     const hospital = await this.prisma.hospital.findUnique({ where: { userId } });
     if (!hospital) throw new NotFoundException('Hospital profile not found');
+    if (hospital.status !== 'ACTIVE') throw new ForbiddenException('Hospital account is not active');
     return hospital;
   }
 
@@ -41,9 +42,7 @@ export class DoctorService {
     const [assignedWorkers, visitsToday, recentRecords] = await Promise.all([
       this.prisma.doctorWorkerAssignment.count({ where: { doctorId: doctor.id, active: true } }),
       this.prisma.medicalRecord.count({ where: { doctorId: doctor.id, visitDate: { gte: startOfDay, lt: endOfDay } } }),
-      this.prisma.medicalRecord.findMany({
-        where: { doctorId: doctor.id }, include: { worker: true }, orderBy: { visitDate: 'desc' }, take: 5,
-      }),
+      this.prisma.medicalRecord.findMany({ where: { doctorId: doctor.id }, include: { worker: true }, orderBy: { visitDate: 'desc' }, take: 5 }),
     ]);
 
     return {
@@ -55,13 +54,15 @@ export class DoctorService {
 
   async createDoctor(hospitalUserId: bigint, request: CreateDoctorDto) {
     const hospital = await this.hospital(hospitalUserId);
-    if (await this.prisma.user.findUnique({ where: { email: request.email } })) throw new Error('Email is already registered');
-    if (request.licenseNumber && await this.prisma.doctor.findUnique({ where: { licenseNumber: request.licenseNumber } })) throw new Error('License number is already registered');
+    if (await this.prisma.user.findUnique({ where: { email: request.email } })) throw new BadRequestException('Email is already registered');
+    if (request.licenseNumber && await this.prisma.doctor.findUnique({ where: { licenseNumber: request.licenseNumber } })) throw new BadRequestException('License number is already registered');
 
-    const user = await this.prisma.user.create({ data: { email: request.email, passwordHash: await bcrypt.hash(request.password, 10), role: 'DOCTOR', status: 'ACTIVE' } });
-    const doctor = await this.prisma.doctor.create({
-      data: { userId: user.id, hospitalId: hospital.id, fullName: request.fullName, specialization: request.specialization, licenseNumber: request.licenseNumber, department: request.department, role: request.role ?? DoctorRole.JUNIOR_DOCTOR, status: 'ACTIVE', workingHoursStart: request.workingHoursStart, workingHoursEnd: request.workingHoursEnd },
-      include: { user: true },
+    const doctor = await this.prisma.$transaction(async (tx) => {
+      const user = await tx.user.create({ data: { email: request.email, passwordHash: await bcrypt.hash(request.password, 10), role: 'DOCTOR', status: 'ACTIVE' } });
+      return tx.doctor.create({
+        data: { userId: user.id, hospitalId: hospital.id, fullName: request.fullName, specialization: request.specialization, licenseNumber: request.licenseNumber, department: request.department, role: request.role ?? DoctorRole.JUNIOR_DOCTOR, status: 'ACTIVE', workingHoursStart: request.workingHoursStart, workingHoursEnd: request.workingHoursEnd },
+        include: { user: true },
+      });
     });
     return this.response(doctor);
   }
@@ -82,7 +83,7 @@ export class DoctorService {
     const hospital = await this.hospital(hospitalUserId);
     const doctor = await this.prisma.doctor.findUnique({ where: { id: doctorId }, include: { user: true } });
     if (!doctor) throw new NotFoundException('Doctor not found');
-    if (doctor.hospitalId !== hospital.id) throw new Error('Doctor does not belong to this hospital');
+    if (doctor.hospitalId !== hospital.id) throw new ForbiddenException('Doctor does not belong to this hospital');
     return this.response(doctor);
   }
 
@@ -90,8 +91,8 @@ export class DoctorService {
     const hospital = await this.hospital(hospitalUserId);
     const doctor = await this.prisma.doctor.findUnique({ where: { id: doctorId } });
     if (!doctor) throw new NotFoundException('Doctor not found');
-    if (doctor.hospitalId !== hospital.id) throw new Error('Doctor does not belong to this hospital');
-    if (request.licenseNumber && await this.prisma.doctor.findFirst({ where: { licenseNumber: request.licenseNumber, NOT: { id: doctorId } } })) throw new Error('License number is already registered');
+    if (doctor.hospitalId !== hospital.id) throw new ForbiddenException('Doctor does not belong to this hospital');
+    if (request.licenseNumber && await this.prisma.doctor.findFirst({ where: { licenseNumber: request.licenseNumber, NOT: { id: doctorId } } })) throw new BadRequestException('License number is already registered');
     const updated = await this.prisma.doctor.update({ where: { id: doctorId }, data: request, include: { user: true } });
     return this.response(updated);
   }
@@ -100,7 +101,7 @@ export class DoctorService {
     const hospital = await this.hospital(hospitalUserId);
     const doctor = await this.prisma.doctor.findUnique({ where: { id: doctorId } });
     if (!doctor) throw new NotFoundException('Doctor not found');
-    if (doctor.hospitalId !== hospital.id) throw new Error('Doctor does not belong to this hospital');
+    if (doctor.hospitalId !== hospital.id) throw new ForbiddenException('Doctor does not belong to this hospital');
     const updated = await this.prisma.$transaction(async (tx) => {
       const result = await tx.doctor.update({ where: { id: doctorId }, data: { status }, include: { user: true } });
       await tx.user.update({ where: { id: doctor.userId }, data: { status: status === 'ACTIVE' ? 'ACTIVE' : 'INACTIVE' } });

@@ -19,6 +19,11 @@ export class MedicalService {
     return assignment;
   }
 
+  private assertCanWrite(doctor: any) {
+    if (doctor.role === 'READ_ONLY') throw new ForbiddenException('Read-only doctors cannot modify clinical records');
+    if (doctor.status !== 'ACTIVE') throw new ForbiddenException('Only active doctors can modify clinical records');
+  }
+
   async listWorkerRecords(userId: bigint, workerId: bigint) {
     const doctor = await this.doctor(userId); await this.access(doctor.id, workerId);
     const records = await this.prisma.medicalRecord.findMany({ where: { workerId }, orderBy: { visitDate: 'desc' }, include: { prescriptions: true, doctor: true } });
@@ -34,13 +39,13 @@ export class MedicalService {
   }
 
   async createRecord(userId: bigint, workerId: bigint, dto: MedicalRecordDto) {
-    const doctor = await this.doctor(userId); const assignment = await this.access(doctor.id, workerId);
+    const doctor = await this.doctor(userId); this.assertCanWrite(doctor); const assignment = await this.access(doctor.id, workerId);
     const record = await this.prisma.medicalRecord.create({ data: { workerId, doctorId: doctor.id, hospitalId: assignment.hospitalId, visitDate: new Date(dto.visitDate), symptoms: dto.symptoms, diagnosis: dto.diagnosis, treatment: dto.treatment, notes: dto.notes }, include: { prescriptions: true, doctor: true } });
     return this.recordResponse(record, doctor.id);
   }
 
   async updateRecord(userId: bigint, recordId: bigint, dto: MedicalRecordDto) {
-    const doctor = await this.doctor(userId);
+    const doctor = await this.doctor(userId); this.assertCanWrite(doctor);
     const record = await this.prisma.medicalRecord.findUnique({ where: { id: recordId } });
     if (!record) throw new NotFoundException('Medical record not found');
     await this.access(doctor.id, record.workerId);
@@ -59,7 +64,7 @@ export class MedicalService {
   }
 
   async createPrescription(userId: bigint, recordId: bigint, dto: PrescriptionDto) {
-    const doctor = await this.doctor(userId);
+    const doctor = await this.doctor(userId); this.assertCanWrite(doctor);
     const record = await this.prisma.medicalRecord.findUnique({ where: { id: recordId } });
     if (!record) throw new NotFoundException('Medical record not found');
     await this.access(doctor.id, record.workerId);
@@ -69,7 +74,7 @@ export class MedicalService {
   }
 
   async updatePrescription(userId: bigint, prescriptionId: bigint, dto: PrescriptionDto) {
-    const doctor = await this.doctor(userId);
+    const doctor = await this.doctor(userId); this.assertCanWrite(doctor);
     const p = await this.prisma.prescription.findUnique({ where: { id: prescriptionId } });
     if (!p) throw new NotFoundException('Prescription not found');
     await this.access(doctor.id, p.workerId);
