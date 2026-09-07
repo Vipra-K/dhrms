@@ -20,8 +20,7 @@ export class MedicalService {
   }
 
   async listWorkerRecords(userId: bigint, workerId: bigint) {
-    const doctor = await this.doctor(userId);
-    await this.access(doctor.id, workerId);
+    const doctor = await this.doctor(userId); await this.access(doctor.id, workerId);
     const records = await this.prisma.medicalRecord.findMany({ where: { workerId }, orderBy: { visitDate: 'desc' }, include: { prescriptions: true, doctor: true } });
     return records.map(r => this.recordResponse(r, doctor.id));
   }
@@ -64,6 +63,7 @@ export class MedicalService {
     const record = await this.prisma.medicalRecord.findUnique({ where: { id: recordId } });
     if (!record) throw new NotFoundException('Medical record not found');
     await this.access(doctor.id, record.workerId);
+    if (record.doctorId !== doctor.id) throw new ForbiddenException('Only the doctor who created this visit can add prescriptions');
     const p = await this.prisma.prescription.create({ data: { medicalRecordId: recordId, workerId: record.workerId, doctorId: doctor.id, medicineName: dto.medicineName, dosage: dto.dosage, frequency: dto.frequency, duration: dto.duration, instructions: dto.instructions } });
     return this.prescriptionResponse(p, doctor.id);
   }
