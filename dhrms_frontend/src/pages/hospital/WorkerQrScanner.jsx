@@ -22,8 +22,9 @@ const WorkerQrScanner = () => {
       try {
         await scanner.clear();
         scannerRef.current = null;
+        const workerData = await lookupWorkerByQr(decodedText);
         setScanning(false);
-        setWorker(await lookupWorkerByQr(decodedText));
+        setWorker(workerData);
       } catch (err) {
         setScanning(false);
         setError(getApiError(err, "Invalid or expired worker QR code."));
@@ -33,11 +34,25 @@ const WorkerQrScanner = () => {
   };
 
   useEffect(() => {
-    startScanner();
+    const scanner = new Html5QrcodeScanner("worker-qr-reader", { fps: 10, qrbox: { width: 250, height: 250 } }, false);
+    scannerRef.current = scanner;
+    const onScanSuccess = async (decodedText) => {
+      try {
+        await scanner.clear();
+        scannerRef.current = null;
+        const workerData = await lookupWorkerByQr(decodedText);
+        setScanning(false);
+        setWorker(workerData);
+      } catch (err) {
+        setScanning(false);
+        setError(getApiError(err, "Invalid or expired worker QR code."));
+      }
+    };
+    scanner.render(onScanSuccess, () => {});
+
     return () => {
-      const scanner = scannerRef.current;
       scannerRef.current = null;
-      if (scanner) scanner.clear().catch(() => {});
+      scanner.clear().catch(() => {});
     };
   }, []);
 
