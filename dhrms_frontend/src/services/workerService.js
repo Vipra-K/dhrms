@@ -14,7 +14,6 @@ export const getWorkerAssignment = async (workerId) => (await api.get(`/hospital
 export const getWorkerAssignmentHistory = async (workerId) => (await api.get(`/hospitals/workers/${workerId}/assignment/history`)).data;
 export const assignWorkerToDoctor = async (workerId, doctorId) => (await api.post(`/hospitals/workers/${workerId}/assignment`, { doctorId })).data;
 export const getMyWorker = async (workerId) => (await api.get(`/doctors/me/workers/${workerId}`)).data;
-export const getMyDoctorDashboard = async () => (await api.get("/doctors/me/dashboard")).data;
 export const getMyWorkerProfile = async () => (await api.get("/workers/me")).data;
 export const updateMyWorkerProfile = async (worker) => (await api.put("/workers/me", worker)).data;
 export const getMyWorkerMedicalRecords = async () => (await api.get("/workers/me/medical-records")).data;
