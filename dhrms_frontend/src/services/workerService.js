@@ -9,10 +9,18 @@ export const activateWorker = async (workerId) => (await api.patch(`/hospitals/w
 export const deactivateWorker = async (workerId) => (await api.patch(`/hospitals/workers/${workerId}/deactivate`)).data;
 export const generateWorkerQr = async (workerId) => (await api.post(`/hospitals/workers/${workerId}/qr`)).data;
 export const viewWorkerQr = async (workerId) => (await api.get(`/hospitals/workers/${workerId}/qr`)).data;
+export const getOrCreateWorkerQr = async (workerId) => {
+  try {
+    return await viewWorkerQr(workerId);
+  } catch (error) {
+    if (error?.response?.status !== 404) throw error;
+    return generateWorkerQr(workerId);
+  }
+};
 export const lookupWorkerByQr = async (qrContent) => (await api.post("/hospitals/workers/qr/lookup", { qrContent })).data;
 export const getWorkerAssignment = async (workerId) => (await api.get(`/hospitals/workers/${workerId}/assignment`)).data;
 export const getWorkerAssignmentHistory = async (workerId) => (await api.get(`/hospitals/workers/${workerId}/assignment/history`)).data;
-export const assignWorkerToDoctor = async (workerId, doctorId) => (await api.post(`/hospitals/workers/${workerId}/assignment`, { doctorId })).data;
+export const assignWorkerToDoctor = async (workerId, doctorId) => (await api.post(`/hospitals/workers/${workerId}/assignment`, { doctorId: String(doctorId) })).data;
 export const getMyWorker = async (workerId) => (await api.get(`/doctors/me/workers/${workerId}`)).data;
 export const getMyWorkerProfile = async () => (await api.get("/workers/me")).data;
 export const updateMyWorkerProfile = async (worker) => (await api.put("/workers/me", worker)).data;
