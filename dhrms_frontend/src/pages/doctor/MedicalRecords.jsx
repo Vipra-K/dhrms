@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getMedicalRecords, createMedicalRecord, updateMedicalRecord, createPrescription, updatePrescription } from "../../services/MedicalService";
+import { getMedicalRecords, createMedicalRecord, updateMedicalRecord, createPrescription, updatePrescription } from "../../services/medicalService";
 import { getApiError } from "../../services/api";
 
 const blankRecord = { visitDate: "", symptoms: "", diagnosis: "", treatment: "", notes: "" };
