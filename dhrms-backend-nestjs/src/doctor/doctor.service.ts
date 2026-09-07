@@ -16,17 +16,10 @@ export class DoctorService {
 
   private response(doctor: any) {
     return {
-      id: Number(doctor.id),
-      fullName: doctor.fullName,
-      email: doctor.user.email,
-      specialization: doctor.specialization,
-      licenseNumber: doctor.licenseNumber,
-      department: doctor.department,
-      role: doctor.role,
-      status: doctor.status,
-      workingHoursStart: doctor.workingHoursStart,
-      workingHoursEnd: doctor.workingHoursEnd,
-      hospitalId: Number(doctor.hospitalId),
+      id: Number(doctor.id), fullName: doctor.fullName, email: doctor.user.email,
+      specialization: doctor.specialization, licenseNumber: doctor.licenseNumber, department: doctor.department,
+      role: doctor.role, status: doctor.status, workingHoursStart: doctor.workingHoursStart,
+      workingHoursEnd: doctor.workingHoursEnd, hospitalId: Number(doctor.hospitalId),
     };
   }
 
@@ -36,6 +29,30 @@ export class DoctorService {
     return this.response(doctor);
   }
 
+  async getMyDashboard(userId: bigint) {
+    const doctor = await this.prisma.doctor.findUnique({ where: { userId }, include: { user: true } });
+    if (!doctor) throw new NotFoundException('Doctor profile not found');
+
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(startOfDay);
+    endOfDay.setDate(endOfDay.getDate() + 1);
+
+    const [assignedWorkers, visitsToday, recentRecords] = await Promise.all([
+      this.prisma.doctorWorkerAssignment.count({ where: { doctorId: doctor.id, active: true } }),
+      this.prisma.medicalRecord.count({ where: { doctorId: doctor.id, visitDate: { gte: startOfDay, lt: endOfDay } } }),
+      this.prisma.medicalRecord.findMany({
+        where: { doctorId: doctor.id }, include: { worker: true }, orderBy: { visitDate: 'desc' }, take: 5,
+      }),
+    ]);
+
+    return {
+      doctor: this.response(doctor),
+      counts: { assignedWorkers, visitsToday },
+      recentVisits: recentRecords.map((record) => ({ id: Number(record.id), visitDate: record.visitDate, workerId: Number(record.workerId), workerCode: record.worker.workerCode, workerName: record.worker.fullName, diagnosis: record.diagnosis })),
+    };
+  }
+
   async createDoctor(hospitalUserId: bigint, request: CreateDoctorDto) {
     const hospital = await this.hospital(hospitalUserId);
     if (await this.prisma.user.findUnique({ where: { email: request.email } })) throw new Error('Email is already registered');
@@ -43,18 +60,7 @@ export class DoctorService {
 
     const user = await this.prisma.user.create({ data: { email: request.email, passwordHash: await bcrypt.hash(request.password, 10), role: 'DOCTOR', status: 'ACTIVE' } });
     const doctor = await this.prisma.doctor.create({
-      data: {
-        userId: user.id,
-        hospitalId: hospital.id,
-        fullName: request.fullName,
-        specialization: request.specialization,
-        licenseNumber: request.licenseNumber,
-        department: request.department,
-        role: request.role ?? DoctorRole.JUNIOR_DOCTOR,
-        status: 'ACTIVE',
-        workingHoursStart: request.workingHoursStart,
-        workingHoursEnd: request.workingHoursEnd,
-      },
+      data: { userId: user.id, hospitalId: hospital.id, fullName: request.fullName, specialization: request.specialization, licenseNumber: request.licenseNumber, department: request.department, role: request.role ?? DoctorRole.JUNIOR_DOCTOR, status: 'ACTIVE', workingHoursStart: request.workingHoursStart, workingHoursEnd: request.workingHoursEnd },
       include: { user: true },
     });
     return this.response(doctor);
@@ -62,13 +68,13 @@ export class DoctorService {
 
   async getHospitalDoctors(hospitalUserId: bigint) {
     const hospital = await this.hospital(hospitalUserId);
-    const doctors = await this.prisma.doctor.findMany({ where: { hospitalId: hospital.id }, include: { user: true } });
+    const doctors = await this.prisma.doctor.findMany({ where: { hospitalId: hospital.id }, include: { user: true }, orderBy: { fullName: 'asc' } });
     return doctors.map((doctor) => this.response(doctor));
   }
 
   async getDoctorsForHospital(hospitalUserId: bigint) {
     const hospital = await this.hospital(hospitalUserId);
-    const doctors = await this.prisma.doctor.findMany({ where: { hospitalId: hospital.id, status: 'ACTIVE' }, include: { user: true } });
+    const doctors = await this.prisma.doctor.findMany({ where: { hospitalId: hospital.id, status: 'ACTIVE' }, include: { user: true }, orderBy: { fullName: 'asc' } });
     return doctors.map((doctor) => this.response(doctor));
   }
 
@@ -86,7 +92,6 @@ export class DoctorService {
     if (!doctor) throw new NotFoundException('Doctor not found');
     if (doctor.hospitalId !== hospital.id) throw new Error('Doctor does not belong to this hospital');
     if (request.licenseNumber && await this.prisma.doctor.findFirst({ where: { licenseNumber: request.licenseNumber, NOT: { id: doctorId } } })) throw new Error('License number is already registered');
-
     const updated = await this.prisma.doctor.update({ where: { id: doctorId }, data: request, include: { user: true } });
     return this.response(updated);
   }
@@ -96,10 +101,10 @@ export class DoctorService {
     const doctor = await this.prisma.doctor.findUnique({ where: { id: doctorId } });
     if (!doctor) throw new NotFoundException('Doctor not found');
     if (doctor.hospitalId !== hospital.id) throw new Error('Doctor does not belong to this hospital');
-
     const updated = await this.prisma.$transaction(async (tx) => {
       const result = await tx.doctor.update({ where: { id: doctorId }, data: { status }, include: { user: true } });
       await tx.user.update({ where: { id: doctor.userId }, data: { status: status === 'ACTIVE' ? 'ACTIVE' : 'INACTIVE' } });
+      if (status !== 'ACTIVE') await tx.doctorWorkerAssignment.updateMany({ where: { doctorId, active: true }, data: { active: false, endedAt: new Date() } });
       return result;
     });
     return this.response(updated);

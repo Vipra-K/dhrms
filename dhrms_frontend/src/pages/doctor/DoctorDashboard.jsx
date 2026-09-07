@@ -1,110 +1,29 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getMyDoctorProfile } from "../../services/doctorService";
 import RoleLayout from "../../components/RoleLayout";
+import { getMyDoctorDashboard } from "../../services/doctorService";
+import { getApiError } from "../../services/api";
 
 const DoctorDashboard = () => {
   const navigate = useNavigate();
-  const [doctor, setDoctor] = useState(null);
+  const [dashboard, setDashboard] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const loadProfile = async () => {
-      try {
-        const data = await getMyDoctorProfile();
-        setDoctor(data);
-      } catch (error) {
-        setError(
-          error.response?.data?.error || "Failed to load doctor profile.",
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadProfile();
+    getMyDoctorDashboard().then(setDashboard).catch((err) => setError(getApiError(err, "Unable to load doctor dashboard."))).finally(() => setLoading(false));
   }, []);
 
-  const actions = useMemo(
-    () => [
-      {
-        label: "My Workers",
-        onClick: () => navigate("/doctor/workers"),
-      },
-    ],
-    [navigate],
-  );
+  if (loading) return <RoleLayout title="Doctor dashboard"><div className="loading-card">Loading your clinical workspace…</div></RoleLayout>;
+  if (error) return <RoleLayout title="Doctor dashboard"><div className="alert error">{error}</div></RoleLayout>;
 
-  if (loading) {
-    return (
-      <div className="content-area">
-        <div className="loading-card">Loading dashboard…</div>
-      </div>
-    );
-  }
+  const { doctor, counts, recentVisits } = dashboard;
 
-  if (error) {
-    return (
-      <div className="content-area">
-        <div className="alert error">{error}</div>
-      </div>
-    );
-  }
-
-  return (
-    <RoleLayout
-      title="Doctor Dashboard"
-      description="Overview of your profile and current worker assignments."
-      actions={actions}
-    >
-      <div className="card-row">
-        <article className="card">
-          <h3>Your profile</h3>
-          <p>
-            <strong>Name:</strong> {doctor.fullName}
-          </p>
-          <p>
-            <strong>Email:</strong> {doctor.email}
-          </p>
-          <p>
-            <strong>Specialization:</strong>{" "}
-            {doctor.specialization || "Not specified"}
-          </p>
-          <p>
-            <strong>Department:</strong> {doctor.department || "Not specified"}
-          </p>
-          <p>
-            <strong>License:</strong> {doctor.licenseNumber || "Not specified"}
-          </p>
-        </article>
-
-        <article className="card">
-          <h3>Next steps</h3>
-          <p>
-            Open your assigned workers and add medical records from the worker
-            profile.
-          </p>
-          <div className="page-actions">
-            <button
-              type="button"
-              className="button button-primary"
-              onClick={() => navigate("/doctor/workers")}
-            >
-              View Workers
-            </button>
-            <button
-              type="button"
-              className="button button-secondary"
-              onClick={() => navigate("/doctor/workers")}
-            >
-              Medical Records
-            </button>
-          </div>
-        </article>
-      </div>
-    </RoleLayout>
-  );
+  return <RoleLayout title={`Welcome, ${doctor.fullName}`} description={`${doctor.specialization || "Doctor"}${doctor.department ? ` · ${doctor.department}` : ""}`} actions={[{ label: "View assigned workers", onClick: () => navigate("/doctor/workers") }]}>
+    <div className="dashboard-welcome"><div><span className="eyebrow">Clinical workspace</span><h2>Start with the workers under your care.</h2><p>Your dashboard surfaces the people and recent visits that matter first.</p></div><div className="dashboard-mark">D</div></div>
+    <div className="card-row"><article className="card"><span className="eyebrow">Assigned workers</span><h2>{counts.assignedWorkers}</h2><p>Workers with an active assignment to you.</p><button className="button button-primary" onClick={() => navigate("/doctor/workers")}>Open workers</button></article><article className="card"><span className="eyebrow">Visits today</span><h2>{counts.visitsToday}</h2><p>Medical records recorded for today.</p></article><article className="card"><span className="eyebrow">Role</span><h2>{doctor.role.replaceAll("_", " ")}</h2><p>License: {doctor.licenseNumber || "Not specified"}</p></article></div>
+    <div className="panel"><div className="section-toolbar"><div><span className="eyebrow">Recent activity</span><h2>Recent visits</h2></div><button className="button button-secondary" onClick={() => navigate("/doctor/workers")}>View all workers</button></div>{recentVisits.length === 0 ? <div className="empty-state-card"><h3>No visits recorded yet</h3><p>Open an assigned worker to create the first clinical visit.</p></div> : <div className="table-card"><table className="table"><thead><tr><th>Worker</th><th>Date</th><th>Diagnosis</th><th /></tr></thead><tbody>{recentVisits.map((visit) => <tr key={visit.id}><td><div className="person-cell"><span className="avatar">{visit.workerName.charAt(0)}</span><div><strong>{visit.workerName}</strong><small>{visit.workerCode}</small></div></div></td><td>{new Date(visit.visitDate).toLocaleDateString()}</td><td>{visit.diagnosis}</td><td><button className="button button-ghost button-small" onClick={() => navigate(`/doctor/workers/${visit.workerId}`)}>Open worker</button></td></tr>)}</tbody></table></div>}</div>
+  </RoleLayout>;
 };
 
 export default DoctorDashboard;

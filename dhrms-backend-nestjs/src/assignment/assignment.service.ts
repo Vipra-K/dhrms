@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -19,31 +19,42 @@ export class AssignmentService {
 
   async assignWorker(hospitalUserId: bigint, workerId: bigint, doctorId: bigint) {
     const hospital = await this.hospital(hospitalUserId);
-    const worker = await this.prisma.worker.findUnique({ where: { id: workerId } });
-    if (!worker) throw new NotFoundException('Worker not found');
+    const worker = await this.prisma.worker.findFirst({ where: { id: workerId, hospitalId: hospital.id } });
+    if (!worker) throw new NotFoundException('Worker not found in this hospital');
     const doctor = await this.prisma.doctor.findUnique({ where: { id: doctorId } });
     if (!doctor) throw new NotFoundException('Doctor not found');
     if (doctor.hospitalId !== hospital.id) throw new ForbiddenException('Doctor does not belong to this hospital');
     if (doctor.status !== 'ACTIVE') throw new BadRequestException('Doctor is not active');
+    if (!worker.active) throw new BadRequestException('Inactive workers cannot be assigned');
 
-    const current = await this.prisma.doctorWorkerAssignment.findFirst({ where: { workerId, hospitalId: hospital.id, active: true } });
-    if (current) {
-      if (current.doctorId === doctor.id) return this.response(await this.prisma.doctorWorkerAssignment.findUnique({ where: { id: current.id }, include: { doctor: true, worker: true } }));
-      await this.prisma.doctorWorkerAssignment.update({ where: { id: current.id }, data: { active: false } });
-    }
+    const current = await this.prisma.doctorWorkerAssignment.findFirst({ where: { workerId, hospitalId: hospital.id, active: true }, include: { doctor: true, worker: true } });
+    if (current?.doctorId === doctor.id) return this.response(current);
 
-    const existing = await this.prisma.doctorWorkerAssignment.findUnique({ where: { doctorId_workerId_hospitalId: { doctorId, workerId, hospitalId: hospital.id } } });
-    const assignment = existing
-      ? await this.prisma.doctorWorkerAssignment.update({ where: { id: existing.id }, data: { active: true, assignedBy: hospitalUserId }, include: { doctor: true, worker: true } })
-      : await this.prisma.doctorWorkerAssignment.create({ data: { doctorId, workerId, hospitalId: hospital.id, assignedBy: hospitalUserId, active: true }, include: { doctor: true, worker: true } });
+    const assignment = await this.prisma.$transaction(async (tx) => {
+      if (current) await tx.doctorWorkerAssignment.update({ where: { id: current.id }, data: { active: false, endedAt: new Date() } });
+      return tx.doctorWorkerAssignment.create({
+        data: { doctorId, workerId, hospitalId: hospital.id, assignedBy: hospitalUserId, active: true },
+        include: { doctor: true, worker: true },
+      });
+    });
+
     return this.response(assignment);
   }
 
   async getWorkerAssignment(hospitalUserId: bigint, workerId: bigint) {
     const hospital = await this.hospital(hospitalUserId);
+    const worker = await this.prisma.worker.findFirst({ where: { id: workerId, hospitalId: hospital.id } });
+    if (!worker) throw new NotFoundException('Worker not found in this hospital');
     const assignment = await this.prisma.doctorWorkerAssignment.findFirst({ where: { workerId, hospitalId: hospital.id, active: true }, include: { doctor: true, worker: true } });
-    if (!assignment) throw new NotFoundException('Worker is not assigned to a doctor');
-    return this.response(assignment);
+    return assignment ? this.response(assignment) : null;
+  }
+
+  async getWorkerAssignmentHistory(hospitalUserId: bigint, workerId: bigint) {
+    const hospital = await this.hospital(hospitalUserId);
+    const worker = await this.prisma.worker.findFirst({ where: { id: workerId, hospitalId: hospital.id } });
+    if (!worker) throw new NotFoundException('Worker not found in this hospital');
+    const assignments = await this.prisma.doctorWorkerAssignment.findMany({ where: { workerId, hospitalId: hospital.id }, include: { doctor: true }, orderBy: { assignedAt: 'desc' } });
+    return assignments.map((assignment) => this.historyResponse(assignment));
   }
 
   async getMyWorkers(doctorUserId: bigint) {
@@ -66,11 +77,9 @@ export class AssignmentService {
   }
 
   private response(a: any) {
-    if (!a) return a;
-    return { id: Number(a.id), workerId: Number(a.workerId), workerCode: a.worker.workerCode, doctorId: Number(a.doctorId), doctorName: a.doctor.fullName, doctorSpecialization: a.doctor.specialization, hospitalId: Number(a.hospitalId), active: a.active, assignedAt: a.assignedAt };
+    return { id: Number(a.id), workerId: Number(a.workerId), workerCode: a.worker.workerCode, doctorId: Number(a.doctorId), doctorName: a.doctor.fullName, doctorSpecialization: a.doctor.specialization, hospitalId: Number(a.hospitalId), active: a.active, assignedAt: a.assignedAt, endedAt: a.endedAt };
   }
 
-  private workerResponse(w: any) {
-    return { workerId: Number(w.id), workerCode: w.workerCode, fullName: w.fullName, dateOfBirth: w.dateOfBirth, gender: w.gender, bloodGroup: w.bloodGroup, phone: w.phone };
-  }
+  private historyResponse(a: any) { return { ...this.response(a), status: a.active ? 'CURRENT' : 'ENDED' }; }
+  private workerResponse(w: any) { return { workerId: Number(w.id), workerCode: w.workerCode, fullName: w.fullName, dateOfBirth: w.dateOfBirth, gender: w.gender, bloodGroup: w.bloodGroup, phone: w.phone }; }
 }

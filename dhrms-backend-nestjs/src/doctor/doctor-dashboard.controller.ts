@@ -14,4 +14,9 @@ export class DoctorDashboardController {
   getMyProfile(@Req() req: AuthenticatedRequest) {
     return this.doctorService.getMyProfile(req.user!.id);
   }
+
+  @Get('/me/dashboard')
+  getDashboard(@Req() req: AuthenticatedRequest) {
+    return this.doctorService.getMyDashboard(req.user!.id);
+  }
 }
