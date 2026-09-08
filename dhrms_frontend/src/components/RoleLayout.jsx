@@ -22,6 +22,8 @@ const roleNavigation = {
     { to: "/worker", label: "Dashboard", end: true },
     { to: "/worker/qr", label: "My QR" },
     { to: "/worker/medical-history", label: "Medical History" },
+    { to: "/worker/prescriptions", label: "Prescriptions" },
+    { to: "/worker/documents", label: "Documents" },
     { to: "/worker/profile", label: "My Profile" },
   ],
 };
