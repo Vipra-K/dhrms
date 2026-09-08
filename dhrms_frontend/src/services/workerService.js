@@ -7,17 +7,11 @@ export const createWorker = async (worker) => (await api.post("/hospitals/worker
 export const updateWorker = async (workerId, worker) => (await api.put(`/hospitals/workers/${workerId}`, worker)).data;
 export const activateWorker = async (workerId) => (await api.patch(`/hospitals/workers/${workerId}/activate`)).data;
 export const deactivateWorker = async (workerId) => (await api.patch(`/hospitals/workers/${workerId}/deactivate`)).data;
+export const addWorkerToHospital = async (workerId) => (await api.post(`/hospitals/workers/${workerId}/relationship`)).data;
 export const terminateHospitalRelationship = async (workerId) => (await api.patch(`/hospitals/workers/${workerId}/terminate-relationship`)).data;
 export const generateWorkerQr = async (workerId) => (await api.post(`/hospitals/workers/${workerId}/qr`)).data;
 export const viewWorkerQr = async (workerId) => (await api.get(`/hospitals/workers/${workerId}/qr`)).data;
-export const getOrCreateWorkerQr = async (workerId) => {
-  try {
-    return await viewWorkerQr(workerId);
-  } catch (error) {
-    if (error?.response?.status !== 404) throw error;
-    return generateWorkerQr(workerId);
-  }
-};
+export const getOrCreateWorkerQr = async (workerId) => { try { return await viewWorkerQr(workerId); } catch (error) { if (error?.response?.status !== 404) throw error; return generateWorkerQr(workerId); } };
 export const lookupWorkerByQr = async (qrContent) => (await api.post("/hospitals/workers/qr/lookup", { qrContent })).data;
 export const lookupWorkerByPhone = async (phone) => (await api.post("/hospitals/workers/phone/lookup", { phone })).data;
 export const lookupWorkerByCode = async (workerCode) => (await api.post("/hospitals/workers/code/lookup", { workerCode })).data;

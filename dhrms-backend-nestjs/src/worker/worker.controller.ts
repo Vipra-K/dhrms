@@ -12,33 +12,15 @@ import { WorkerService } from './worker.service';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('HOSPITAL')
 export class WorkerController {
-  constructor(
-    private readonly workerQrService: WorkerQrService,
-    private readonly workerService: WorkerService,
-  ) {}
-
+  constructor(private readonly workerQrService: WorkerQrService, private readonly workerService: WorkerService) {}
   @Post('/qr/lookup')
-  lookupWorkerByQr(@Req() req: AuthenticatedRequest, @Body() body: WorkerQrLookupDto) {
-    return this.workerQrService.getWorkerFromQr(req.user!.id);
-  }
-
+  lookupWorkerByQr(@Req() req: AuthenticatedRequest, @Body() body: WorkerQrLookupDto) { return this.workerQrService.getWorkerFromQr(req.user!.id, body.qrContent); }
   @Post('/phone/lookup')
-  lookupWorkerByPhone(@Req() req: AuthenticatedRequest, @Body() body: WorkerPhoneLookupDto) {
-    return this.workerQrService.getWorkerFromPhone(req.user!.id, body.phone);
-  }
-
+  lookupWorkerByPhone(@Req() req: AuthenticatedRequest, @Body() body: WorkerPhoneLookupDto) { return this.workerQrService.getWorkerFromPhone(req.user!.id, body.phone); }
   @Post('/code/lookup')
-  lookupWorkerByCode(@Req() req: AuthenticatedRequest, @Body() body: WorkerCodeLookupDto) {
-    return this.workerQrService.getWorkerFromCode(req.user!.id, body.workerCode);
-  }
-
+  lookupWorkerByCode(@Req() req: AuthenticatedRequest, @Body() body: WorkerCodeLookupDto) { return this.workerQrService.getWorkerFromCode(req.user!.id, body.workerCode); }
   @Post('/:workerId/relationship')
-  addWorkerToHospital(@Req() req: AuthenticatedRequest, @Param('workerId') workerId: string) {
-    return this.workerService.addWorkerToHospital(req.user!.id, BigInt(workerId));
-  }
-
+  addWorkerToHospital(@Req() req: AuthenticatedRequest, @Param('workerId') workerId: string) { return this.workerService.addWorkerToHospital(req.user!.id, BigInt(workerId)); }
   @Patch('/:workerId/terminate-relationship')
-  terminateHospitalRelationship(@Req() req: AuthenticatedRequest, @Param('workerId') workerId: string) {
-    return this.workerService.terminateHospitalRelationship(req.user!.id, BigInt(workerId));
-  }
+  terminateHospitalRelationship(@Req() req: AuthenticatedRequest, @Param('workerId') workerId: string) { return this.workerService.terminateHospitalRelationship(req.user!.id, BigInt(workerId)); }
 }
