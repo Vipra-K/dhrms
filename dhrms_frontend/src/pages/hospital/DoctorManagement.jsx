@@ -18,7 +18,6 @@ const DoctorManagement = () => {
 
   const loadDoctors = useCallback(async () => {
     try {
-      setError("");
       const data = await getDoctors();
       setDoctors(data);
     } catch (err) {
@@ -29,8 +28,28 @@ const DoctorManagement = () => {
   }, []);
 
   useEffect(() => {
-    void loadDoctors();
-  }, [loadDoctors]);
+    let ignore = false;
+    const fetch = async () => {
+      try {
+        const data = await getDoctors();
+        if (!ignore) {
+          setDoctors(data);
+        }
+      } catch (err) {
+        if (!ignore) {
+          setError(getApiError(err, "Unable to load doctors."));
+        }
+      } finally {
+        if (!ignore) {
+          setInitialLoading(false);
+        }
+      }
+    };
+    fetch();
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   const handleCreate = async (event) => {
     event.preventDefault(); setError(""); setSuccess(""); setLoading(true);

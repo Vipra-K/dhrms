@@ -22,7 +22,6 @@ const WorkerManagement = () => {
 
   const loadWorkers = useCallback(async () => {
     try {
-      setError("");
       const data = await getWorkers();
       setWorkers(data);
     } catch (err) {
@@ -33,8 +32,28 @@ const WorkerManagement = () => {
   }, []);
 
   useEffect(() => {
-    void loadWorkers();
-  }, [loadWorkers]);
+    let ignore = false;
+    const fetch = async () => {
+      try {
+        const data = await getWorkers();
+        if (!ignore) {
+          setWorkers(data);
+        }
+      } catch (err) {
+        if (!ignore) {
+          setError(getApiError(err, "Unable to load workers."));
+        }
+      } finally {
+        if (!ignore) {
+          setLoading(false);
+        }
+      }
+    };
+    fetch();
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   const handleCreate = async (event) => {
     event.preventDefault(); setError(""); setSuccess(""); setSaving(true);

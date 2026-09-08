@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { getMedicalRecords, createMedicalRecord, updateMedicalRecord, createPrescription, updatePrescription } from "../../services/medicalService";
 import { getApiError } from "../../services/api";
 
@@ -18,21 +18,29 @@ const MedicalRecords = ({ workerId }) => {
   const [prescriptionRecordId, setPrescriptionRecordId] = useState(null);
   const [saving, setSaving] = useState(false);
 
-  const loadRecords = useCallback(async () => {
-    try {
-      setError("");
-      const data = await getMedicalRecords(workerId);
-      setRecords(data);
-    } catch (err) {
-      setError(getApiError(err, "Unable to load medical records."));
-    } finally {
-      setLoading(false);
-    }
-  }, [workerId]);
-
   useEffect(() => {
-    void loadRecords();
-  }, [loadRecords]);
+    let ignore = false;
+    const fetchRecords = async () => {
+      try {
+        const data = await getMedicalRecords(workerId);
+        if (!ignore) {
+          setRecords(data);
+        }
+      } catch (err) {
+        if (!ignore) {
+          setError(getApiError(err, "Unable to load medical records."));
+        }
+      } finally {
+        if (!ignore) {
+          setLoading(false);
+        }
+      }
+    };
+    fetchRecords();
+    return () => {
+      ignore = true;
+    };
+  }, [workerId]);
 
   const submitRecord = async (e) => {
     e.preventDefault();

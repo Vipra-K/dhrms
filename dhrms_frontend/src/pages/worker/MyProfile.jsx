@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import RoleLayout from "../../components/RoleLayout";
 import { getApiError } from "../../services/api";
 import { getMyWorkerProfile, updateMyWorkerProfile } from "../../services/workerService";
@@ -24,22 +24,30 @@ const MyProfile = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const loadProfile = useCallback(async () => {
-    try {
-      setError("");
-      const data = await getMyWorkerProfile();
-      setWorker(data);
-      setForm(data);
-    } catch (err) {
-      setError(getApiError(err, "Failed to load profile."));
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
   useEffect(() => {
-    void loadProfile();
-  }, [loadProfile]);
+    let ignore = false;
+    const fetchProfile = async () => {
+      try {
+        const data = await getMyWorkerProfile();
+        if (!ignore) {
+          setWorker(data);
+          setForm(data);
+        }
+      } catch (err) {
+        if (!ignore) {
+          setError(getApiError(err, "Failed to load profile."));
+        }
+      } finally {
+        if (!ignore) {
+          setLoading(false);
+        }
+      }
+    };
+    fetchProfile();
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   const save = async (event) => {
     event.preventDefault();

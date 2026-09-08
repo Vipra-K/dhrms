@@ -20,7 +20,6 @@ const WorkerProfile = () => {
 
   const load = useCallback(async () => {
     try {
-      setError("");
       const [workerData, assignmentHistory] = await Promise.all([getWorker(workerId), getWorkerAssignmentHistory(workerId)]);
       setWorker(workerData);
       setHistory(assignmentHistory);
@@ -32,8 +31,29 @@ const WorkerProfile = () => {
   }, [workerId]);
 
   useEffect(() => {
-    void load();
-  }, [load]);
+    let ignore = false;
+    const fetch = async () => {
+      try {
+        const [workerData, assignmentHistory] = await Promise.all([getWorker(workerId), getWorkerAssignmentHistory(workerId)]);
+        if (!ignore) {
+          setWorker(workerData);
+          setHistory(assignmentHistory);
+        }
+      } catch (err) {
+        if (!ignore) {
+          setError(getApiError(err, "Unable to load worker profile."));
+        }
+      } finally {
+        if (!ignore) {
+          setLoading(false);
+        }
+      }
+    };
+    fetch();
+    return () => {
+      ignore = true;
+    };
+  }, [workerId]);
 
   const openAssignment = async () => {
     try { setError(""); setDoctors(await getHospitalDoctors()); setShowAssignment(true); }
