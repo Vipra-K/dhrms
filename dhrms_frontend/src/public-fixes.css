@@ -134,39 +134,147 @@
 }
 
 @media (max-width: 900px) {
-  .public-auth-shell {
-    overflow: auto;
+  .public-auth-shell,
+  .public-auth-wrap {
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
   }
 
   .public-auth-wrap {
-    height: auto;
-    min-height: 100dvh;
-    padding: 18px;
+    padding: 12px;
   }
 
   .public-auth-card {
-    max-height: none;
+    max-height: calc(100dvh - 24px);
   }
 
   .public-auth-intro {
-    padding: 28px;
+    min-height: 0;
+    padding: 20px 24px;
+    border-right: 0;
+    border-bottom: 1px solid #202a38;
+  }
+
+  .public-auth-intro-copy {
+    margin: 14px 0 0;
+  }
+
+  .public-auth-intro h1 {
+    margin: 10px 0 6px;
+    font-size: 28px;
+  }
+
+  .public-auth-intro p {
+    font-size: 11px;
+    line-height: 1.45;
+  }
+
+  .public-auth-points {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin-top: 12px;
+  }
+
+  .public-auth-points div {
+    padding: 8px;
+    font-size: 9px;
   }
 
   .public-auth-form {
-    padding: 30px 28px;
-  }
-}
-
-@media (max-width: 700px) {
-  .public-register-grid {
-    grid-template-columns: 1fr;
+    padding: 20px 24px;
   }
 
-  .public-register-wide {
-    grid-column: auto;
+  .public-form-head {
+    margin-bottom: 12px;
+  }
+
+  .public-form-head h2 {
+    font-size: 22px;
+  }
+
+  .public-input {
+    height: 42px;
   }
 
   .public-register-card {
-    padding: 20px;
+    padding: 18px 22px;
+  }
+}
+
+@media (max-width: 520px) {
+  .public-auth-wrap {
+    padding: 8px;
+  }
+
+  .public-auth-card {
+    max-height: calc(100dvh - 16px);
+    border-radius: 16px;
+  }
+
+  .public-auth-intro {
+    padding: 14px 16px;
+  }
+
+  .public-auth-back,
+  .public-register-back {
+    width: 34px;
+    height: 34px;
+  }
+
+  .public-auth-intro-copy {
+    margin-top: 10px;
+  }
+
+  .public-auth-intro h1 {
+    font-size: 23px;
+  }
+
+  .public-auth-points {
+    display: none;
+  }
+
+  .public-auth-form {
+    padding: 16px;
+  }
+
+  .public-register-card {
+    padding: 14px;
+  }
+
+  .public-register-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .public-register-wide {
+    grid-column: 1 / -1;
+  }
+
+  .public-register-head {
+    margin-bottom: 10px;
+  }
+
+  .public-register-head h1 {
+    font-size: 23px;
+  }
+
+  .public-register-head p {
+    font-size: 10px;
+  }
+
+  .public-register-form .public-field label {
+    font-size: 9px;
+  }
+
+  .public-register-form .public-input {
+    height: 36px;
+    padding: 0 9px;
+    font-size: 10px;
+  }
+
+  .public-register-form .public-submit {
+    min-height: 38px;
+    font-size: 10px;
   }
 }
