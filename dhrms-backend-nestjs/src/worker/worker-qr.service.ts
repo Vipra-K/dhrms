@@ -18,18 +18,28 @@ export class WorkerQrService {
   async generateQr(hospitalUserId: bigint, workerId: bigint) {
     const worker = await this.ownedWorker(hospitalUserId, workerId);
     if (!worker.active) throw new BadRequestException('Cannot generate a QR code for an inactive worker');
-    const existing = await this.prisma.workerQrCode.findUnique({ where: { workerId } });
-    if (existing?.status === 'ACTIVE' && existing.qrContent) return { workerId: Number(worker.id), workerCode: worker.workerCode, qrContent: existing.qrContent, qrImage: await QRCode.toDataURL(existing.qrContent, { width: 400 }) };
-    const rawToken = randomUUID().replace(/-/g, ''); const qrContent = `DHRMS:${rawToken}`; const tokenHash = this.hashToken(rawToken);
-    if (existing) await this.prisma.workerQrCode.update({ where: { id: existing.id }, data: { tokenHash, qrContent, status: 'ACTIVE', revokedAt: null } });
-    else await this.prisma.workerQrCode.create({ data: { workerId, tokenHash, qrContent, status: 'ACTIVE' } });
-    return { workerId: Number(worker.id), workerCode: worker.workerCode, qrContent, qrImage: await QRCode.toDataURL(qrContent, { width: 400 }) };
+    return this.generateQrForWorker(worker);
   }
   async getWorkerQr(hospitalUserId: bigint, workerId: bigint) {
     const worker = await this.ownedWorker(hospitalUserId, workerId); const existing = await this.prisma.workerQrCode.findUnique({ where: { workerId } });
     if (!worker.active) throw new BadRequestException('Worker is inactive; their QR code is unavailable');
     if (!existing || existing.status !== 'ACTIVE' || !existing.qrContent) throw new NotFoundException('QR code not found');
     return { workerId: Number(worker.id), workerCode: worker.workerCode, qrContent: existing.qrContent, qrImage: await QRCode.toDataURL(existing.qrContent, { width: 400 }) };
+  }
+  async getMyWorkerQr(userId: bigint) {
+    const worker = await this.prisma.worker.findUnique({ where: { userId } });
+    if (!worker) throw new NotFoundException('Worker profile not found');
+    if (!worker.active) throw new ForbiddenException('Worker account is inactive');
+    const existing = await this.prisma.workerQrCode.findUnique({ where: { workerId: worker.id } });
+    if (!existing || existing.status !== 'ACTIVE' || !existing.qrContent) return this.generateQrForWorker(worker);
+    return { workerId: Number(worker.id), workerCode: worker.workerCode, qrContent: existing.qrContent, qrImage: await QRCode.toDataURL(existing.qrContent, { width: 500 }) };
+  }
+  private async generateQrForWorker(worker: any) {
+    const rawToken = randomUUID().replace(/-/g, ''); const qrContent = `DHRMS:${rawToken}`; const tokenHash = this.hashToken(rawToken);
+    const existing = await this.prisma.workerQrCode.findUnique({ where: { workerId: worker.id } });
+    if (existing) await this.prisma.workerQrCode.update({ where: { id: existing.id }, data: { tokenHash, qrContent, status: 'ACTIVE', revokedAt: null } });
+    else await this.prisma.workerQrCode.create({ data: { workerId: worker.id, tokenHash, qrContent, status: 'ACTIVE' } });
+    return { workerId: Number(worker.id), workerCode: worker.workerCode, qrContent, qrImage: await QRCode.toDataURL(qrContent, { width: 500 }) };
   }
   async getWorkerFromQr(hospitalUserId: bigint, qrContent: string) {
     if (!qrContent || !qrContent.startsWith('DHRMS:')) throw new BadRequestException('Invalid DHRMS QR code');
