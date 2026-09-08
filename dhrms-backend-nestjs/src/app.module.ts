@@ -8,6 +8,7 @@ import { HospitalModule } from './hospital/hospital.module';
 import { AssignmentModule } from './assignment/assignment.module';
 import { MedicalModule } from './medical/medical.module';
 import { EncounterModule } from './encounter/encounter.module';
+import { AiModule } from './ai/ai.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { EncounterModule } from './encounter/encounter.module';
     AssignmentModule,
     MedicalModule,
     EncounterModule,
+    AiModule,
   ],
 })
 export class AppModule {}
