@@ -1,13 +1,13 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';
-import { FirebaseStorageService } from './firebase-storage.service';
+import { SupabaseStorageService } from './supabase-storage.service';
 
 const ALLOWED_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'application/pdf']);
 
 @Injectable()
 export class MedicalAttachmentService {
-  constructor(private readonly prisma: PrismaService, private readonly storage: FirebaseStorageService) {}
+  constructor(private readonly prisma: PrismaService, private readonly storage: SupabaseStorageService) {}
 
   private id(value: string) {
     if (!/^\d+$/.test(value)) throw new BadRequestException('Invalid attachment identifier');
@@ -65,7 +65,7 @@ export class MedicalAttachmentService {
     const storedPaths: string[] = [];
     try {
       for (const file of files) {
-      const attachmentId = randomUUID();
+        const attachmentId = randomUUID();
         const fileName = this.safeName(file.originalname);
         const storagePath = `medical-records/${recordId}/${attachmentId}/${fileName}`;
         await this.storage.upload(storagePath, file.buffer, file.mimetype);
@@ -74,13 +74,10 @@ export class MedicalAttachmentService {
         uploaded.push(this.response(attachment));
       }
     } catch (error) {
-      // Do not leave a partially-uploaded batch visible if one file fails.
       await Promise.all(storedPaths.map((path) => this.storage.delete(path).catch(() => undefined)));
       await Promise.all(uploaded.map(async (attachment) => {
         const saved = await this.prisma.medicalRecordAttachment.findUnique({ where: { id: BigInt(attachment.id) } });
-        if (saved) {
-          await this.prisma.medicalRecordAttachment.delete({ where: { id: saved.id } }).catch(() => undefined);
-        }
+        if (saved) await this.prisma.medicalRecordAttachment.delete({ where: { id: saved.id } }).catch(() => undefined);
       }));
       throw error;
     }
