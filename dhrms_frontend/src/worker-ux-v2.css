@@ -1,0 +1,33 @@
+/* Worker UX v2 — information hierarchy and interaction layer. API/service contracts intentionally unchanged. */
+.role-worker{--ux-bg:#071417;--ux-surface:#0b2025;--ux-surface-2:#0f2930;--ux-line:rgba(147,220,215,.13);--ux-line-strong:rgba(147,220,215,.24);--ux-teal:#55d7cc;--ux-text:#effcfb;--ux-muted:#8eaaab}
+.role-worker .page-content{max-width:1320px}
+.role-worker .dashboard-welcome{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:32px}
+.role-worker .dashboard-welcome h2{max-width:850px}
+.role-worker .worker-summary-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.role-worker .worker-summary-card{position:relative;display:grid;grid-template-columns:auto minmax(0,1fr);align-items:start;gap:15px;overflow:hidden}
+.role-worker .worker-summary-card:after{content:"";position:absolute;right:-48px;bottom:-70px;width:150px;height:150px;border:1px solid rgba(85,215,204,.08);border-radius:50%;box-shadow:0 0 0 28px rgba(85,215,204,.018)}
+.role-worker .worker-summary-card h2{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.role-worker .worker-section-heading{display:flex;align-items:end;justify-content:space-between;margin-top:8px}
+.role-worker .worker-quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.role-worker .worker-quick-card{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;text-align:left;width:100%;font:inherit;color:inherit;cursor:pointer;transition:transform .18s ease,border-color .18s ease,background .18s ease}
+.role-worker .worker-quick-card:focus-visible,.role-worker .button:focus-visible,.role-worker .sidebar-link:focus-visible{outline:2px solid var(--ux-teal);outline-offset:3px}
+.role-worker .worker-quick-card strong{display:block;color:var(--ux-text);font-size:13px}
+.role-worker .worker-quick-card small{display:block;margin-top:4px;color:var(--ux-muted);font-size:10px;line-height:1.5}
+.role-worker .worker-privacy-note{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border:1px solid var(--ux-line);border-radius:14px;background:rgba(85,215,204,.035)}
+.role-worker .worker-privacy-note:before{content:"✓";display:grid;place-items:center;flex:0 0 auto;width:24px;height:24px;border-radius:8px;background:rgba(85,215,204,.09);color:var(--ux-teal);font-weight:800}
+.role-worker .worker-privacy-note strong{color:#cce9e7;font-size:11px}.role-worker .worker-privacy-note span{color:#789496;font-size:10px;line-height:1.55}
+/* Medical history: make the timeline the primary record explorer. */
+.role-worker .compact-filter{min-width:190px}.role-worker .compact-filter>span{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#668385}
+.role-worker .record-timeline{gap:12px;padding-top:4px}.role-worker .medical-record-card{grid-template-columns:128px minmax(0,1fr);transition:border-color .18s ease,box-shadow .18s ease,transform .18s ease}.role-worker .medical-record-card:hover{transform:translateY(-1px);border-color:var(--ux-line-strong);box-shadow:0 22px 60px rgba(0,0,0,.20)}
+.role-worker .record-date{padding:20px 16px}.role-worker .record-body{padding:21px}.role-worker .record-heading{display:flex;justify-content:space-between;gap:18px}.role-worker .record-heading>div{min-width:0}.role-worker .record-heading h3{overflow:hidden;text-overflow:ellipsis}.role-worker .record-fields{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:16px}.role-worker .record-fields>div{min-width:0}.role-worker .record-fields p{overflow:hidden;text-overflow:ellipsis}
+.role-worker .prescription-section{margin-top:16px;padding-top:16px}.role-worker .prescription-item{min-height:58px}.role-worker .prescription-item>div:first-child{min-width:0}.role-worker .prescription-item strong,.role-worker .prescription-item span,.role-worker .prescription-item small{overflow:hidden;text-overflow:ellipsis}
+/* Dedicated records pages share one explorer toolbar and card rhythm. */
+.role-worker .worker-page-toolbar{display:flex;align-items:end;justify-content:space-between;gap:20px;margin-bottom:4px}.role-worker .worker-page-toolbar>div{min-width:0}.role-worker .worker-page-toolbar h2{margin:4px 0 0}.role-worker .worker-page-toolbar p{max-width:720px;margin-top:5px;color:var(--ux-muted);line-height:1.55}
+.role-worker .worker-prescription-grid,.role-worker .worker-document-grid{grid-auto-rows:1fr}.role-worker .worker-prescription-card,.role-worker .worker-document-card{height:100%}
+.role-worker .worker-document-card{align-items:flex-start}.role-worker .worker-document-main{min-width:0}.role-worker .worker-document-heading h3{max-width:100%}
+/* Profile: separate identity from editable personal information. */
+.role-worker .worker-profile-summary{box-shadow:0 20px 60px rgba(0,0,0,.16)}.role-worker .worker-profile-panel{min-width:0}.role-worker .worker-profile-groups{gap:18px}.role-worker .worker-profile-groups section{padding:18px 0 0}.role-worker .worker-profile-groups section:first-child{padding-top:0}.role-worker .worker-profile-form{padding-top:4px}.role-worker .worker-profile-form .field.full{grid-column:1/-1}
+/* QR: treat the QR as a primary identity credential, with supporting guidance secondary. */
+.role-worker .worker-qr-layout{align-items:stretch}.role-worker .worker-qr-card{display:flex;flex-direction:column}.role-worker .worker-qr-frame{margin:24px auto 20px}.role-worker .worker-qr-actions{display:flex;justify-content:center;gap:9px}.role-worker .worker-qr-info{display:grid;align-content:start;gap:10px}.role-worker .worker-info-card{height:100%;display:grid;grid-template-columns:auto minmax(0,1fr);align-items:start;gap:12px}.role-worker .worker-info-card strong{color:#dcefee;font-size:11px}.role-worker .worker-info-card p{margin-top:5px;color:#7e999a;font-size:10px;line-height:1.55}
+@media(max-width:900px){.role-worker .dashboard-welcome{grid-template-columns:1fr}.role-worker .worker-summary-grid{grid-template-columns:1fr}.role-worker .worker-quick-grid{grid-template-columns:1fr}.role-worker .record-fields{grid-template-columns:1fr 1fr}.role-worker .medical-record-card{grid-template-columns:1fr}.role-worker .record-date{border-right:0;border-bottom:1px solid var(--ux-line);padding:14px 18px;flex-direction:row;align-items:center}.role-worker .record-date:before{margin:0 4px 0 0}.role-worker .record-heading{align-items:flex-start}}
+@media(max-width:600px){.role-worker .worker-page-toolbar{display:grid;align-items:start}.role-worker .compact-filter{width:100%;min-width:0}.role-worker .record-fields{grid-template-columns:1fr}.role-worker .record-heading{display:block}.role-worker .record-heading .button{margin-top:12px}.role-worker .worker-qr-actions{width:100%}.role-worker .worker-qr-actions .button-primary{flex:1}}
