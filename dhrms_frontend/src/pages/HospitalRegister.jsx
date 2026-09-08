@@ -2,6 +2,10 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { registerHospital } from "../services/authService";
 
+const ArrowIcon = ({ direction = "right" }) => <svg viewBox="0 0 20 20" aria-hidden="true" className="public-icon">{direction === "left" ? <path d="M12.5 4.5 7 10l5.5 5.5M7.5 10H16" /> : <path d="M7.5 4.5 13 10l-5.5 5.5M4 10h9" />}</svg>;
+const RegisterIcon = () => <svg viewBox="0 0 20 20" aria-hidden="true" className="public-icon"><path d="M10 4v12M4 10h12" /></svg>;
+const LoginIcon = () => <svg viewBox="0 0 20 20" aria-hidden="true" className="public-icon"><path d="M11 4h5v12h-5M10 10H4m0 0 3-3M4 10l3 3" /></svg>;
+
 const HospitalRegister = () => {
   const navigate = useNavigate();
   const [form, setForm] = useState({ hospitalName: "", hfrId: "", hospitalCode: "", email: "", password: "", address: "", city: "", district: "", phone: "" });
@@ -29,23 +33,24 @@ const HospitalRegister = () => {
 
   return (
     <div className="public-auth-shell">
-      <div className="public-auth-wrap" style={{ maxWidth: 900 }}>
-        <main className="public-auth-card" style={{ padding: 34 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, marginBottom: 28 }}>
+      <div className="public-auth-wrap public-register-wrap">
+        <main className="public-auth-card public-register-card">
+          <div className="public-register-topbar">
             <button className="public-brand" type="button" onClick={() => navigate("/")}><span className="public-brand-mark">D</span>DHRMS</button>
-            <button className="public-back" type="button" onClick={() => navigate("/login")} style={{ display: "inline-flex", alignItems: "center", gap: 6, border: "1px solid #202a38", background: "#111722", color: "#9ca7b8", borderRadius: 8, padding: "7px 10px", fontSize: 11, fontWeight: 700 }}>← Back to portal</button>
+            <button className="public-icon-btn" type="button" onClick={() => navigate("/login")} title="Back to portal selection" aria-label="Back to portal selection"><ArrowIcon direction="left" /></button>
           </div>
 
-          <header className="public-form-head" style={{ textAlign: "center", maxWidth: 650, margin: "0 auto 28px" }}>
+          <header className="public-register-head">
+            <div className="public-register-icon"><span>+</span></div>
             <span className="public-kicker">Hospital registration</span>
             <h1>Create a hospital account</h1>
-            <p>Set up your hospital profile to manage doctors, workers, and healthcare visits.</p>
+            <p>Set up your hospital profile and start managing doctors, workers, and healthcare visits.</p>
           </header>
 
-          {error && <div className="public-alert public-alert-error" role="alert" style={{ marginBottom: 16 }}>{error}</div>}
-          {success && <div className="public-alert public-alert-success" role="status" style={{ marginBottom: 16 }}>{success}</div>}
+          {error && <div className="public-alert public-alert-error" role="alert">{error}</div>}
+          {success && <div className="public-alert public-alert-success" role="status">{success}</div>}
 
-          <form onSubmit={handleSubmit} className="public-form">
+          <form onSubmit={handleSubmit} className="public-form public-register-form">
             <div className="public-register-grid">
               <div className="public-field"><label htmlFor="hospitalName">Hospital name</label><input id="hospitalName" className="public-input" name="hospitalName" value={form.hospitalName} onChange={handleChange} required placeholder="Enter hospital name" /></div>
               <div className="public-field"><label htmlFor="hfrId">HFR ID</label><input id="hfrId" className="public-input" name="hfrId" value={form.hfrId} onChange={handleChange} placeholder="HFR-KL-0001" required /></div>
@@ -58,10 +63,10 @@ const HospitalRegister = () => {
               <div className="public-field"><label htmlFor="district">District</label><input id="district" className="public-input" name="district" value={form.district} onChange={handleChange} placeholder="District" /></div>
             </div>
 
-            <button type="submit" className="public-btn public-btn-primary" style={{ width: "100%", marginTop: 8 }} disabled={loading}>{loading ? "Registering hospital…" : "Register hospital"}<span>→</span></button>
+            <button type="submit" className="public-btn public-btn-primary public-submit" disabled={loading}><span>{loading ? "Registering hospital…" : "Register hospital"}</span>{loading ? null : <RegisterIcon />}</button>
           </form>
 
-          <div className="public-form-footer" style={{ marginTop: 18, justifyContent: "center" }}><span>Already registered?</span><Link className="public-text-link" to="/login">Sign in instead</Link></div>
+          <div className="public-form-footer public-register-footer"><span>Already registered?</span><Link className="public-icon-link" to="/login" title="Sign in" aria-label="Sign in"><LoginIcon /></Link></div>
         </main>
       </div>
     </div>
