@@ -3,9 +3,7 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const roleNavigation = {
-  REGISTRATION_OFFICER: [
-    { to: "/registration", label: "Dashboard", end: true },
-  ],
+  REGISTRATION_OFFICER: [{ to: "/registration", label: "Dashboard", end: true }],
   HOSPITAL: [
     { to: "/hospital", label: "Dashboard", end: true },
     { to: "/hospital/workers/scan", label: "Start Visit" },
@@ -56,12 +54,7 @@ const RoleLayout = ({ title, description, actions, children }) => {
         <div className="sidebar-section-label">Workspace</div>
         <nav className="sidebar-nav" aria-label="Primary navigation">
           {navItems.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.end}
-              className={({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`}
-            >
+            <NavLink key={item.to} to={item.to} end={item.end} className={({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`}>
               <span className="nav-dot" aria-hidden="true" />
               {item.label}
             </NavLink>
@@ -93,7 +86,7 @@ const RoleLayout = ({ title, description, actions, children }) => {
           )}
         </header>
         <div className="breadcrumbs" aria-label="Breadcrumb">
-          <button type="button" onClick={() => navigate("/">DHRMS</button>
+          <button type="button" onClick={() => navigate("/")}>DHRMS</button>
           <span aria-hidden="true">/</span>
           <span>{location.pathname.split("/").filter(Boolean).pop() || "dashboard"}</span>
         </div>
