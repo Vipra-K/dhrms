@@ -59,6 +59,7 @@ const RoleLayout = ({ title, description, actions, children }) => {
   const navItems = useMemo(() => roleNavigation[user?.role] || [], [user?.role]);
   const isWorker = user?.role === "WORKER";
   const isHospital = user?.role === "HOSPITAL";
+  const isRegistrationOfficer = user?.role === "REGISTRATION_OFFICER";
 
   const handleLogout = () => {
     logout();
@@ -68,7 +69,7 @@ const RoleLayout = ({ title, description, actions, children }) => {
   const currentSection = navItems.find((item) => item.to && (item.end ? location.pathname === item.to : location.pathname.startsWith(item.to)))?.label;
 
   return (
-    <div className={`app-shell ${isWorker ? "role-worker" : ""} ${isHospital ? "role-hospital" : ""}`}>
+    <div className={`app-shell ${isWorker ? "role-worker" : ""} ${isHospital ? "role-hospital" : ""} ${isRegistrationOfficer ? "role-registration" : ""}`}>
       <aside className="sidebar" aria-label={`${roleNames[user?.role] || "DHRMS"} navigation`}>
         <button className="sidebar-brand brand-button" onClick={() => navigate("/")} type="button">
           <span className="brand-mark"><span>D</span></span>
