@@ -14,9 +14,8 @@ export class WorkerController {
   constructor(private readonly workerService: WorkerService, private readonly workerQrService: WorkerQrService) {}
 
   @Post('/qr/lookup')
-  async lookupWorkerByQr(@Req() req: AuthenticatedRequest, @Body() body: WorkerQrLookupDto) {
-    const worker = await this.workerQrService.getWorkerFromQr(body.qrContent);
-    return this.workerService.getRegisteredWorker(worker.id);
+  async lookupWorkerByQr(@Req() _req: AuthenticatedRequest, @Body() body: WorkerQrLookupDto) {
+    return this.workerQrService.getWorkerFromQr(body.qrContent);
   }
 
   @Get()
