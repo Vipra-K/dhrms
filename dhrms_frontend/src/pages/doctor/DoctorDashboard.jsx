@@ -48,7 +48,6 @@ const DoctorDashboard = () => {
   const assignedWorkers = counts?.assignedWorkers ?? 0;
   const todayVisits = counts?.visitsToday ?? 0;
   const workloadLabel = activeCount === 0 ? "No active encounters" : `${activeCount} encounter${activeCount === 1 ? "" : "s"} requiring attention`;
-  const doctorInitial = (doctor?.fullName || "D").charAt(0).toUpperCase();
 
   const metrics = useMemo(() => [
     { label: "Active encounters", value: activeCount, helper: activeCount ? "Currently in your clinical queue" : "Your queue is clear", icon: "01" },
