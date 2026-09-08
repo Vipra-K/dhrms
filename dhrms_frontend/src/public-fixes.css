@@ -12,13 +12,6 @@
   grid-column: 1 / -1;
 }
 
-.public-back:hover {
-  border-color: #344157 !important;
-  background: #161d29 !important;
-  color: #eef2f8 !important;
-  transform: translateY(-1px);
-}
-
 .public-text-link {
   transition: color 0.18s ease;
 }
@@ -27,7 +20,7 @@
   color: #c3c9ff !important;
 }
 
-/* Public authentication screens: fit the viewport and keep navigation icon-first. */
+/* Public authentication: compact, role-focused, no document scrolling. */
 .public-auth-shell {
   height: 100dvh;
   min-height: 0;
@@ -35,93 +28,365 @@
 }
 
 .public-auth-wrap {
+  width: 100%;
   height: 100dvh;
   min-height: 0;
   box-sizing: border-box;
-  padding: 24px 0;
+  padding: clamp(16px, 3vh, 30px) 20px;
+  display: grid;
+  place-items: center;
 }
 
 .public-auth-card {
-  max-height: calc(100dvh - 48px);
+  width: min(1160px, 100%);
+  max-height: calc(100dvh - clamp(32px, 6vh, 60px));
   box-sizing: border-box;
 }
 
-.public-auth-intro {
-  padding: 32px 38px;
+/* Login redesign inspired by contemporary healthcare/EHR authentication layouts. */
+.role-login-shell {
+  background:
+    radial-gradient(circle at 8% 15%, rgba(79, 70, 229, 0.14), transparent 28%),
+    radial-gradient(circle at 92% 85%, rgba(37, 99, 235, 0.08), transparent 30%),
+    var(--bg);
 }
 
-.public-auth-back {
-  margin: 0 0 10px;
+.role-login-wrap {
+  padding: clamp(16px, 3vh, 30px) 20px;
 }
 
-.public-auth-intro-copy {
-  margin-top: 24px;
+.role-login-card {
+  display: grid;
+  grid-template-columns: minmax(360px, 0.9fr) minmax(430px, 1.1fr);
+  height: min(680px, calc(100dvh - clamp(32px, 6vh, 60px)));
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.34);
 }
 
-.public-auth-intro h1 {
-  font-size: clamp(32px, 3.4vw, 44px);
+.role-login-visual {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: clamp(24px, 4vh, 42px);
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 78% 18%, rgba(109, 124, 255, 0.28), transparent 27%),
+    linear-gradient(145deg, #10162c 0%, #121a35 48%, #17245a 100%);
+  border-right: 1px solid rgba(255, 255, 255, 0.07);
 }
 
-.public-auth-form {
-  padding: 34px 40px;
+.role-login-visual::before,
+.role-login-visual::after {
+  content: "";
+  position: absolute;
+  border: 1px solid rgba(147, 160, 255, 0.12);
+  border-radius: 50%;
+  pointer-events: none;
 }
 
-.public-form-head {
+.role-login-visual::before {
+  width: 430px;
+  height: 430px;
+  right: -220px;
+  top: 72px;
+}
+
+.role-login-visual::after {
+  width: 300px;
+  height: 300px;
+  right: -150px;
+  top: 137px;
+}
+
+.role-login-back {
+  position: relative;
+  z-index: 2;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+}
+
+.role-login-visual-content {
+  position: relative;
+  z-index: 2;
+  max-width: 500px;
+  margin: auto 0;
+}
+
+.role-login-visual-content .public-kicker {
+  display: inline-flex;
   margin-bottom: 18px;
 }
 
-.public-form {
-  gap: 12px;
+.role-login-mark {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 18px;
+  border-radius: 15px;
+  color: #dfe3ff;
+  background: rgba(109, 124, 255, 0.14);
+  border: 1px solid rgba(146, 156, 255, 0.2);
+  font-size: 17px;
+  font-weight: 800;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
 }
 
-.public-form-footer {
-  margin-top: 12px;
+.role-login-visual-content h1 {
+  max-width: 520px;
+  color: #f8fafc;
+  font-size: clamp(34px, 3.5vw, 52px);
+  line-height: 1.02;
+  letter-spacing: -0.055em;
+}
+
+.role-login-visual-content p {
+  max-width: 500px;
+  margin-top: 18px;
+  color: #aab5d0;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.role-login-trust {
+  display: grid;
+  gap: 9px;
+  margin-top: clamp(22px, 4vh, 34px);
+}
+
+.role-login-trust div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 42px;
+  padding: 10px 12px;
+  color: #d6dded;
+  background: rgba(5, 9, 18, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 11px;
+  font-size: 11px;
+}
+
+.role-login-feature-icon {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: #9ca7ff;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.role-login-visual-meta {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #7f8cab;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.role-login-form-panel {
+  min-width: 0;
+  display: grid;
+  place-items: center;
+  padding: clamp(26px, 5vh, 56px) clamp(28px, 5vw, 68px);
+  background: #0b1017;
+}
+
+.role-login-form-inner {
+  width: min(470px, 100%);
+}
+
+.role-login-heading {
+  margin-bottom: 28px;
+}
+
+.role-login-code {
+  color: #9da8ff;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.role-login-heading h2 {
+  margin-top: 10px;
+  color: var(--strong);
+  font-size: clamp(28px, 3vw, 38px);
+  line-height: 1.08;
+  letter-spacing: -0.04em;
+}
+
+.role-login-heading p {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.role-login-form {
+  gap: 17px;
+}
+
+.role-login-form .public-field {
+  gap: 7px;
+}
+
+.role-login-form .public-field label {
+  color: #cbd3df;
+  font-size: 11px;
+}
+
+.role-login-form .public-input {
+  height: 48px;
+  padding: 0 14px;
+  border-radius: 11px;
+  background: #101721;
+}
+
+.role-login-submit {
+  height: 48px;
+  margin-top: 5px;
+}
+
+.role-login-links,
+.role-login-register-note {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 18px;
+  color: #6f7d91;
+  font-size: 10px;
+}
+
+.role-login-portal-link,
+.role-login-register-note a {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #aeb7ff;
+  font-weight: 700;
+}
+
+.role-login-portal-link:hover,
+.role-login-register-note a:hover {
+  color: #d1d5ff;
+}
+
+.role-login-portal-link .public-icon {
+  width: 15px;
+  height: 15px;
+}
+
+.role-login-register-note {
+  justify-content: flex-start;
+  padding-top: 17px;
+  margin-top: 17px;
+  border-top: 1px solid var(--border);
+}
+
+/* Hospital registration keeps the same compact authentication system. */
+.public-register-shell {
+  background:
+    radial-gradient(circle at 8% 15%, rgba(79, 70, 229, 0.12), transparent 28%),
+    var(--bg);
+}
+
+.public-register-wrap {
+  padding: clamp(14px, 2.5vh, 24px) 20px;
 }
 
 .public-register-card {
-  padding: 24px 30px 22px;
+  width: min(1060px, 100%);
+  height: min(760px, calc(100dvh - clamp(28px, 5vh, 48px)));
+  overflow: hidden;
+  padding: clamp(18px, 2.5vh, 26px) clamp(24px, 3vw, 34px) 18px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.3);
 }
 
 .public-register-topbar {
+  display: flex;
   justify-content: flex-start;
-  margin-bottom: 8px;
+  margin-bottom: 2px;
+}
+
+.public-register-back {
+  width: 40px;
+  height: 40px;
 }
 
 .public-register-head {
-  margin-bottom: 16px;
+  text-align: center;
+  margin: 0 auto clamp(14px, 2vh, 20px);
+  max-width: 720px;
 }
 
 .public-register-icon {
-  width: 40px;
-  height: 40px;
-  margin-bottom: 8px;
-  border-radius: 12px;
-  font-size: 20px;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 8px;
+  border-radius: 13px;
+  color: #aeb7ff;
+  background: var(--accent-soft);
+  border: 1px solid rgba(109, 124, 255, 0.18);
+}
+
+.public-register-icon .public-icon {
+  width: 19px;
+  height: 19px;
 }
 
 .public-register-head h1 {
   margin: 7px 0 5px;
-  font-size: 28px;
+  color: var(--strong);
+  font-size: clamp(25px, 2.8vw, 34px);
+  line-height: 1.1;
+  letter-spacing: -0.04em;
 }
 
 .public-register-head p {
-  line-height: 1.45;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
 }
 
 .public-register-grid {
-  gap: 10px 14px;
+  gap: 9px 14px;
 }
 
 .public-register-form {
-  gap: 10px;
+  gap: 9px;
 }
 
 .public-register-form .public-field {
   gap: 5px;
 }
 
+.public-register-form .public-field label {
+  color: #cbd3df;
+  font-size: 10px;
+}
+
 .public-register-form .public-input {
-  height: 42px;
+  height: 40px;
+  padding: 0 12px;
 }
 
 .public-register-form .public-submit {
@@ -130,151 +395,178 @@
 }
 
 .public-register-footer {
-  margin-top: 10px;
+  margin-top: 8px;
+}
+
+.public-register-login-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #aeb7ff;
+  font-weight: 700;
+}
+
+.public-register-login-link .public-icon {
+  width: 14px;
+  height: 14px;
 }
 
 @media (max-width: 900px) {
-  .public-auth-shell,
-  .public-auth-wrap {
-    height: 100dvh;
-    min-height: 0;
-    overflow: hidden;
+  .role-login-card {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(230px, 0.75fr) minmax(330px, 1.25fr);
+    height: min(760px, calc(100dvh - 28px));
   }
 
-  .public-auth-wrap {
-    padding: 12px;
-  }
-
-  .public-auth-card {
-    max-height: calc(100dvh - 24px);
-  }
-
-  .public-auth-intro {
-    min-height: 0;
-    padding: 20px 24px;
+  .role-login-visual {
+    padding: 20px 26px;
     border-right: 0;
-    border-bottom: 1px solid #202a38;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
   }
 
-  .public-auth-intro-copy {
-    margin: 14px 0 0;
+  .role-login-visual-content {
+    margin: auto 0 0;
   }
 
-  .public-auth-intro h1 {
-    margin: 10px 0 6px;
-    font-size: 28px;
+  .role-login-mark {
+    display: none;
   }
 
-  .public-auth-intro p {
+  .role-login-visual-content .public-kicker {
+    margin-bottom: 8px;
+  }
+
+  .role-login-visual-content h1 {
+    font-size: 27px;
+  }
+
+  .role-login-visual-content p {
+    margin-top: 8px;
     font-size: 11px;
     line-height: 1.45;
   }
 
-  .public-auth-points {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 6px;
-    margin-top: 12px;
+  .role-login-trust {
+    display: none;
   }
 
-  .public-auth-points div {
-    padding: 8px;
-    font-size: 9px;
-  }
-
-  .public-auth-form {
-    padding: 20px 24px;
-  }
-
-  .public-form-head {
-    margin-bottom: 12px;
-  }
-
-  .public-form-head h2 {
-    font-size: 22px;
-  }
-
-  .public-input {
-    height: 42px;
+  .role-login-form-panel {
+    padding: 24px 28px;
   }
 
   .public-register-card {
-    padding: 18px 22px;
+    height: min(760px, calc(100dvh - 28px));
   }
 }
 
-@media (max-width: 520px) {
+@media (max-width: 560px) {
   .public-auth-wrap {
     padding: 8px;
   }
 
-  .public-auth-card {
-    max-height: calc(100dvh - 16px);
+  .role-login-card {
+    height: calc(100dvh - 16px);
     border-radius: 16px;
+    grid-template-rows: 36% 64%;
   }
 
-  .public-auth-intro {
+  .role-login-visual {
     padding: 14px 16px;
   }
 
-  .public-auth-back,
+  .role-login-back,
   .public-register-back {
     width: 34px;
     height: 34px;
   }
 
-  .public-auth-intro-copy {
-    margin-top: 10px;
+  .role-login-visual-content h1 {
+    font-size: 22px;
   }
 
-  .public-auth-intro h1 {
-    font-size: 23px;
-  }
-
-  .public-auth-points {
+  .role-login-visual-content p {
     display: none;
   }
 
-  .public-auth-form {
-    padding: 16px;
+  .role-login-visual-meta {
+    font-size: 8px;
   }
 
-  .public-register-card {
-    padding: 14px;
+  .role-login-form-panel {
+    padding: 18px 16px;
   }
 
-  .public-register-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
+  .role-login-heading {
+    margin-bottom: 16px;
   }
 
-  .public-register-wide {
-    grid-column: 1 / -1;
+  .role-login-heading h2 {
+    font-size: 24px;
   }
 
-  .public-register-head {
-    margin-bottom: 10px;
+  .role-login-form {
+    gap: 11px;
   }
 
-  .public-register-head h1 {
-    font-size: 23px;
+  .role-login-form .public-input,
+  .role-login-submit {
+    height: 43px;
   }
 
-  .public-register-head p {
-    font-size: 10px;
-  }
-
-  .public-register-form .public-field label {
+  .role-login-links,
+  .role-login-register-note {
+    margin-top: 12px;
     font-size: 9px;
   }
 
+  .public-register-card {
+    height: calc(100dvh - 16px);
+    padding: 12px 14px 10px;
+    border-radius: 16px;
+  }
+
+  .public-register-head {
+    margin-bottom: 8px;
+  }
+
+  .public-register-icon {
+    width: 34px;
+    height: 34px;
+    margin-bottom: 5px;
+  }
+
+  .public-register-head h1 {
+    font-size: 22px;
+  }
+
+  .public-register-head p {
+    font-size: 9px;
+  }
+
+  .public-register-grid {
+    gap: 6px 8px;
+  }
+
+  .public-register-form .public-field {
+    gap: 3px;
+  }
+
+  .public-register-form .public-field label {
+    font-size: 8px;
+  }
+
   .public-register-form .public-input {
-    height: 36px;
-    padding: 0 9px;
-    font-size: 10px;
+    height: 33px;
+    padding: 0 8px;
+    font-size: 9px;
   }
 
   .public-register-form .public-submit {
-    min-height: 38px;
-    font-size: 10px;
+    min-height: 36px;
+    font-size: 9px;
+  }
+
+  .public-register-footer {
+    font-size: 9px;
   }
 }
