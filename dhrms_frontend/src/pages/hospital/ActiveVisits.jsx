@@ -14,7 +14,7 @@ const ActiveVisits = () => {
     try {
       setError("");
       setLoading(true);
-      setVisits(await getHospitalActiveEncounters());
+      setVisits((await getHospitalActiveEncounters()) || []);
     } catch (err) {
       setError(getApiError(err, "Unable to load active visits."));
     } finally {
@@ -27,27 +27,26 @@ const ActiveVisits = () => {
   return (
     <RoleLayout
       title="Active visits"
-      description="Workers currently receiving care at your hospital. Completing a visit ends only the doctor assignment; the hospital relationship remains active."
-      actions={[{ label: "Refresh", onClick: load, variant: "secondary" }]}
+      description="A live view of workers currently receiving care at this hospital."
+      actions={[
+        { label: "Start visit", onClick: () => navigate("/hospital/workers/scan") },
+        { label: "Refresh", onClick: load, variant: "secondary", disabled: loading },
+      ]}
     >
       {error && <div className="alert error" role="alert">{error}</div>}
-      <div className="panel">
-        <div className="section-toolbar">
-          <div>
-            <span className="eyebrow">Current encounters</span>
-            <h2>{visits.length} active visit{visits.length === 1 ? "" : "s"}</h2>
-            <p>These are the visits currently in progress. The worker remains associated with this hospital after the doctor completes the visit.</p>
-          </div>
-          <button className="button button-primary" type="button" onClick={() => navigate("/hospital/find-worker")}>Start visit</button>
+      <section className="panel">
+        <div className="section-toolbar" style={{ marginBottom: "18px" }}>
+          <div><span className="eyebrow">Live queue</span><h2>{visits.length} active visit{visits.length === 1 ? "" : "s"}</h2><p>Each row shows the worker, responsible doctor, start time, and current status.</p></div>
         </div>
 
         {loading ? (
-          <div className="loading-card">Loading active visits…</div>
+          <div className="loading-card">Loading the live visit queue…</div>
         ) : visits.length === 0 ? (
           <div className="empty-state-card">
+            <span className="empty-icon">+</span>
             <h3>No active visits</h3>
-            <p>Find a worker by phone or scan their QR code to start a new visit.</p>
-            <button className="button button-primary" type="button" onClick={() => navigate("/hospital/find-worker")}>Find worker</button>
+            <p>Start from a worker's QR code or use phone lookup to create the next encounter.</p>
+            <div className="row-actions" style={{ justifyContent: "center" }}><button className="button button-primary" type="button" onClick={() => navigate("/hospital/workers/scan")}>Scan worker QR</button><button className="button button-secondary" type="button" onClick={() => navigate("/hospital/find-worker")}>Find by phone</button></div>
           </div>
         ) : (
           <div className="table-card">
@@ -56,14 +55,9 @@ const ActiveVisits = () => {
               <tbody>
                 {visits.map((visit) => (
                   <tr key={visit.id}>
-                    <td>
-                      <div className="person-cell">
-                        <span className="avatar">{(visit.workerName || "W").charAt(0)}</span>
-                        <div><strong>{visit.workerName}</strong><small>{visit.workerCode}</small></div>
-                      </div>
-                    </td>
-                    <td><strong>{visit.doctorName}</strong><small>{visit.doctorSpecialization || "Doctor"}</small></td>
-                    <td>{new Date(visit.startedAt).toLocaleString()}</td>
+                    <td><div className="person-cell"><span className="avatar">{(visit.workerName || "W").charAt(0).toUpperCase()}</span><div><strong>{visit.workerName || "Worker"}</strong><small>{visit.workerCode || "Worker record"}</small></div></div></td>
+                    <td><div><strong>{visit.doctorName || "Doctor"}</strong><small>{visit.doctorSpecialization || "Clinical team"}</small></div></td>
+                    <td>{visit.startedAt ? new Date(visit.startedAt).toLocaleString() : "—"}</td>
                     <td><span className="status-badge status-active">ACTIVE</span></td>
                   </tr>
                 ))}
@@ -71,7 +65,9 @@ const ActiveVisits = () => {
             </table>
           </div>
         )}
-      </div>
+      </section>
+
+      <div className="dashboard-note"><strong>Relationship stays active.</strong><span>Completing a clinical visit ends the doctor assignment for that encounter; it does not remove the worker from this hospital. Use Workers to manage the hospital relationship.</span></div>
     </RoleLayout>
   );
 };
