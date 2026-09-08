@@ -27,6 +27,136 @@
   color: #c3c9ff !important;
 }
 
+/* Public authentication screens: fit the viewport and keep navigation icon-first. */
+.public-auth-shell {
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.public-auth-wrap {
+  height: 100dvh;
+  min-height: 0;
+  box-sizing: border-box;
+  padding: 24px 0;
+}
+
+.public-auth-card {
+  max-height: calc(100dvh - 48px);
+  box-sizing: border-box;
+}
+
+.public-auth-intro {
+  padding: 32px 38px;
+}
+
+.public-auth-back {
+  margin: 0 0 10px;
+}
+
+.public-auth-intro-copy {
+  margin-top: 24px;
+}
+
+.public-auth-intro h1 {
+  font-size: clamp(32px, 3.4vw, 44px);
+}
+
+.public-auth-form {
+  padding: 34px 40px;
+}
+
+.public-form-head {
+  margin-bottom: 18px;
+}
+
+.public-form {
+  gap: 12px;
+}
+
+.public-form-footer {
+  margin-top: 12px;
+}
+
+.public-register-card {
+  padding: 24px 30px 22px;
+}
+
+.public-register-topbar {
+  justify-content: flex-start;
+  margin-bottom: 8px;
+}
+
+.public-register-head {
+  margin-bottom: 16px;
+}
+
+.public-register-icon {
+  width: 40px;
+  height: 40px;
+  margin-bottom: 8px;
+  border-radius: 12px;
+  font-size: 20px;
+}
+
+.public-register-head h1 {
+  margin: 7px 0 5px;
+  font-size: 28px;
+}
+
+.public-register-head p {
+  line-height: 1.45;
+}
+
+.public-register-grid {
+  gap: 10px 14px;
+}
+
+.public-register-form {
+  gap: 10px;
+}
+
+.public-register-form .public-field {
+  gap: 5px;
+}
+
+.public-register-form .public-input {
+  height: 42px;
+}
+
+.public-register-form .public-submit {
+  min-height: 42px;
+  margin-top: 2px;
+}
+
+.public-register-footer {
+  margin-top: 10px;
+}
+
+@media (max-width: 900px) {
+  .public-auth-shell {
+    overflow: auto;
+  }
+
+  .public-auth-wrap {
+    height: auto;
+    min-height: 100dvh;
+    padding: 18px;
+  }
+
+  .public-auth-card {
+    max-height: none;
+  }
+
+  .public-auth-intro {
+    padding: 28px;
+  }
+
+  .public-auth-form {
+    padding: 30px 28px;
+  }
+}
+
 @media (max-width: 700px) {
   .public-register-grid {
     grid-template-columns: 1fr;
@@ -34,5 +164,9 @@
 
   .public-register-wide {
     grid-column: auto;
+  }
+
+  .public-register-card {
+    padding: 20px;
   }
 }
