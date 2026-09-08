@@ -6,6 +6,7 @@ import HospitalRegister from "./pages/HospitalRegister";
 import HospitalDashboard from "./pages/HospitalDashboard";
 import DoctorManagement from "./pages/hospital/DoctorManagement";
 import DoctorProfile from "./pages/hospital/DoctorProfile";
+import AssignDoctor from "./pages/hospital/AssignDoctor";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import DoctorDashboard from "./pages/doctor/DoctorDashboard";
 import ActiveVisits from "./pages/hospital/ActiveVisits";
@@ -45,6 +46,7 @@ const App = () => (
       <Route path="/hospital" element={<Protected role="HOSPITAL"><HospitalDashboard /></Protected>} />
       <Route path="/hospital/doctors" element={<Protected role="HOSPITAL"><DoctorManagement /></Protected>} />
       <Route path="/hospital/doctors/:doctorId" element={<Protected role="HOSPITAL"><DoctorProfile /></Protected>} />
+      <Route path="/hospital/assign-doctor" element={<Protected role="HOSPITAL"><AssignDoctor /></Protected>} />
       <Route path="/hospital/workers" element={<Protected role="HOSPITAL"><ActiveVisits /></Protected>} />
       <Route path="/hospital/manage-workers" element={<Protected role="HOSPITAL"><ManageWorkers /></Protected>} />
       <Route path="/hospital/workers/scan" element={<Protected role="HOSPITAL"><WorkerQrScanner /></Protected>} />
