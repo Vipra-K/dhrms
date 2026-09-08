@@ -17,7 +17,8 @@ export const lookupWorkerByPhone = async (phone) => (await api.post("/hospitals/
 export const lookupWorkerByCode = async (workerCode) => (await api.post("/hospitals/workers/code/lookup", { workerCode })).data;
 export const getWorkerAssignment = async (workerId) => (await api.get(`/hospitals/workers/${workerId}/assignment`)).data;
 export const getWorkerAssignmentHistory = async (workerId) => (await api.get(`/hospitals/workers/${workerId}/assignment/history`)).data;
-export const assignWorkerToDoctor = async (workerId, doctorId) => (await api.post(`/hospitals/workers/${workerId}/assignment`, { doctorId: String(doctorId) })).data;
+// Legacy helper name retained for existing UI callers. The NestJS backend now represents a doctor/worker assignment as an active encounter.
+export const assignWorkerToDoctor = async (workerId, doctorId) => (await api.post("/encounters", { workerId: Number(workerId), doctorId: Number(doctorId) })).data;
 export const getMyWorker = async (workerId) => (await api.get(`/doctors/me/workers/${workerId}`)).data;
 export const getMyWorkerProfile = async () => (await api.get("/workers/me")).data;
 export const updateMyWorkerProfile = async (worker) => (await api.put("/workers/me", worker)).data;
