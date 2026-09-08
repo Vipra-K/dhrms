@@ -1,15 +1,40 @@
 import { useNavigate } from "react-router-dom";
 
 const roles = [
-  { label: "Registration Officer", description: "Verify and register migrant workers and issue DHRMS identities.", path: "/login/registration-officer" },
-  { label: "Hospital", description: "Manage doctors and conduct worker healthcare visits.", path: "/login/hospital" },
-  { label: "Doctor", description: "Handle active visits and manage clinical records.", path: "/login/doctor" },
-  { label: "Worker", description: "View your profile and personal medical history.", path: "/login/worker" },
+  { label: "Registration Officer", code: "R", description: "Register workers, verify identity and issue DHRMS identities.", path: "/login/registration-officer" },
+  { label: "Hospital", code: "H", description: "Manage workers, doctors and healthcare visits.", path: "/login/hospital" },
+  { label: "Doctor", code: "D", description: "Handle assigned workers and clinical records.", path: "/login/doctor" },
+  { label: "Worker", code: "W", description: "View your profile, QR identity and health records.", path: "/login/worker" },
 ];
 
 const RoleLoginPicker = () => {
   const navigate = useNavigate();
-  return <div className="auth-page role-picker-page"><main className="role-picker"><button className="auth-brand centered-brand" onClick={() => navigate("/")} type="button">DHRMS</button><span className="landing-pill">Secure portal access</span><h1>Choose your portal</h1><p>Only the tools and records relevant to your role will be shown.</p><div className="role-picker-grid">{roles.map((role) => <button key={role.label} className="role-picker-card" type="button" onClick={() => navigate(role.path)}><span className="role-icon">{role.label.charAt(0)}</span><span><strong>{role.label}</strong><small>{role.description}</small></span><b>→</b></button>)}</div><button className="button button-secondary button-full" onClick={() => navigate("/hospital/register")} type="button">Register a hospital</button></main></div>;
+  return (
+    <div className="public-auth-shell">
+      <div className="public-auth-wrap">
+        <main className="public-role-picker">
+          <button className="public-back" type="button" onClick={() => navigate("/")}>← Back to DHRMS home</button>
+          <div className="public-role-picker-head">
+            <span className="public-kicker">Secure portal access</span>
+            <h1>Choose your portal</h1>
+            <p>Select the role that matches your DHRMS account.</p>
+          </div>
+          <div className="public-role-grid">
+            {roles.map((role) => (
+              <button key={role.label} className="public-role-card" type="button" onClick={() => navigate(role.path)}>
+                <span className="public-role-icon">{role.code}</span>
+                <span><strong>{role.label}</strong><small>{role.description}</small></span>
+                <span className="public-role-arrow">→</span>
+              </button>
+            ))}
+          </div>
+          <div style={{ marginTop: 12 }}>
+            <button className="public-btn public-btn-secondary" style={{ width: "100%" }} type="button" onClick={() => navigate("/hospital/register")}>Need a hospital account? Register a hospital</button>
+          </div>
+        </main>
+      </div>
+    </div>
+  );
 };
 
 export default RoleLoginPicker;
