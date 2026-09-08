@@ -18,6 +18,14 @@ export const getWorkerByCode = async (workerCode) => {
   return response.data;
 };
 
+export const getWorkerByPhone = async (phone) => {
+  const response = await api.post("/hospitals/workers/phone/lookup", {
+    phone,
+  });
+
+  return response.data;
+};
+
 export const createWorker = async (worker) => {
   const response = await api.post("/hospitals/workers", worker);
 
