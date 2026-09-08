@@ -12,7 +12,9 @@ export class WorkerRegistrationService {
 
   async register(registrarId: bigint, dto: RegisterWorkerDto) {
     const registrar = await this.prisma.user.findUnique({ where: { id: registrarId } });
-    if (!registrar || registrar.status !== 'ACTIVE') throw new ForbiddenException('Registration officer account is not active');
+    if (!registrar || registrar.status !== 'ACTIVE' || registrar.role !== 'REGISTRATION_OFFICER') {
+      throw new ForbiddenException('Only active registration officers can register workers');
+    }
 
     if ((dto.email && !dto.password) || (!dto.email && dto.password)) {
       throw new BadRequestException('Email and password must be provided together');
