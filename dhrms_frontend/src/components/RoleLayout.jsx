@@ -3,7 +3,11 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const roleNavigation = {
-  REGISTRATION_OFFICER: [{ to: "/registration", label: "Dashboard", end: true }],
+  REGISTRATION_OFFICER: [
+    { to: "/registration", label: "Dashboard", end: true },
+    { to: "/registration/register", label: "Register Worker" },
+    { to: "/registration/workers", label: "Workers" },
+  ],
   HOSPITAL: [
     { to: "/hospital", label: "Dashboard", end: true },
     { to: "/hospital/workers/scan", label: "Start Visit" },
