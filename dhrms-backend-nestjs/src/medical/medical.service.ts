@@ -51,8 +51,11 @@ export class MedicalService {
     if (encounter.workerId !== workerId || encounter.doctorId !== doctor.id) throw new ForbiddenException('Encounter does not belong to this doctor and worker');
     if (encounter.status !== 'ACTIVE') throw new ConflictException('Cannot create a medical record for a completed encounter');
 
+    const existingRecord = await this.prisma.medicalRecord.findUnique({ where: { encounterId: encounter.id } });
+    if (existingRecord) throw new ConflictException('This visit already has a medical record');
+
     const record = await this.prisma.medicalRecord.create({
-      data: { workerId, doctorId: doctor.id, hospitalId: encounter.hospitalId, encounterId: encounter.id, visitDate: new Date(dto.visitDate), symptoms: dto.symptoms, diagnosis: dto.diagnosis, treatment: dto.treatment, notes: dto.notes },
+      data: { workerId, doctorId: doctor.id, hospitalId: encounter.hospitalId, encounterId: encounter.id, visitDate: new Date(), symptoms: dto.symptoms, diagnosis: dto.diagnosis, treatment: dto.treatment, notes: dto.notes },
       include: { prescriptions: true, doctor: true, attachments: true, encounter: true },
     });
     return this.recordResponse(record, doctor.id);
@@ -65,7 +68,7 @@ export class MedicalService {
     if (!record) throw new NotFoundException('Medical record not found');
     if (record.doctorId !== doctor.id) throw new ForbiddenException('Only the doctor who created this record can edit it');
     await this.activeEncounter(doctor.id, record.workerId);
-    const updated = await this.prisma.medicalRecord.update({ where: { id: recordId }, data: { visitDate: new Date(dto.visitDate), symptoms: dto.symptoms, diagnosis: dto.diagnosis, treatment: dto.treatment, notes: dto.notes }, include: { prescriptions: true, doctor: true, attachments: { where: { status: 'ACTIVE' } }, encounter: true } });
+    const updated = await this.prisma.medicalRecord.update({ where: { id: recordId }, data: { symptoms: dto.symptoms, diagnosis: dto.diagnosis, treatment: dto.treatment, notes: dto.notes }, include: { prescriptions: true, doctor: true, attachments: { where: { status: 'ACTIVE' } }, encounter: true } });
     return this.recordResponse(updated, doctor.id);
   }
 
