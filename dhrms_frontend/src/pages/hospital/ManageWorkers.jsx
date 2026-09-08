@@ -25,9 +25,7 @@ const ManageWorkers = () => {
     }
   };
 
-  useEffect(() => {
-    loadWorkers();
-  }, []);
+  useEffect(() => { loadWorkers(); }, []);
 
   const filteredWorkers = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -36,11 +34,8 @@ const ManageWorkers = () => {
   }, [workers, search]);
 
   const handleTerminate = async (worker) => {
-    const confirmed = window.confirm(
-      `Terminate the hospital relationship with ${worker.fullName}? Their DHRMS account and medical history will remain available, but this hospital will no longer be able to start new visits for them.`
-    );
+    const confirmed = window.confirm(`End the hospital relationship with ${worker.fullName}? Their DHRMS account and medical history will remain available, but this hospital will no longer be able to start new visits for them.`);
     if (!confirmed) return;
-
     setTerminatingId(worker.id);
     setError("");
     try {
@@ -56,74 +51,57 @@ const ManageWorkers = () => {
   return (
     <RoleLayout
       title="Workers"
-      description="Manage workers currently associated with this hospital."
+      description="Manage the workers currently associated with this hospital and move directly to their profile or doctor assignment."
       actions={[
-        { label: "Assign doctor", onClick: () => navigate("/hospital/assign-doctor") },
-        { label: "Find worker", onClick: () => navigate("/hospital/find-worker"), variant: "secondary" },
+        { label: "Find worker", onClick: () => navigate("/hospital/find-worker") },
+        { label: "Assign doctor", onClick: () => navigate("/hospital/assign-doctor"), variant: "secondary" },
       ]}
     >
       {error && <div className="alert error" role="alert">{error}</div>}
-      <div className="panel">
+      <section className="panel">
         <div className="section-toolbar">
-          <div>
-            <span className="eyebrow">Hospital relationships</span>
-            <h2>Worker directory</h2>
-            <p>Search the workers connected to this hospital and take the appropriate action from one place.</p>
-          </div>
+          <div><span className="eyebrow">Hospital directory</span><h2>{workers.length} worker{workers.length === 1 ? "" : "s"}</h2><p>Search by name, phone number, or DHRMS worker ID.</p></div>
           <button className="button button-secondary" type="button" onClick={loadWorkers} disabled={loading}>{loading ? "Refreshing…" : "Refresh"}</button>
         </div>
 
-        <div className="field" style={{ marginBottom: "1rem" }}>
+        <div className="field" style={{ margin: "18px 0" }}>
           <label htmlFor="worker-directory-search">Search workers</label>
-          <input id="worker-directory-search" className="input" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search by name, phone or worker code" />
+          <input id="worker-directory-search" className="input" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Name, phone, or worker ID" />
         </div>
 
         {loading ? (
           <div className="loading-card">Loading workers…</div>
         ) : workers.length === 0 ? (
           <div className="empty-state-card">
-            <h3>No active workers</h3>
-            <p>No workers are currently associated with this hospital.</p>
+            <span className="empty-icon">W</span><h3>No workers associated</h3><p>Find a worker to establish the hospital relationship and begin care.</p>
             <button className="button button-primary" type="button" onClick={() => navigate("/hospital/find-worker")}>Find a worker</button>
           </div>
         ) : filteredWorkers.length === 0 ? (
           <div className="empty-state-card">
-            <h3>No matching workers</h3>
-            <p>Try a different name, phone number or worker code.</p>
+            <span className="empty-icon">⌕</span><h3>No matching workers</h3><p>Try a different name, phone number, or worker ID.</p>
             <button className="button button-secondary" type="button" onClick={() => setSearch("")}>Clear search</button>
           </div>
         ) : (
           <div className="table-card">
             <table className="table">
-              <thead><tr><th>Worker</th><th>Phone</th><th>Doctor</th><th>Status</th><th>Actions</th></tr></thead>
+              <thead><tr><th>Worker</th><th>Contact</th><th>Doctor</th><th>Status</th><th>Actions</th></tr></thead>
               <tbody>
                 {filteredWorkers.map((worker) => (
                   <tr key={worker.id}>
-                    <td>
-                      <div className="person-cell">
-                        <span className="avatar">{(worker.fullName || "W").charAt(0).toUpperCase()}</span>
-                        <div><strong>{worker.fullName || "Worker"}</strong><small>{worker.workerCode || "Worker record"}</small></div>
-                      </div>
-                    </td>
+                    <td><div className="person-cell"><span className="avatar">{(worker.fullName || "W").charAt(0).toUpperCase()}</span><div><strong>{worker.fullName || "Worker"}</strong><small>{worker.workerCode || "Worker record"}</small></div></div></td>
                     <td>{worker.phone || "—"}</td>
-                    <td>{worker.assignedDoctor?.name || worker.assignedDoctor?.fullName || "No doctor assigned"}</td>
+                    <td>{worker.assignedDoctor?.name || worker.assignedDoctor?.fullName || <span className="muted-note">Unassigned</span>}</td>
                     <td><span className="status-badge status-active">ACTIVE</span></td>
-                    <td>
-                      <div className="header-actions">
-                        <button className="button button-secondary" type="button" onClick={() => navigate(`/hospital/workers/${worker.id}`)}>View</button>
-                        <button className="button button-primary" type="button" onClick={() => navigate(`/hospital/assign-doctor?workerId=${encodeURIComponent(worker.id)}`)}>Assign</button>
-                        <button className="button button-secondary" type="button" onClick={() => handleTerminate(worker)} disabled={terminatingId === worker.id}>
-                          {terminatingId === worker.id ? "Ending…" : "End relationship"}
-                        </button>
-                      </div>
-                    </td>
+                    <td><div className="row-actions"><button className="button button-primary button-small" type="button" onClick={() => navigate(`/hospital/workers/${worker.id}`)}>Open</button><button className="button button-secondary button-small" type="button" onClick={() => navigate(`/hospital/assign-doctor?workerId=${encodeURIComponent(worker.id)}`)}>Assign</button><button className="button button-ghost button-small" type="button" onClick={() => handleTerminate(worker)} disabled={terminatingId === worker.id}>{terminatingId === worker.id ? "Ending…" : "End relationship"}</button></div></td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
         )}
-      </div>
+      </section>
+
+      <div className="dashboard-note"><strong>One worker, one hospital relationship.</strong><span>Ending the relationship removes this hospital's access to start new visits, while the worker's DHRMS identity and medical history remain available.</span></div>
     </RoleLayout>
   );
 };
