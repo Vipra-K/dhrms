@@ -5,8 +5,9 @@ import { useAuth } from "../context/AuthContext";
 import { getApiError } from "../services/api";
 
 const roleConfig = {
-  HOSPITAL: { label: "Hospital", description: "Manage doctors, workers and worker identification.", redirect: "/hospital" },
-  DOCTOR: { label: "Doctor", description: "Access assigned workers and manage clinical records.", redirect: "/doctor" },
+  REGISTRATION_OFFICER: { label: "Registration Officer", description: "Verify workers and issue permanent DHRMS identities.", redirect: "/registration" },
+  HOSPITAL: { label: "Hospital", description: "Manage doctors and conduct worker healthcare visits.", redirect: "/hospital" },
+  DOCTOR: { label: "Doctor", description: "Handle active visits and manage clinical records.", redirect: "/doctor" },
   WORKER: { label: "Worker", description: "View your profile and personal medical history.", redirect: "/worker" },
 };
 
@@ -18,6 +19,8 @@ const RoleLogin = ({ role }) => {
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState(searchParams.get("reason") === "session-expired" ? "Your session expired. Please sign in again." : "");
   const [loading, setLoading] = useState(false);
+
+  if (!config) return null;
 
   const handleSubmit = async (event) => {
     event.preventDefault(); setError(""); setLoading(true);
