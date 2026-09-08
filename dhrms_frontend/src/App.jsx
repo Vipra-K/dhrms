@@ -8,11 +8,12 @@ import DoctorManagement from "./pages/hospital/DoctorManagement";
 import DoctorProfile from "./pages/hospital/DoctorProfile";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import DoctorDashboard from "./pages/doctor/DoctorDashboard";
-import WorkerManagement from "./pages/hospital/WorkerManagement";
+import ActiveVisits from "./pages/hospital/ActiveVisits";
 import WorkerQrScanner from "./pages/hospital/WorkerQrScanner";
 import FindWorker from "./pages/hospital/FindWorker";
 import WorkerProfile from "./pages/hospital/WorkerProfile";
-import MyWorkers from "./pages/doctor/MyWorkers";
+import DoctorActiveVisits from "./pages/doctor/ActiveVisits";
+import DoctorEncounter from "./pages/doctor/Encounter";
 import WorkerDashboard from "./pages/worker/WorkerDashboard";
 import MyProfile from "./pages/worker/MyProfile";
 import MedicalHistory from "./pages/worker/MedicalHistory";
@@ -40,13 +41,14 @@ const App = () => (
       <Route path="/hospital" element={<Protected role="HOSPITAL"><HospitalDashboard /></Protected>} />
       <Route path="/hospital/doctors" element={<Protected role="HOSPITAL"><DoctorManagement /></Protected>} />
       <Route path="/hospital/doctors/:doctorId" element={<Protected role="HOSPITAL"><DoctorProfile /></Protected>} />
-      <Route path="/hospital/workers" element={<Protected role="HOSPITAL"><WorkerManagement /></Protected>} />
+      <Route path="/hospital/workers" element={<Protected role="HOSPITAL"><ActiveVisits /></Protected>} />
       <Route path="/hospital/workers/scan" element={<Protected role="HOSPITAL"><WorkerQrScanner /></Protected>} />
       <Route path="/hospital/find-worker" element={<Protected role="HOSPITAL"><FindWorker /></Protected>} />
       <Route path="/hospital/workers/:workerId" element={<Protected role="HOSPITAL"><WorkerProfile /></Protected>} />
 
       <Route path="/doctor" element={<Protected role="DOCTOR"><DoctorDashboard /></Protected>} />
-      <Route path="/doctor/workers" element={<Protected role="DOCTOR"><MyWorkers /></Protected>} />
+      <Route path="/doctor/workers" element={<Protected role="DOCTOR"><DoctorActiveVisits /></Protected>} />
+      <Route path="/doctor/encounters/:encounterId" element={<Protected role="DOCTOR"><DoctorEncounter /></Protected>} />
       <Route path="/doctor/workers/:workerId" element={<Protected role="DOCTOR"><DoctorWorkerProfile /></Protected>} />
 
       <Route path="/worker" element={<Protected role="WORKER"><WorkerDashboard /></Protected>} />
