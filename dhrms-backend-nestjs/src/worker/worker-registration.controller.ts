@@ -16,6 +16,11 @@ export class WorkerRegistrationController {
     return this.registrationService.listRegisteredWorkers(req.user!.id, search);
   }
 
+  @Get('/check-phone')
+  checkPhone(@Req() req: AuthenticatedRequest, @Query('phone') phone?: string) {
+    return this.registrationService.checkPhone(req.user!.id, phone || '');
+  }
+
   @Get('/:workerId')
   get(@Req() req: AuthenticatedRequest, @Param('workerId') workerId: string) {
     return this.registrationService.getRegisteredWorker(req.user!.id, BigInt(workerId));
