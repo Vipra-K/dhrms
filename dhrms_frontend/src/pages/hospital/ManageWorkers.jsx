@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import RoleLayout from "../../components/RoleLayout";
 import { getApiError } from "../../services/api";
@@ -7,11 +7,13 @@ import { getWorkers, terminateHospitalRelationship } from "../../services/worker
 const ManageWorkers = () => {
   const navigate = useNavigate();
   const [workers, setWorkers] = useState([]);
+  const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [terminatingId, setTerminatingId] = useState(null);
 
   const loadWorkers = async () => {
+    setLoading(true);
     try {
       setError("");
       const data = await getWorkers();
@@ -26,6 +28,12 @@ const ManageWorkers = () => {
   useEffect(() => {
     loadWorkers();
   }, []);
+
+  const filteredWorkers = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    if (!query) return workers;
+    return workers.filter((worker) => [worker.fullName, worker.phone, worker.workerCode].some((value) => String(value || "").toLowerCase().includes(query)));
+  }, [workers, search]);
 
   const handleTerminate = async (worker) => {
     const confirmed = window.confirm(
@@ -47,19 +55,27 @@ const ManageWorkers = () => {
 
   return (
     <RoleLayout
-      title="Manage Workers"
-      description="Workers currently associated with this hospital"
-      actions={[{ label: "Find worker", onClick: () => navigate("/hospital/find-worker") }]}
+      title="Workers"
+      description="Manage workers currently associated with this hospital."
+      actions={[
+        { label: "Assign doctor", onClick: () => navigate("/hospital/assign-doctor") },
+        { label: "Find worker", onClick: () => navigate("/hospital/find-worker"), variant: "secondary" },
+      ]}
     >
-      {error && <div className="alert error">{error}</div>}
+      {error && <div className="alert error" role="alert">{error}</div>}
       <div className="panel">
         <div className="section-toolbar">
           <div>
             <span className="eyebrow">Hospital relationships</span>
-            <h2>Active workers</h2>
-            <p>These workers currently have an active relationship with this hospital. Ending a relationship does not deactivate the worker account or delete medical history.</p>
+            <h2>Worker directory</h2>
+            <p>Search the workers connected to this hospital and take the appropriate action from one place.</p>
           </div>
-          <button className="button button-secondary" type="button" onClick={() => { setLoading(true); loadWorkers(); }} disabled={loading}>Refresh</button>
+          <button className="button button-secondary" type="button" onClick={loadWorkers} disabled={loading}>{loading ? "Refreshing…" : "Refresh"}</button>
+        </div>
+
+        <div className="field" style={{ marginBottom: "1rem" }}>
+          <label htmlFor="worker-directory-search">Search workers</label>
+          <input id="worker-directory-search" className="input" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search by name, phone or worker code" />
         </div>
 
         {loading ? (
@@ -70,27 +86,34 @@ const ManageWorkers = () => {
             <p>No workers are currently associated with this hospital.</p>
             <button className="button button-primary" type="button" onClick={() => navigate("/hospital/find-worker")}>Find a worker</button>
           </div>
+        ) : filteredWorkers.length === 0 ? (
+          <div className="empty-state-card">
+            <h3>No matching workers</h3>
+            <p>Try a different name, phone number or worker code.</p>
+            <button className="button button-secondary" type="button" onClick={() => setSearch("")}>Clear search</button>
+          </div>
         ) : (
           <div className="table-card">
             <table className="table">
               <thead><tr><th>Worker</th><th>Phone</th><th>Doctor</th><th>Status</th><th>Actions</th></tr></thead>
               <tbody>
-                {workers.map((worker) => (
+                {filteredWorkers.map((worker) => (
                   <tr key={worker.id}>
                     <td>
                       <div className="person-cell">
                         <span className="avatar">{(worker.fullName || "W").charAt(0).toUpperCase()}</span>
-                        <div><strong>{worker.fullName}</strong><small>{worker.workerCode}</small></div>
+                        <div><strong>{worker.fullName || "Worker"}</strong><small>{worker.workerCode || "Worker record"}</small></div>
                       </div>
                     </td>
                     <td>{worker.phone || "—"}</td>
-                    <td>{worker.assignedDoctor?.name || "No doctor assigned"}</td>
+                    <td>{worker.assignedDoctor?.name || worker.assignedDoctor?.fullName || "No doctor assigned"}</td>
                     <td><span className="status-badge status-active">ACTIVE</span></td>
                     <td>
                       <div className="header-actions">
                         <button className="button button-secondary" type="button" onClick={() => navigate(`/hospital/workers/${worker.id}`)}>View</button>
-                        <button className="button button-primary" type="button" onClick={() => handleTerminate(worker)} disabled={terminatingId === worker.id}>
-                          {terminatingId === worker.id ? "Terminating…" : "Terminate"}
+                        <button className="button button-primary" type="button" onClick={() => navigate(`/hospital/assign-doctor?workerId=${encodeURIComponent(worker.id)}`)}>Assign</button>
+                        <button className="button button-secondary" type="button" onClick={() => handleTerminate(worker)} disabled={terminatingId === worker.id}>
+                          {terminatingId === worker.id ? "Ending…" : "End relationship"}
                         </button>
                       </div>
                     </td>
