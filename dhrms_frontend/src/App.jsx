@@ -12,6 +12,7 @@ import ActiveVisits from "./pages/hospital/ActiveVisits";
 import WorkerQrScanner from "./pages/hospital/WorkerQrScanner";
 import FindWorker from "./pages/hospital/FindWorker";
 import WorkerProfile from "./pages/hospital/WorkerProfile";
+import ManageWorkers from "./pages/hospital/ManageWorkers";
 import DoctorActiveVisits from "./pages/doctor/ActiveVisits";
 import DoctorEncounter from "./pages/doctor/Encounter";
 import WorkerDashboard from "./pages/worker/WorkerDashboard";
@@ -42,6 +43,7 @@ const App = () => (
       <Route path="/hospital/doctors" element={<Protected role="HOSPITAL"><DoctorManagement /></Protected>} />
       <Route path="/hospital/doctors/:doctorId" element={<Protected role="HOSPITAL"><DoctorProfile /></Protected>} />
       <Route path="/hospital/workers" element={<Protected role="HOSPITAL"><ActiveVisits /></Protected>} />
+      <Route path="/hospital/manage-workers" element={<Protected role="HOSPITAL"><ManageWorkers /></Protected>} />
       <Route path="/hospital/workers/scan" element={<Protected role="HOSPITAL"><WorkerQrScanner /></Protected>} />
       <Route path="/hospital/find-worker" element={<Protected role="HOSPITAL"><FindWorker /></Protected>} />
       <Route path="/hospital/workers/:workerId" element={<Protected role="HOSPITAL"><WorkerProfile /></Protected>} />
