@@ -54,31 +54,22 @@ export class WorkerQrService {
     const qrCode = await this.prisma.workerQrCode.findFirst({ where: { tokenHash, status: 'ACTIVE' }, include: { worker: true } });
     if (!qrCode) throw new BadRequestException('Invalid or revoked QR code');
     if (!qrCode.worker.active) throw new BadRequestException('Worker is inactive; QR code cannot be used');
+    return this.toLookupResponse(qrCode.worker);
+  }
 
-    // Worker IDs are PostgreSQL BIGINT values. Do not return the raw Prisma
-    // model here because Express JSON serialization cannot serialize BigInt.
-    // Returning an explicit public DTO also prevents internal fields from
-    // leaking through the QR lookup endpoint.
-    return {
-      id: Number(qrCode.worker.id),
-      workerCode: qrCode.worker.workerCode,
-      fullName: qrCode.worker.fullName,
-      dateOfBirth: qrCode.worker.dateOfBirth,
-      gender: qrCode.worker.gender,
-      bloodGroup: qrCode.worker.bloodGroup,
-      phone: qrCode.worker.phone,
-      address: qrCode.worker.address,
-      emergencyContactName: qrCode.worker.emergencyContactName,
-      emergencyContactPhone: qrCode.worker.emergencyContactPhone,
-      emergencyContactRelation: qrCode.worker.emergencyContactRelation,
-      employerName: qrCode.worker.employerName,
-      worksiteName: qrCode.worker.worksiteName,
-      worksiteAddress: qrCode.worker.worksiteAddress,
-      worksiteDistrict: qrCode.worker.worksiteDistrict,
-      jobRole: qrCode.worker.jobRole,
-      registrationStatus: qrCode.worker.registrationStatus,
-      active: qrCode.worker.active,
-    };
+  async getWorkerFromPhone(phone: string) {
+    const normalizedPhone = phone.replace(/\s+/g, '').trim();
+    if (!normalizedPhone) throw new BadRequestException('Phone number is required');
+
+    const worker = await this.prisma.worker.findFirst({
+      where: {
+        phone: normalizedPhone,
+        active: true,
+      },
+    });
+
+    if (!worker) throw new NotFoundException('Worker not found');
+    return this.toLookupResponse(worker);
   }
 
   async revokeQr(hospitalUserId: bigint, workerId: bigint) {
@@ -86,6 +77,29 @@ export class WorkerQrService {
     const existing = await this.prisma.workerQrCode.findUnique({ where: { workerId } });
     if (!existing) return null;
     return this.prisma.workerQrCode.update({ where: { id: existing.id }, data: { status: 'REVOKED', revokedAt: new Date() } });
+  }
+
+  private toLookupResponse(worker: any) {
+    return {
+      id: Number(worker.id),
+      workerCode: worker.workerCode,
+      fullName: worker.fullName,
+      dateOfBirth: worker.dateOfBirth,
+      gender: worker.gender,
+      bloodGroup: worker.bloodGroup,
+      phone: worker.phone,
+      address: worker.address,
+      emergencyContactName: worker.emergencyContactName,
+      emergencyContactPhone: worker.emergencyContactPhone,
+      emergencyContactRelation: worker.emergencyContactRelation,
+      employerName: worker.employerName,
+      worksiteName: worker.worksiteName,
+      worksiteAddress: worker.worksiteAddress,
+      worksiteDistrict: worker.worksiteDistrict,
+      jobRole: worker.jobRole,
+      registrationStatus: worker.registrationStatus,
+      active: worker.active,
+    };
   }
 
   private hashToken(token: string) { return crypto.createHash('sha256').update(token, 'utf8').digest('base64'); }
