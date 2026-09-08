@@ -36,15 +36,14 @@ const HospitalRegister = () => {
       <div className="public-auth-wrap public-register-wrap">
         <main className="public-auth-card public-register-card">
           <div className="public-register-topbar">
-            <button className="public-brand" type="button" onClick={() => navigate("/")}><span className="public-brand-mark">D</span>DHRMS</button>
-            <button className="public-icon-btn" type="button" onClick={() => navigate("/login")} title="Back to portal selection" aria-label="Back to portal selection"><ArrowIcon direction="left" /></button>
+            <button className="public-icon-btn public-register-back" type="button" onClick={() => navigate("/login")} title="Back to portal selection" aria-label="Back to portal selection"><ArrowIcon direction="left" /></button>
           </div>
 
           <header className="public-register-head">
-            <div className="public-register-icon"><span>+</span></div>
+            <div className="public-register-icon"><RegisterIcon /></div>
             <span className="public-kicker">Hospital account</span>
             <h1>Register your hospital</h1>
-            <p>Create a DHRMS hospital account to manage authorized workers, doctors and healthcare workflows.</p>
+            <p>Set up your hospital profile to manage authorized workers, doctors and healthcare records in DHRMS.</p>
           </header>
 
           {error && <div className="public-alert public-alert-error" role="alert">{error}</div>}
