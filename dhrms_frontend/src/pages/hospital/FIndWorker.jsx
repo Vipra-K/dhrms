@@ -1,17 +1,19 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { getWorkerByCode } from "../../services/workerService";
+import {
+  getWorkerByCode,
+  getWorkerByPhone,
+} from "../../services/workerService";
 
 const FindWorker = () => {
   const navigate = useNavigate();
 
+  const [searchMode, setSearchMode] = useState("phone");
   const [workerCode, setWorkerCode] = useState("");
-
+  const [phone, setPhone] = useState("");
   const [worker, setWorker] = useState(null);
-
   const [error, setError] = useState("");
-
   const [loading, setLoading] = useState(false);
 
   const handleSearch = async (event) => {
@@ -20,21 +22,33 @@ const FindWorker = () => {
     setError("");
     setWorker(null);
 
-    const code = workerCode.trim();
+    const value = (searchMode === "phone" ? phone : workerCode).trim();
 
-    if (!code) {
-      setError("Please enter a worker ID");
+    if (!value) {
+      setError(
+        searchMode === "phone"
+          ? "Please enter the worker's phone number"
+          : "Please enter the worker code",
+      );
+      return;
+    }
+
+    if (searchMode === "phone" && !/^\+?[0-9]{10,15}$/.test(value)) {
+      setError("Please enter a valid phone number");
       return;
     }
 
     setLoading(true);
 
     try {
-      const data = await getWorkerByCode(code);
+      const data =
+        searchMode === "phone"
+          ? await getWorkerByPhone(value)
+          : await getWorkerByCode(value);
 
       setWorker(data);
     } catch (error) {
-      setError(error.response?.data?.error || "Worker not found");
+      setError(error.response?.data?.message || error.response?.data?.error || "Worker not found");
     } finally {
       setLoading(false);
     }
@@ -44,15 +58,54 @@ const FindWorker = () => {
     <div>
       <h1>Find Worker</h1>
 
-      <p>Enter the worker's DHRMS ID to find their record.</p>
+      <p>Identify a worker using their phone number or DHRMS worker code.</p>
+
+      <div>
+        <button
+          type="button"
+          onClick={() => {
+            setSearchMode("phone");
+            setError("");
+            setWorker(null);
+          }}
+          aria-pressed={searchMode === "phone"}
+        >
+          Phone Number
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            setSearchMode("code");
+            setError("");
+            setWorker(null);
+          }}
+          aria-pressed={searchMode === "code"}
+        >
+          Worker Code
+        </button>
+      </div>
 
       <form onSubmit={handleSearch}>
-        <input
-          type="text"
-          value={workerCode}
-          onChange={(event) => setWorkerCode(event.target.value)}
-          placeholder="DHRMS-WKR-XXXXXXXX"
-        />
+        {searchMode === "phone" ? (
+          <input
+            type="tel"
+            inputMode="tel"
+            autoComplete="tel"
+            value={phone}
+            onChange={(event) => setPhone(event.target.value)}
+            placeholder="9000000000"
+            aria-label="Worker phone number"
+          />
+        ) : (
+          <input
+            type="text"
+            value={workerCode}
+            onChange={(event) => setWorkerCode(event.target.value)}
+            placeholder="DHRMS-WKR-XXXXXXXX"
+            aria-label="Worker code"
+          />
+        )}
 
         <button type="submit" disabled={loading}>
           {loading ? "Searching..." : "Find Worker"}
