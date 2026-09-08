@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { AuthenticatedRequest, JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Roles } from '../auth/roles.decorator';
 import { RolesGuard } from '../auth/roles.guard';
@@ -10,6 +10,16 @@ import { WorkerRegistrationService } from './worker-registration.service';
 @Roles('REGISTRATION_OFFICER')
 export class WorkerRegistrationController {
   constructor(private readonly registrationService: WorkerRegistrationService) {}
+
+  @Get()
+  list(@Req() req: AuthenticatedRequest, @Query('search') search?: string) {
+    return this.registrationService.listRegisteredWorkers(req.user!.id, search);
+  }
+
+  @Get('/:workerId')
+  get(@Req() req: AuthenticatedRequest, @Param('workerId') workerId: string) {
+    return this.registrationService.getRegisteredWorker(req.user!.id, BigInt(workerId));
+  }
 
   @Post()
   register(@Req() req: AuthenticatedRequest, @Body() body: RegisterWorkerDto) {
