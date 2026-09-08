@@ -10,11 +10,11 @@ const roleNavigation = {
   ],
   HOSPITAL: [
     { to: "/hospital", label: "Dashboard", end: true },
-    { to: "/hospital/workers/scan", label: "Start Visit" },
-    { to: "/hospital/find-worker", label: "Find Worker" },
-    { to: "/hospital/workers", label: "Active Visits" },
-    { to: "/hospital/manage-workers", label: "Manage Workers" },
+    { to: "/hospital/manage-workers", label: "Workers" },
+    { to: "/hospital/assign-doctor", label: "Assign Doctor" },
     { to: "/hospital/doctors", label: "Doctors" },
+    { to: "/hospital/workers/scan", label: "Start Visit" },
+    { to: "/hospital/workers", label: "Active Visits" },
   ],
   DOCTOR: [
     { to: "/doctor", label: "Dashboard", end: true },
