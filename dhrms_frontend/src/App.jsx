@@ -17,6 +17,7 @@ import DoctorActiveVisits from "./pages/doctor/ActiveVisits";
 import DoctorEncounter from "./pages/doctor/Encounter";
 import WorkerDashboard from "./pages/worker/WorkerDashboard";
 import MyProfile from "./pages/worker/MyProfile";
+import MyQr from "./pages/worker/MyQr";
 import MedicalHistory from "./pages/worker/MedicalHistory";
 import DoctorWorkerProfile from "./pages/doctor/DoctorWorkerProfile";
 import RegistrationOfficerDashboard from "./pages/registration/RegistrationOfficerDashboard";
@@ -36,9 +37,7 @@ const App = () => (
       <Route path="/login/registration-officer" element={<RoleLogin role="REGISTRATION_OFFICER" />} />
       <Route path="/hospital/register" element={<HospitalRegister />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
-
       <Route path="/registration" element={<Protected role="REGISTRATION_OFFICER"><RegistrationOfficerDashboard /></Protected>} />
-
       <Route path="/hospital" element={<Protected role="HOSPITAL"><HospitalDashboard /></Protected>} />
       <Route path="/hospital/doctors" element={<Protected role="HOSPITAL"><DoctorManagement /></Protected>} />
       <Route path="/hospital/doctors/:doctorId" element={<Protected role="HOSPITAL"><DoctorProfile /></Protected>} />
@@ -47,16 +46,14 @@ const App = () => (
       <Route path="/hospital/workers/scan" element={<Protected role="HOSPITAL"><WorkerQrScanner /></Protected>} />
       <Route path="/hospital/find-worker" element={<Protected role="HOSPITAL"><FindWorker /></Protected>} />
       <Route path="/hospital/workers/:workerId" element={<Protected role="HOSPITAL"><WorkerProfile /></Protected>} />
-
       <Route path="/doctor" element={<Protected role="DOCTOR"><DoctorDashboard /></Protected>} />
       <Route path="/doctor/workers" element={<Protected role="DOCTOR"><DoctorActiveVisits /></Protected>} />
       <Route path="/doctor/encounters/:encounterId" element={<Protected role="DOCTOR"><DoctorEncounter /></Protected>} />
       <Route path="/doctor/workers/:workerId" element={<Protected role="DOCTOR"><DoctorWorkerProfile /></Protected>} />
-
       <Route path="/worker" element={<Protected role="WORKER"><WorkerDashboard /></Protected>} />
       <Route path="/worker/profile" element={<Protected role="WORKER"><MyProfile /></Protected>} />
+      <Route path="/worker/qr" element={<Protected role="WORKER"><MyQr /></Protected>} />
       <Route path="/worker/medical-history" element={<Protected role="WORKER"><MedicalHistory /></Protected>} />
-
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   </BrowserRouter>
