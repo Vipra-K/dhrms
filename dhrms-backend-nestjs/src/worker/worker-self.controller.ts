@@ -4,12 +4,13 @@ import { Roles } from '../auth/roles.decorator';
 import { RolesGuard } from '../auth/roles.guard';
 import { UpdateWorkerDto } from './dto/update-worker.dto';
 import { WorkerService } from './worker.service';
+import { WorkerQrService } from './worker-qr.service';
 
 @Controller('api/workers/me')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('WORKER')
 export class WorkerSelfController {
-  constructor(private readonly workerService: WorkerService) {}
+  constructor(private readonly workerService: WorkerService, private readonly workerQrService: WorkerQrService) {}
 
   @Get()
   getMyProfile(@Req() req: AuthenticatedRequest) {
@@ -24,5 +25,10 @@ export class WorkerSelfController {
   @Get('/medical-records')
   getMyMedicalRecords(@Req() req: AuthenticatedRequest) {
     return this.workerService.getMyMedicalRecords(req.user!.id);
+  }
+
+  @Get('/qr')
+  getMyQr(@Req() req: AuthenticatedRequest) {
+    return this.workerQrService.getMyWorkerQr(req.user!.id);
   }
 }
