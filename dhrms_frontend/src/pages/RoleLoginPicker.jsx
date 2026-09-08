@@ -1,9 +1,10 @@
 import { useNavigate } from "react-router-dom";
 
 const roles = [
-  { label: "Hospital", description: "Manage doctors, workers and QR identification.", path: "/login/hospital" },
-  { label: "Doctor", description: "Work with assigned workers and clinical records.", path: "/login/doctor" },
-  { label: "Worker", description: "View your profile and medical history.", path: "/login/worker" },
+  { label: "Registration Officer", description: "Verify and register migrant workers and issue DHRMS identities.", path: "/login/registration-officer" },
+  { label: "Hospital", description: "Manage doctors and conduct worker healthcare visits.", path: "/login/hospital" },
+  { label: "Doctor", description: "Handle active visits and manage clinical records.", path: "/login/doctor" },
+  { label: "Worker", description: "View your profile and personal medical history.", path: "/login/worker" },
 ];
 
 const RoleLoginPicker = () => {
