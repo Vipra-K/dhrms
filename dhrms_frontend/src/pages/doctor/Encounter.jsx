@@ -6,6 +6,18 @@ import "./medical-records.css";
 import { completeEncounter, getAiWorkerHistorySummary, getDoctorEncounter } from "../../services/encounterService";
 import { getApiError } from "../../services/api";
 
+const cleanSummary = (text = "") => {
+  return text
+    .replace(/\\?\*\*/g, "")
+    .replace(/\\?\*/g, "")
+    .replace(/<[^>]*>/g, "")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/^\s*[-•]\s*/gm, "• ")
+    .trim();
+};
+
 const Encounter = () => {
   const { encounterId } = useParams();
   const navigate = useNavigate();
@@ -24,9 +36,9 @@ const Encounter = () => {
       <div className="card worker-profile-header"><div className="person-cell"><span className="avatar">{(encounter.workerName || "W").charAt(0)}</span><div><span className="eyebrow">{encounter.workerCode}</span><h2>{encounter.workerName}</h2><p>{encounter.hospitalName}</p></div></div><span className={`status-badge ${encounter.status === "ACTIVE" ? "status-active" : "status-inactive"}`}>{encounter.status}</span></div>
       <div className="profile-grid"><div><small>Started</small><strong>{new Date(encounter.startedAt).toLocaleString()}</strong></div><div><small>Visit date</small><strong>{visitDate}</strong></div><div><small>Doctor</small><strong>{encounter.doctorName}</strong></div><div><small>Hospital</small><strong>{encounter.hospitalName}</strong></div></div>
       {encounter.status === "ACTIVE" ? <>
-        <div className="panel"><div className="section-toolbar"><div><span className="eyebrow">History</span><h2>History summary</h2><p>Use the summary as a quick reference. Check the original records before making clinical decisions.</p></div><button className="button button-primary" type="button" onClick={analyzeHistory} disabled={aiLoading}>{aiLoading ? "Loading…" : "Summarize history"}</button></div>{aiError && <div className="alert error">{aiError}</div>}{aiSummary && <div className="ai-summary" style={{ marginTop: 16, whiteSpace: "pre-wrap", lineHeight: 1.6 }}><strong>History summary</strong><p>{aiSummary.summary}</p><small>{aiSummary.recordsAnalyzed} record{aiSummary.recordsAnalyzed === 1 ? "" : "s"} reviewed · Verify against original records.</small></div>}</div>
+        <div className="panel ai-history-panel"><div className="section-toolbar"><div><span className="eyebrow">History</span><h2>AI summary</h2><p>Quick reference for the worker's previous records.</p></div><button className="button button-primary" type="button" onClick={analyzeHistory} disabled={aiLoading}>{aiLoading ? "Loading…" : aiSummary ? "Refresh summary" : "Generate summary"}</button></div>{aiError && <div className="alert error">{aiError}</div>}{aiSummary && <div className="ai-summary" style={{ marginTop: 16 }}><div className="ai-summary-content">{cleanSummary(aiSummary.summary).split(/\n+/).map((line, index) => line.trim() ? <p key={`${index}-${line.slice(0, 12)}`}>{line.trim()}</p> : null)}</div><small>{aiSummary.recordsAnalyzed} record{aiSummary.recordsAnalyzed === 1 ? "" : "s"} reviewed · Verify with the original record.</small></div>}</div>
         <MedicalRecords workerId={String(encounter.workerId)} encounterId={String(encounter.id)} />
-        <div className="panel"><div className="section-toolbar"><div><span className="eyebrow">Finish</span><h2>Complete visit</h2><p>Save all changes before completing.</p></div><button className="button button-primary" type="button" onClick={finish} disabled={completing}>{completing ? "Completing…" : "Complete visit"}</button></div></div>
+        <div className="panel"><div className="section-toolbar"><div><span className="eyebrow">Finish</span><h2>Complete visit</h2><p>Save changes before completing.</p></div><button className="button button-primary" type="button" onClick={finish} disabled={completing}>{completing ? "Completing…" : "Complete visit"}</button></div></div>
       </> : <div className="empty-state-card"><h3>Visit completed</h3><p>This visit is closed and can no longer be edited.</p><button className="button button-secondary" type="button" onClick={() => navigate("/doctor/workers")}>Back to active visits</button></div>}
     </>}
   </RoleLayout>;
