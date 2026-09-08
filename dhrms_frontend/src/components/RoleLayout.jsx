@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import "../registration-dark.css";
 
 const Icon = ({ name }) => {
   const paths = {
