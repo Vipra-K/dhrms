@@ -49,6 +49,7 @@ model Hospital {
   doctors Doctor[]
   workers Worker[]
   assignments DoctorWorkerAssignment[]
+  encounters Encounter[]
   medicalRecords MedicalRecord[]
   @@index([hospitalCode], map: "idx_hospital_code")
   @@index([hfrFacilityId], map: "idx_hospital_hfr_id")
@@ -72,31 +73,12 @@ model Doctor {
   user User @relation(fields: [userId], references: [id])
   hospital Hospital @relation(fields: [hospitalId], references: [id])
   assignments DoctorWorkerAssignment[]
+  encounters Encounter[]
   medicalRecords MedicalRecord[]
   prescriptions Prescription[]
   @@index([licenseNumber], map: "idx_doctor_license")
   @@index([hospitalId], map: "idx_doctor_hospital")
   @@map("doctors")
-}
-
-model MedicalRecordAttachment {
-  id BigInt @id @default(autoincrement())
-  medicalRecordId BigInt @map("medical_record_id")
-  fileName String @map("file_name") @db.VarChar(255)
-  storagePath String @unique @map("storage_path") @db.VarChar(700)
-  mimeType String @map("mime_type") @db.VarChar(100)
-  fileSize Int @map("file_size")
-  uploadedById BigInt @map("uploaded_by_id")
-  status String @default("ACTIVE") @db.VarChar(20)
-  revokedAt DateTime? @map("revoked_at")
-  revokedById BigInt? @map("revoked_by_id")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  medicalRecord MedicalRecord @relation(fields: [medicalRecordId], references: [id])
-  uploadedBy User @relation("MedicalAttachmentUploader", fields: [uploadedById], references: [id])
-  @@index([medicalRecordId, status], map: "idx_medical_attachment_record_status")
-  @@index([uploadedById], map: "idx_medical_attachment_uploader")
-  @@map("medical_record_attachments")
 }
 
 model Worker {
@@ -112,7 +94,7 @@ model Worker {
   address String? @db.VarChar(300)
   emergencyContactName String? @map("emergency_contact_name") @db.VarChar(150)
   emergencyContactPhone String? @map("emergency_contact_phone") @db.VarChar(20)
-  emergencyContactRelation String? @map("emergency_contact_relation") @db.VarChar(50)
+  emergencyContactRelation String? @db.VarChar(50)
   active Boolean @default(true)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -120,12 +102,34 @@ model Worker {
   hospital Hospital? @relation(fields: [hospitalId], references: [id])
   qrCode WorkerQrCode?
   assignments DoctorWorkerAssignment[]
+  encounters Encounter[]
   medicalRecords MedicalRecord[]
   prescriptions Prescription[]
   @@index([workerCode], map: "idx_worker_code")
   @@index([fullName], map: "idx_worker_name")
   @@index([hospitalId], map: "idx_worker_hospital")
   @@map("workers")
+}
+
+model Encounter {
+  id BigInt @id @default(autoincrement())
+  workerId BigInt @map("worker_id")
+  hospitalId BigInt @map("hospital_id")
+  doctorId BigInt @map("doctor_id")
+  status String @default("ACTIVE") @db.VarChar(20)
+  startedAt DateTime @default(now()) @map("started_at")
+  completedAt DateTime? @map("completed_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  worker Worker @relation(fields: [workerId], references: [id])
+  hospital Hospital @relation(fields: [hospitalId], references: [id])
+  doctor Doctor @relation(fields: [doctorId], references: [id])
+  medicalRecords MedicalRecord[]
+  @@index([workerId, status], map: "idx_encounter_worker_status")
+  @@index([hospitalId, status], map: "idx_encounter_hospital_status")
+  @@index([doctorId, status], map: "idx_encounter_doctor_status")
+  @@index([startedAt], map: "idx_encounter_started_at")
+  @@map("encounters")
 }
 
 model DoctorWorkerAssignment {
@@ -152,6 +156,7 @@ model MedicalRecord {
   workerId BigInt @map("worker_id")
   hospitalId BigInt @map("hospital_id")
   doctorId BigInt @map("doctor_id")
+  encounterId BigInt? @map("encounter_id")
   visitDate DateTime @map("visit_date") @db.Date
   symptoms String? @db.VarChar(2000)
   diagnosis String @db.VarChar(2000)
@@ -162,11 +167,13 @@ model MedicalRecord {
   worker Worker @relation(fields: [workerId], references: [id])
   hospital Hospital @relation(fields: [hospitalId], references: [id])
   doctor Doctor @relation(fields: [doctorId], references: [id])
+  encounter Encounter? @relation(fields: [encounterId], references: [id])
   prescriptions Prescription[]
   attachments MedicalRecordAttachment[]
   @@index([workerId], map: "idx_medical_record_worker")
   @@index([doctorId], map: "idx_medical_record_doctor")
   @@index([hospitalId], map: "idx_medical_record_hospital")
+  @@index([encounterId], map: "idx_medical_record_encounter")
   @@index([visitDate], map: "idx_medical_record_visit_date")
   @@map("medical_records")
 }
@@ -189,6 +196,26 @@ model Prescription {
   @@index([medicalRecordId], map: "idx_prescription_record")
   @@index([workerId], map: "idx_prescription_worker")
   @@map("prescriptions")
+}
+
+model MedicalRecordAttachment {
+  id BigInt @id @default(autoincrement())
+  medicalRecordId BigInt @map("medical_record_id")
+  fileName String @map("file_name") @db.VarChar(255)
+  storagePath String @unique @map("storage_path") @db.VarChar(700)
+  mimeType String @map("mime_type") @db.VarChar(100)
+  fileSize Int @map("file_size")
+  uploadedById BigInt @map("uploaded_by_id")
+  status String @default("ACTIVE") @db.VarChar(20)
+  revokedAt DateTime? @map("revoked_at")
+  revokedById BigInt? @map("revoked_by_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  medicalRecord MedicalRecord @relation(fields: [medicalRecordId], references: [id])
+  uploadedBy User @relation("MedicalAttachmentUploader", fields: [uploadedById], references: [id])
+  @@index([medicalRecordId, status], map: "idx_medical_attachment_record_status")
+  @@index([uploadedById], map: "idx_medical_attachment_uploader")
+  @@map("medical_record_attachments")
 }
 
 model WorkerQrCode {
