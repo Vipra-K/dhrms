@@ -31,4 +31,9 @@ export class WorkerSelfController {
   getMyQr(@Req() req: AuthenticatedRequest) {
     return this.workerQrService.getMyWorkerQr(req.user!.id);
   }
+
+  @Get('/current-visit')
+  getMyCurrentVisit(@Req() req: AuthenticatedRequest) {
+    return this.workerService.getMyCurrentVisit(req.user!.id);
+  }
 }
