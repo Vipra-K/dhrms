@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import RoleLayout from "../../components/RoleLayout";
 import MedicalRecords from "./MedicalRecords";
@@ -14,30 +14,120 @@ const Encounter = () => {
   const [error, setError] = useState("");
   const [completing, setCompleting] = useState(false);
 
-  const load = async () => {
-    try { setError(""); setEncounter(await getDoctorEncounter(encounterId)); }
-    catch (err) { setError(getApiError(err, "Unable to load this visit.")); }
-    finally { setLoading(false); }
-  };
+  const load = useCallback(async () => {
+    try {
+      setError("");
+      setLoading(true);
+      setEncounter(await getDoctorEncounter(encounterId));
+    } catch (err) {
+      setError(getApiError(err, "Unable to load this visit."));
+    } finally {
+      setLoading(false);
+    }
+  }, [encounterId]);
 
-  useEffect(() => { load(); }, [encounterId]);
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const visitDate = useMemo(
+    () => new Intl.DateTimeFormat(undefined, { dateStyle: "full" }).format(new Date()),
+    [],
+  );
 
   const finish = async () => {
-    if (!window.confirm("Complete this visit? This ends the current doctor-worker relationship. The worker will remain associated with the hospital until the hospital explicitly terminates that relationship.")) return;
-    setCompleting(true); setError("");
-    try { await completeEncounter(encounterId); navigate("/doctor/workers", { replace: true }); }
-    catch (err) { setError(getApiError(err, "Unable to complete the visit.")); }
-    finally { setCompleting(false); }
+    if (encounter?.status !== "ACTIVE") return;
+
+    const confirmed = window.confirm(
+      "Complete this visit? This closes only the current doctor-worker relationship. The worker will remain associated with the hospital until the hospital explicitly terminates that relationship. Make sure all clinical information has been saved before continuing.",
+    );
+    if (!confirmed) return;
+
+    setCompleting(true);
+    setError("");
+    try {
+      await completeEncounter(encounterId);
+      navigate("/doctor/workers", { replace: true });
+    } catch (err) {
+      setError(getApiError(err, "Unable to complete the visit."));
+    } finally {
+      setCompleting(false);
+    }
   };
 
-  return <RoleLayout title="Current visit" description="This doctor-worker relationship exists only for the active encounter. The hospital relationship remains active until the hospital terminates it.">
-    {loading && <div className="loading-card">Loading visit…</div>}
-    {error && <div className="alert error">{error}</div>}
-    {encounter && <>
-      <div className="card worker-profile-header"><div className="person-cell"><span className="avatar">{(encounter.workerName || "W").charAt(0)}</span><div><span className="eyebrow">Worker ID {encounter.workerCode}</span><h2>{encounter.workerName}</h2><p>{encounter.hospitalName} · {encounter.doctorName}</p></div></div><span className={`status-badge ${encounter.status === "ACTIVE" ? "status-active" : "status-inactive"}`}>{encounter.status}</span></div>
-      <div className="profile-grid"><div><small>Started</small><strong>{new Date(encounter.startedAt).toLocaleString()}</strong></div><div><small>Doctor</small><strong>{encounter.doctorName}</strong></div><div><small>Specialization</small><strong>{encounter.doctorSpecialization || "—"}</strong></div><div><small>Hospital</small><strong>{encounter.hospitalName}</strong></div></div>
-      {encounter.status === "ACTIVE" ? <><MedicalRecords workerId={String(encounter.workerId)} encounterId={String(encounter.id)} /><div className="panel"><div className="section-toolbar"><div><span className="eyebrow">Finish care</span><h2>Complete this visit</h2><p>Completing the visit ends only this doctor-worker relationship. The worker remains associated with the hospital.</p></div><button className="button button-primary" onClick={finish} disabled={completing}>{completing ? "Completing…" : "Complete visit"}</button></div></div></> : <div className="empty-state-card"><h3>This visit is complete</h3><p>The doctor-worker relationship is closed. The hospital-worker relationship remains active until the hospital terminates it.</p></div>}
-    </>}
-  </RoleLayout>;
+  return (
+    <RoleLayout
+      title="Current clinical visit"
+      description="Only the assigned doctor can work on this encounter. Completing it ends the doctor-worker relationship for this visit; the hospital relationship remains active."
+      actions={[
+        { label: "Refresh", onClick: load, variant: "secondary" },
+        { label: "Back to active visits", onClick: () => navigate("/doctor/workers"), variant: "secondary" },
+      ]}
+    >
+      {loading && !encounter && <div className="loading-card">Loading clinical visit…</div>}
+      {error && <div className="alert error" role="alert">{error}</div>}
+
+      {encounter && (
+        <>
+          <div className="card worker-profile-header">
+            <div className="person-cell">
+              <span className="avatar">{(encounter.workerName || "W").charAt(0)}</span>
+              <div>
+                <span className="eyebrow">Worker ID {encounter.workerCode}</span>
+                <h2>{encounter.workerName}</h2>
+                <p>{encounter.hospitalName} · {encounter.doctorName}</p>
+              </div>
+            </div>
+            <span className={`status-badge ${encounter.status === "ACTIVE" ? "status-active" : "status-inactive"}`}>
+              {encounter.status}
+            </span>
+          </div>
+
+          <div className="profile-grid">
+            <div><small>Visit started</small><strong>{new Date(encounter.startedAt).toLocaleString()}</strong></div>
+            <div><small>Visit date</small><strong>{visitDate}</strong></div>
+            <div><small>Doctor</small><strong>{encounter.doctorName}</strong></div>
+            <div><small>Hospital</small><strong>{encounter.hospitalName}</strong></div>
+          </div>
+
+          {encounter.status === "ACTIVE" ? (
+            <>
+              <div className="alert info" role="status">
+                <strong>Current visit.</strong> The medical record date is assigned automatically by the system. Create or edit the record below, then add prescriptions and attachments as needed.
+              </div>
+              <MedicalRecords
+                workerId={String(encounter.workerId)}
+                encounterId={String(encounter.id)}
+              />
+              <div className="panel">
+                <div className="section-toolbar">
+                  <div>
+                    <span className="eyebrow">Finish care</span>
+                    <h2>Complete this visit</h2>
+                    <p>Save all clinical changes before completing. After completion, this doctor cannot continue editing this encounter.</p>
+                  </div>
+                  <button
+                    className="button button-primary"
+                    type="button"
+                    onClick={finish}
+                    disabled={completing}
+                  >
+                    {completing ? "Completing…" : "Complete visit"}
+                  </button>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="empty-state-card">
+              <h3>This visit is complete</h3>
+              <p>The doctor-worker relationship for this encounter is closed. The hospital-worker relationship remains active until the hospital terminates it.</p>
+              <button className="button button-secondary" type="button" onClick={() => navigate("/doctor/workers")}>Back to active visits</button>
+            </div>
+          )}
+        </>
+      )}
+    </RoleLayout>
+  );
 };
+
 export default Encounter;
