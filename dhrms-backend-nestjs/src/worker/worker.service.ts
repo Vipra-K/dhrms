@@ -86,6 +86,39 @@ export class WorkerService {
     return this.getWorker(hospitalUserId, worker.id);
   }
 
+  async addWorkerToHospital(hospitalUserId: bigint, workerId: bigint) {
+    const hospital = await this.getHospitalByUserId(hospitalUserId);
+    const worker = await this.prisma.worker.findUnique({ where: { id: workerId } });
+    if (!worker || !worker.active) throw new NotFoundException('Active worker not found');
+
+    if (worker.hospitalId === hospital.id) {
+      return {
+        workerId: Number(worker.id),
+        workerCode: worker.workerCode,
+        hospitalId: Number(hospital.id),
+        hospitalRelationshipStatus: 'ACTIVE',
+        message: 'Worker is already associated with this hospital',
+      };
+    }
+
+    if (worker.hospitalId !== null) {
+      throw new ConflictException('Worker is currently associated with another hospital');
+    }
+
+    const updated = await this.prisma.worker.update({
+      where: { id: worker.id },
+      data: { hospitalId: hospital.id },
+    });
+
+    return {
+      workerId: Number(updated.id),
+      workerCode: updated.workerCode,
+      hospitalId: Number(hospital.id),
+      hospitalRelationshipStatus: 'ACTIVE',
+      message: 'Worker added to hospital successfully',
+    };
+  }
+
   async getWorkerForDoctor(doctorUserId: bigint, workerId: bigint) {
     const doctor = await this.prisma.doctor.findUnique({ where: { userId: doctorUserId } });
     if (!doctor) throw new NotFoundException('Doctor profile not found');
