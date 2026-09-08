@@ -40,7 +40,7 @@ export class SupabaseStorageService {
     const response = await fetch(this.objectUrl(path), {
       method: 'POST',
       headers: { ...this.headers(mimeType), 'x-upsert': 'false', 'cache-control': 'private, no-store' },
-      body: buffer,
+      body: new Uint8Array(buffer),
     });
 
     if (!response.ok) {
