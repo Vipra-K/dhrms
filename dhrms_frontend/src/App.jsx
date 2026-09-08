@@ -19,6 +19,8 @@ import WorkerDashboard from "./pages/worker/WorkerDashboard";
 import MyProfile from "./pages/worker/MyProfile";
 import MyQr from "./pages/worker/MyQr";
 import MedicalHistory from "./pages/worker/MedicalHistory";
+import Prescriptions from "./pages/worker/Prescriptions";
+import Documents from "./pages/worker/Documents";
 import DoctorWorkerProfile from "./pages/doctor/DoctorWorkerProfile";
 import RegistrationOfficerDashboard from "./pages/registration/RegistrationOfficerDashboard";
 import Unauthorized from "./pages/Unauthorized";
@@ -54,6 +56,8 @@ const App = () => (
       <Route path="/worker/profile" element={<Protected role="WORKER"><MyProfile /></Protected>} />
       <Route path="/worker/qr" element={<Protected role="WORKER"><MyQr /></Protected>} />
       <Route path="/worker/medical-history" element={<Protected role="WORKER"><MedicalHistory /></Protected>} />
+      <Route path="/worker/prescriptions" element={<Protected role="WORKER"><Prescriptions /></Protected>} />
+      <Route path="/worker/documents" element={<Protected role="WORKER"><Documents /></Protected>} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   </BrowserRouter>
