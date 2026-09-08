@@ -18,18 +18,23 @@ export class WorkerController {
   ) {}
 
   @Post('/qr/lookup')
-  lookupWorkerByQr(@Req() _req: AuthenticatedRequest, @Body() body: WorkerQrLookupDto) {
-    return this.workerQrService.getWorkerFromQr(body.qrContent);
+  lookupWorkerByQr(@Req() req: AuthenticatedRequest, @Body() body: WorkerQrLookupDto) {
+    return this.workerQrService.getWorkerFromQr(req.user!.id);
   }
 
   @Post('/phone/lookup')
-  lookupWorkerByPhone(@Req() _req: AuthenticatedRequest, @Body() body: WorkerPhoneLookupDto) {
-    return this.workerQrService.getWorkerFromPhone(body.phone);
+  lookupWorkerByPhone(@Req() req: AuthenticatedRequest, @Body() body: WorkerPhoneLookupDto) {
+    return this.workerQrService.getWorkerFromPhone(req.user!.id, body.phone);
   }
 
   @Post('/code/lookup')
-  lookupWorkerByCode(@Req() _req: AuthenticatedRequest, @Body() body: WorkerCodeLookupDto) {
-    return this.workerQrService.getWorkerFromCode(body.workerCode);
+  lookupWorkerByCode(@Req() req: AuthenticatedRequest, @Body() body: WorkerCodeLookupDto) {
+    return this.workerQrService.getWorkerFromCode(req.user!.id, body.workerCode);
+  }
+
+  @Post('/:workerId/relationship')
+  addWorkerToHospital(@Req() req: AuthenticatedRequest, @Param('workerId') workerId: string) {
+    return this.workerService.addWorkerToHospital(req.user!.id, BigInt(workerId));
   }
 
   @Patch('/:workerId/terminate-relationship')
