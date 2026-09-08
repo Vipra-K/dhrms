@@ -52,7 +52,7 @@ const RoleLogin = ({ role }) => {
           </section>
 
           <main className="public-auth-form">
-            <button className="public-back" type="button" onClick={() => navigate("/login")}>← Choose another portal</button>
+            <button className="public-back" type="button" onClick={() => navigate("/login")} style={{ display: "inline-flex", alignItems: "center", gap: 6, border: "1px solid #202a38", background: "#111722", color: "#9ca7b8", borderRadius: 8, padding: "7px 10px", fontSize: 11, fontWeight: 700 }}>← Choose another portal</button>
             <div className="public-form-head"><span style={{ color: "#9da8ff", fontSize: 10, fontWeight: 800, letterSpacing: ".14em", textTransform: "uppercase" }}>{config.code} / {config.label} access</span><h2>Welcome back</h2><p>Sign in with your DHRMS account to continue.</p></div>
             {error && <div className="public-alert public-alert-error" role="alert">{error}</div>}
             <form onSubmit={handleSubmit} className="public-form">
