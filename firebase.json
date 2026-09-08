@@ -1,5 +1,0 @@
-{
-  "storage": {
-    "rules": "dhrms-backend-nestjs/storage.rules"
-  }
-}
