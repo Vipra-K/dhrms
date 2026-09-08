@@ -4,10 +4,10 @@ const ArrowIcon = () => <svg viewBox="0 0 20 20" aria-hidden="true" className="p
 const BackIcon = () => <svg viewBox="0 0 20 20" aria-hidden="true" className="public-icon"><path d="M12.5 4.5 7 10l5.5 5.5M7.5 10H16" /></svg>;
 
 const roles = [
-  { label: "Registration Officer", code: "R", description: "Register workers, verify identity and issue DHRMS identities.", path: "/login/registration-officer" },
-  { label: "Hospital", code: "H", description: "Manage workers, doctors and healthcare visits.", path: "/login/hospital" },
-  { label: "Doctor", code: "D", description: "Handle assigned workers and clinical records.", path: "/login/doctor" },
-  { label: "Worker", code: "W", description: "View your profile, QR identity and health records.", path: "/login/worker" },
+  { label: "Registration Officer", code: "R", description: "Register workers, verify identity and maintain DHRMS records.", path: "/login/registration-officer" },
+  { label: "Hospital", code: "H", description: "Manage workers, doctors and healthcare workflows.", path: "/login/hospital" },
+  { label: "Doctor", code: "D", description: "Manage assigned workers and maintain clinical records.", path: "/login/doctor" },
+  { label: "Worker", code: "W", description: "Access your profile, QR identity and health records.", path: "/login/worker" },
 ];
 
 const RoleLoginPicker = () => {
@@ -18,9 +18,9 @@ const RoleLoginPicker = () => {
         <main className="public-role-picker">
           <button className="public-icon-btn public-back-icon" type="button" onClick={() => navigate("/")} title="Back to DHRMS home" aria-label="Back to DHRMS home"><BackIcon /></button>
           <div className="public-role-picker-head">
-            <span className="public-kicker">Secure portal access</span>
-            <h1>Choose your portal</h1>
-            <p>Select the role that matches your DHRMS account.</p>
+            <span className="public-kicker">Secure access</span>
+            <h1>Select your DHRMS portal</h1>
+            <p>Choose the portal that matches your role and continue to your workspace.</p>
           </div>
           <div className="public-role-grid">
             {roles.map((role) => (
@@ -33,7 +33,7 @@ const RoleLoginPicker = () => {
           </div>
           <button className="public-register-banner" type="button" onClick={() => navigate("/hospital/register")}>
             <span className="public-register-banner-icon">+</span>
-            <span><strong>Need a hospital account?</strong><small>Register your hospital to get started.</small></span>
+            <span><strong>Register a hospital</strong><small>Create a hospital account and set up your DHRMS workspace.</small></span>
             <ArrowIcon />
           </button>
         </main>
