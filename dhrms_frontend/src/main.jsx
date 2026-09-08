@@ -9,6 +9,7 @@ import "./public-fixes.css";
 import "./worker.css";
 import "./worker-overrides.css";
 import "./worker-polish.css";
+import "./worker-superdesign.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
