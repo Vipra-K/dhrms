@@ -33,10 +33,10 @@ const Home = () => {
           <div className="public-nav-actions">
             {isAuthenticated ? (
               <>
-                <button className="public-btn public-btn-secondary" type="button" onClick={() => navigate(dashboardPath || "/login")}>My workspace <ArrowIcon /></button>
+                <button className="public-btn public-btn-secondary" type="button" onClick={() => navigate(dashboardPath || "/login")}>My workspace </button>
                 <button className="public-btn public-btn-primary" type="button" onClick={logout}>Sign out</button>
               </>
-            ) : <button className="public-btn public-btn-primary" type="button" onClick={() => navigate("/login")}>Sign in <ArrowIcon /></button>}
+            ) : <button className="public-btn public-btn-primary" type="button" onClick={() => navigate("/login")}>Sign in </button>}
           </div>
         </nav>
 
@@ -48,7 +48,7 @@ const Home = () => {
               <p className="public-hero-copy">DHRMS connects worker identity, hospital services and clinical records in one secure, role-based system. Each role gets focused access to the information and workflows it needs.</p>
               <div className="public-actions">
                 <button className="public-btn public-btn-primary" type="button" onClick={() => navigate("/login")}>Access DHRMS <ArrowIcon /></button>
-                <button className="public-btn public-btn-secondary" type="button" onClick={() => navigate("/hospital/register")}>Register a hospital <span className="public-add-icon">+</span></button>
+                <button className="public-btn public-btn-secondary" type="button" onClick={() => navigate("/hospital/register")}>Register a hospital</button>
               </div>
               <div className="public-trust"><span>Role-based access</span><span>QR-enabled identity</span><span>Centralized health records</span></div>
             </div>
