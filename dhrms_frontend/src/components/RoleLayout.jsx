@@ -61,6 +61,7 @@ const RoleLayout = ({ title, description, actions, children }) => {
   const isWorker = user?.role === "WORKER";
   const isHospital = user?.role === "HOSPITAL";
   const isRegistrationOfficer = user?.role === "REGISTRATION_OFFICER";
+  const isDoctor = user?.role === "DOCTOR";
 
   const handleLogout = () => {
     logout();
@@ -70,7 +71,7 @@ const RoleLayout = ({ title, description, actions, children }) => {
   const currentSection = navItems.find((item) => item.to && (item.end ? location.pathname === item.to : location.pathname.startsWith(item.to)))?.label;
 
   return (
-    <div className={`app-shell ${isWorker ? "role-worker" : ""} ${isHospital ? "role-hospital" : ""} ${isRegistrationOfficer ? "role-registration" : ""}`}>
+    <div className={`app-shell ${isWorker ? "role-worker" : ""} ${isHospital ? "role-hospital" : ""} ${isRegistrationOfficer ? "role-registration" : ""} ${isDoctor ? "role-doctor" : ""}`}>
       <aside className="sidebar" aria-label={`${roleNames[user?.role] || "DHRMS"} navigation`}>
         <button className="sidebar-brand brand-button" onClick={() => navigate("/")} type="button">
           <span className="brand-mark"><span>D</span></span>
@@ -78,7 +79,7 @@ const RoleLayout = ({ title, description, actions, children }) => {
         </button>
 
         <div className="sidebar-workspace">
-          <span className="sidebar-section-label">{isHospital ? "Hospital workspace" : "Workspace"}</span>
+          <span className="sidebar-section-label">{isHospital ? "Hospital workspace" : isDoctor ? "Clinical workspace" : "Workspace"}</span>
           <nav className="sidebar-nav" aria-label="Primary navigation">
             {navItems.map((item, index) => item.group ? (
               <div className="sidebar-group-label" key={`${item.group}-${index}`}>{item.group}</div>
