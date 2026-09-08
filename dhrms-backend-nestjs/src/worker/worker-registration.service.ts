@@ -12,20 +12,17 @@ export class WorkerRegistrationService {
 
   private async assertOfficer(registrarId: bigint) {
     const registrar = await this.prisma.user.findUnique({ where: { id: registrarId } });
-    if (!registrar || registrar.status !== 'ACTIVE' || registrar.role !== 'REGISTRATION_OFFICER') {
-      throw new ForbiddenException('Only active registration officers can access registration records');
-    }
+    if (!registrar || registrar.status !== 'ACTIVE' || registrar.role !== 'REGISTRATION_OFFICER') throw new ForbiddenException('Only active registration officers can access registration records');
   }
 
   private serializeWorker(worker: any) {
     return {
-      id: Number(worker.id), workerCode: worker.workerCode, fullName: worker.fullName,
-      dateOfBirth: worker.dateOfBirth, gender: worker.gender, bloodGroup: worker.bloodGroup,
-      phone: worker.phone, address: worker.address, emergencyContactName: worker.emergencyContactName,
-      emergencyContactPhone: worker.emergencyContactPhone, emergencyContactRelation: worker.emergencyContactRelation,
-      employerName: worker.employerName, worksiteName: worker.worksiteName, worksiteAddress: worker.worksiteAddress,
-      worksiteDistrict: worker.worksiteDistrict, jobRole: worker.jobRole, registrationStatus: worker.registrationStatus,
-      active: worker.active, createdAt: worker.createdAt, updatedAt: worker.updatedAt,
+      id: Number(worker.id), workerCode: worker.workerCode, fullName: worker.fullName, dateOfBirth: worker.dateOfBirth,
+      gender: worker.gender, bloodGroup: worker.bloodGroup, phone: worker.phone, address: worker.address,
+      emergencyContactName: worker.emergencyContactName, emergencyContactPhone: worker.emergencyContactPhone,
+      emergencyContactRelation: worker.emergencyContactRelation, employerName: worker.employerName, worksiteName: worker.worksiteName,
+      worksiteAddress: worker.worksiteAddress, worksiteDistrict: worker.worksiteDistrict, jobRole: worker.jobRole,
+      registrationStatus: worker.registrationStatus, active: worker.active, createdAt: worker.createdAt, updatedAt: worker.updatedAt,
       qrStatus: worker.qrCode?.status || 'NOT_ISSUED', qrContent: worker.qrCode?.qrContent || null, qrImage: null,
     };
   }
@@ -33,18 +30,18 @@ export class WorkerRegistrationService {
   async listRegisteredWorkers(registrarId: bigint, search?: string) {
     await this.assertOfficer(registrarId);
     const term = search?.trim();
-    const workers = await this.prisma.worker.findMany({
-      where: {
-        registeredById: registrarId,
-        ...(term ? { OR: [
-          { fullName: { contains: term, mode: 'insensitive' } },
-          { workerCode: { contains: term, mode: 'insensitive' } },
-          { phone: { contains: term, mode: 'insensitive' } },
-        ] } : {}),
-      },
-      include: { qrCode: true }, orderBy: { createdAt: 'desc' },
-    });
+    const workers = await this.prisma.worker.findMany({ where: { registeredById: registrarId, ...(term ? { OR: [
+      { fullName: { contains: term, mode: 'insensitive' } }, { workerCode: { contains: term, mode: 'insensitive' } }, { phone: { contains: term, mode: 'insensitive' } },
+    ] } : {}) }, include: { qrCode: true }, orderBy: { createdAt: 'desc' } });
     return workers.map((worker) => this.serializeWorker(worker));
+  }
+
+  async checkPhone(registrarId: bigint, phone: string) {
+    await this.assertOfficer(registrarId);
+    const normalized = phone.trim();
+    if (!normalized) return { exists: false };
+    const worker = await this.prisma.worker.findFirst({ where: { phone: normalized }, select: { id: true, workerCode: true, fullName: true } });
+    return worker ? { exists: true, worker: { id: Number(worker.id), workerCode: worker.workerCode, fullName: worker.fullName } } : { exists: false };
   }
 
   async getRegisteredWorker(registrarId: bigint, workerId: bigint) {
@@ -69,19 +66,15 @@ export class WorkerRegistrationService {
     }
 
     const result = await this.prisma.$transaction(async (tx) => {
-      const user = dto.email && dto.password
-        ? await tx.user.create({ data: { email: dto.email, passwordHash: await bcrypt.hash(dto.password, 10), role: 'WORKER', status: 'ACTIVE' } }) : null;
+      const user = dto.email && dto.password ? await tx.user.create({ data: { email: dto.email, passwordHash: await bcrypt.hash(dto.password, 10), role: 'WORKER', status: 'ACTIVE' } }) : null;
       let workerCode: string;
-      do { workerCode = `DHRMS-WKR-${Math.floor(Math.random() * 100000000).toString().padStart(8, '0')}`; }
-      while (await tx.worker.findUnique({ where: { workerCode } }));
+      do { workerCode = `DHRMS-WKR-${Math.floor(Math.random() * 100000000).toString().padStart(8, '0')}`; } while (await tx.worker.findUnique({ where: { workerCode } }));
       return tx.worker.create({ data: {
-        userId: user?.id, registeredById: registrarId, registrationStatus: 'VERIFIED', workerCode,
-        fullName: dto.fullName, dateOfBirth: dto.dateOfBirth ? new Date(dto.dateOfBirth) : undefined,
-        gender: dto.gender, bloodGroup: dto.bloodGroup, phone: dto.phone, address: dto.address,
-        emergencyContactName: dto.emergencyContactName, emergencyContactPhone: dto.emergencyContactPhone,
-        emergencyContactRelation: dto.emergencyContactRelation, employerName: dto.employerName,
-        worksiteName: dto.worksiteName, worksiteAddress: dto.worksiteAddress, worksiteDistrict: dto.worksiteDistrict,
-        jobRole: dto.jobRole, active: true,
+        userId: user?.id, registeredById: registrarId, registrationStatus: 'VERIFIED', workerCode, fullName: dto.fullName,
+        dateOfBirth: dto.dateOfBirth ? new Date(dto.dateOfBirth) : undefined, gender: dto.gender, bloodGroup: dto.bloodGroup,
+        phone: dto.phone, address: dto.address, emergencyContactName: dto.emergencyContactName, emergencyContactPhone: dto.emergencyContactPhone,
+        emergencyContactRelation: dto.emergencyContactRelation, employerName: dto.employerName, worksiteName: dto.worksiteName,
+        worksiteAddress: dto.worksiteAddress, worksiteDistrict: dto.worksiteDistrict, jobRole: dto.jobRole, active: true,
       } });
     });
 
