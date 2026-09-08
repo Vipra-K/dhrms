@@ -54,7 +54,31 @@ export class WorkerQrService {
     const qrCode = await this.prisma.workerQrCode.findFirst({ where: { tokenHash, status: 'ACTIVE' }, include: { worker: true } });
     if (!qrCode) throw new BadRequestException('Invalid or revoked QR code');
     if (!qrCode.worker.active) throw new BadRequestException('Worker is inactive; QR code cannot be used');
-    return qrCode.worker;
+
+    // Worker IDs are PostgreSQL BIGINT values. Do not return the raw Prisma
+    // model here because Express JSON serialization cannot serialize BigInt.
+    // Returning an explicit public DTO also prevents internal fields from
+    // leaking through the QR lookup endpoint.
+    return {
+      id: Number(qrCode.worker.id),
+      workerCode: qrCode.worker.workerCode,
+      fullName: qrCode.worker.fullName,
+      dateOfBirth: qrCode.worker.dateOfBirth,
+      gender: qrCode.worker.gender,
+      bloodGroup: qrCode.worker.bloodGroup,
+      phone: qrCode.worker.phone,
+      address: qrCode.worker.address,
+      emergencyContactName: qrCode.worker.emergencyContactName,
+      emergencyContactPhone: qrCode.worker.emergencyContactPhone,
+      emergencyContactRelation: qrCode.worker.emergencyContactRelation,
+      employerName: qrCode.worker.employerName,
+      worksiteName: qrCode.worker.worksiteName,
+      worksiteAddress: qrCode.worker.worksiteAddress,
+      worksiteDistrict: qrCode.worker.worksiteDistrict,
+      jobRole: qrCode.worker.jobRole,
+      registrationStatus: qrCode.worker.registrationStatus,
+      active: qrCode.worker.active,
+    };
   }
 
   async revokeQr(hospitalUserId: bigint, workerId: bigint) {
