@@ -7,6 +7,7 @@ import "./index.css";
 import "./public.css";
 import "./public-fixes.css";
 import "./worker.css";
+import "./worker-overrides.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
