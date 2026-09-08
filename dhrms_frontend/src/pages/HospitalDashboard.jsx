@@ -33,7 +33,7 @@ const HospitalDashboard = () => {
 
   const recentVisits = useMemo(() => activeVisits.slice(0, 6), [activeVisits]);
 
-  if (loading) return <RoleLayout title="Hospital overview"><div className="loading-card">Loading your hospital workspace…</div></RoleLayout>;
+  if (loading) return <RoleLayout title="Hospital overview"><div className="loading-card">Loading hospital overview…</div></RoleLayout>;
   if (error) return <RoleLayout title="Hospital overview"><div className="alert error" role="alert">{error}</div></RoleLayout>;
 
   const { hospital, counts } = dashboard;
@@ -49,62 +49,68 @@ const HospitalDashboard = () => {
     >
       <section className="dashboard-welcome">
         <div>
-          <span className="eyebrow">Hospital operations</span>
-          <h2>Keep every worker visit moving from identification to care.</h2>
-          <p>Use the DHRMS QR or phone lookup to identify a worker, confirm their hospital relationship, and start the right clinical visit.</p>
+          <span className="eyebrow">Today</span>
+          <h2>Hospital overview</h2>
+          <p>Review active care and manage workers and doctors from one place.</p>
         </div>
-        <div className="dashboard-mark" aria-hidden="true">+</div>
       </section>
 
       <section className="stats-grid" aria-label="Hospital activity summary">
         <article className="stat-card">
           <div className="stat-card-top"><span className="stat-label">Active visits</span><MetricIcon>↗</MetricIcon></div>
           <strong className="stat-value">{activeVisits.length}</strong>
-          <span className="stat-helper">Visits currently in progress</span>
+          <span className="stat-helper">Currently receiving care</span>
         </article>
         <article className="stat-card">
-          <div className="stat-card-top"><span className="stat-label">Active doctors</span><MetricIcon>+</MetricIcon></div>
+          <div className="stat-card-top"><span className="stat-label">Available doctors</span><MetricIcon>+</MetricIcon></div>
           <strong className="stat-value">{counts.activeDoctors}</strong>
-          <span className="stat-helper">Clinicians available for assignments</span>
+          <span className="stat-helper">Available for new visits</span>
         </article>
       </section>
 
       <section>
         <div className="section-toolbar" style={{ marginBottom: "12px" }}>
-          <div><span className="eyebrow">Care flow</span><h2>Choose the right entry point</h2><p>Each path uses the same hospital and clinical relationships already configured in DHRMS.</p></div>
+          <div>
+            <span className="eyebrow">Quick actions</span>
+            <h2>Common tasks</h2>
+          </div>
         </div>
         <div className="workflow-grid">
           <article className="workflow-card">
-            <div className="workflow-card-top"><span className="workflow-number">01</span><span className="workflow-arrow">→</span></div>
-            <h3>Identify a worker</h3>
-            <p>Scan their QR card at reception or look them up by registered phone number.</p>
-            <div className="row-actions"><button className="button button-secondary button-small" type="button" onClick={() => navigate("/hospital/workers/scan")}>Scan QR</button><button className="button button-ghost button-small" type="button" onClick={() => navigate("/hospital/find-worker")}>Find by phone</button></div>
+            <div className="workflow-card-top"><span className="workflow-number">01</span></div>
+            <h3>Start a visit</h3>
+            <p>Identify a worker using their QR code and begin a clinical visit.</p>
+            <button className="button button-primary button-small" type="button" onClick={() => navigate("/hospital/workers/scan")}>Start visit</button>
           </article>
           <article className="workflow-card">
-            <div className="workflow-card-top"><span className="workflow-number">02</span><span className="workflow-arrow">→</span></div>
-            <h3>Assign a doctor</h3>
-            <p>Change the worker's current doctor assignment without starting a visit.</p>
-            <button className="button button-secondary button-small" type="button" onClick={() => navigate("/hospital/assign-doctor")}>Assign doctor</button>
+            <div className="workflow-card-top"><span className="workflow-number">02</span></div>
+            <h3>Find a worker</h3>
+            <p>Search for a registered worker using their phone number.</p>
+            <button className="button button-secondary button-small" type="button" onClick={() => navigate("/hospital/find-worker")}>Find worker</button>
           </article>
           <article className="workflow-card">
-            <div className="workflow-card-top"><span className="workflow-number">03</span><span className="workflow-arrow">→</span></div>
-            <h3>Monitor active care</h3>
-            <p>Review active encounters and the clinician responsible for each visit.</p>
-            <button className="button button-secondary button-small" type="button" onClick={() => navigate("/hospital/workers")}>View active visits</button>
+            <div className="workflow-card-top"><span className="workflow-number">03</span></div>
+            <h3>Manage doctors</h3>
+            <p>View hospital doctors and manage their availability and assignments.</p>
+            <button className="button button-secondary button-small" type="button" onClick={() => navigate("/hospital/doctors")}>View doctors</button>
           </article>
         </div>
       </section>
 
       <section className="panel">
         <div className="section-toolbar">
-          <div><span className="eyebrow">Live queue</span><h2>Active visits</h2><p>Workers currently receiving care at this hospital.</p></div>
+          <div>
+            <span className="eyebrow">Current activity</span>
+            <h2>Active visits</h2>
+            <p>Workers currently receiving care at this hospital.</p>
+          </div>
           <button className="button button-secondary" type="button" onClick={() => navigate("/hospital/workers")}>View all</button>
         </div>
         {recentVisits.length === 0 ? (
           <div className="empty-state-card">
-            <span className="empty-icon">+</span>
+            <span className="empty-icon">—</span>
             <h3>No active visits</h3>
-            <p>When a visit starts, the worker and assigned doctor will appear here.</p>
+            <p>There are no workers currently receiving care.</p>
             <button className="button button-primary" type="button" onClick={() => navigate("/hospital/workers/scan")}>Start a visit</button>
           </div>
         ) : (
