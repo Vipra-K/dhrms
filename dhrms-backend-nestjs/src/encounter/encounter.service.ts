@@ -25,6 +25,7 @@ export class EncounterService {
     const hospital = await this.hospitalByUser(hospitalUserId);
     const worker = await this.prisma.worker.findUnique({ where: { id: BigInt(dto.workerId) } });
     if (!worker || !worker.active) throw new NotFoundException('Active worker not found');
+    if (worker.hospitalId !== hospital.id) throw new ForbiddenException('Worker does not currently have a relationship with this hospital');
 
     const existing = await this.prisma.encounter.findFirst({
       where: { workerId: worker.id, status: 'ACTIVE' },
