@@ -11,6 +11,8 @@ const formatDateTime = (value) => {
   return new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(date);
 };
 
+const Icon = ({ children }) => <span className="worker-action-icon" aria-hidden="true">{children}</span>;
+
 const WorkerDashboard = () => {
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
@@ -27,7 +29,7 @@ const WorkerDashboard = () => {
       setProfile(profileData);
       setCurrentVisit(visitData);
     } catch (err) {
-      setError(getApiError(err, "Unable to load your dashboard."));
+      setError(getApiError(err, "We couldn't load your worker portal."));
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -36,47 +38,94 @@ const WorkerDashboard = () => {
 
   useEffect(() => { load(); }, [load]);
 
-  if (loading) return <RoleLayout title="My health"><div className="loading-card">Loading your health workspace…</div></RoleLayout>;
-  if (error && !profile) return <RoleLayout title="My health"><div className="alert error" role="alert">{error}</div><button className="button button-primary" type="button" onClick={() => load()}>Try again</button></RoleLayout>;
+  if (loading) {
+    return <RoleLayout title="Overview"><div className="loading-card">Preparing your health overview…</div></RoleLayout>;
+  }
+
+  if (error && !profile) {
+    return <RoleLayout title="Overview"><div className="alert error" role="alert">{error}</div><button className="button button-primary" type="button" onClick={() => load()}>Try again</button></RoleLayout>;
+  }
 
   return (
-    <RoleLayout title={`Welcome, ${profile.fullName}`} description={`Worker ID ${profile.workerCode}`} actions={[
-      { label: "My QR", onClick: () => navigate("/worker/qr") },
-      { label: "Medical history", onClick: () => navigate("/worker/medical-history"), variant: "secondary" },
-    ]}>
+    <RoleLayout
+      title="Your health overview"
+      description="A secure view of your DHRMS identity, care relationship and clinical records."
+      actions={[
+        { label: "My QR", icon: "⌁", onClick: () => navigate("/worker/qr") },
+        { label: "Refresh", icon: "↻", onClick: () => load(true), variant: "secondary", disabled: refreshing },
+      ]}
+    >
       {error && <div className="alert error" role="alert">{error}</div>}
-      <div className="dashboard-welcome">
-        <div><span className="eyebrow">Personal health workspace</span><h2>Your care information, in one place.</h2><p>Use your QR for identification, see your current visit, and review your complete clinical history across hospitals.</p></div>
-        <div className="dashboard-mark">W</div>
-      </div>
+
+      <section className="dashboard-welcome" aria-labelledby="worker-welcome-title">
+        <div>
+          <span className="eyebrow">Personal health workspace</span>
+          <h2 id="worker-welcome-title">Welcome back, {profile.fullName}.</h2>
+          <p>Your verified worker identity connects you to authorized hospital and clinical records. Use the navigation to review your information whenever you need it.</p>
+        </div>
+        <div className="dashboard-mark" title="Worker account" aria-label="Worker account">W</div>
+      </section>
 
       <div className="card-row">
-        <article className="card"><span className="eyebrow">Current hospital</span><h2>{profile.hospital?.name || "Not assigned"}</h2><p>{profile.hospital?.code || "No hospital relationship yet"}{profile.hospital?.city ? ` · ${profile.hospital.city}` : ""}</p></article>
-        <article className="card"><span className="eyebrow">Assigned doctor</span><h2>{profile.assignedDoctor?.name || "Not assigned"}</h2><p>{profile.assignedDoctor?.specialization || "No doctor is currently assigned."}</p></article>
-        <article className="card"><span className="eyebrow">Worker status</span><h2>{profile.active ? "ACTIVE" : "INACTIVE"}</h2><p>Your DHRMS identity remains tied to your worker profile.</p></article>
+        <article className="card">
+          <span className="eyebrow">Worker identity</span>
+          <h2>{profile.workerCode || "—"}</h2>
+          <p>Your unique DHRMS worker identifier.</p>
+        </article>
+        <article className="card">
+          <span className="eyebrow">Care relationship</span>
+          <h2>{profile.hospital?.name || "No hospital assigned"}</h2>
+          <p>{profile.assignedDoctor?.name ? `Dr. ${profile.assignedDoctor.name}` : "No doctor is currently assigned"}</p>
+        </article>
+        <article className="card">
+          <span className="eyebrow">Account status</span>
+          <h2>{profile.active ? "Active" : "Inactive"}</h2>
+          <p>{profile.active ? "Your worker identity is active in DHRMS." : "Contact your registration officer if this is unexpected."}</p>
+        </article>
       </div>
 
-      <div className="panel">
+      <section className="panel" aria-labelledby="current-care-title">
         <div className="section-toolbar">
-          <div><span className="eyebrow">Current visit</span><h2>{currentVisit ? "You are currently being seen" : "No active visit"}</h2></div>
-          <button className="button button-secondary" type="button" onClick={() => load(true)} disabled={refreshing}>{refreshing ? "Refreshing…" : "Refresh"}</button>
+          <div>
+            <span className="eyebrow">Current care</span>
+            <h2 id="current-care-title">{currentVisit ? "An active visit is in progress" : "No active visit"}</h2>
+            <p>{currentVisit ? "The hospital has an open clinical encounter for your worker record." : "When a hospital starts a visit for you, its details will appear here."}</p>
+          </div>
+          <button className="button button-secondary worker-icon-button" type="button" onClick={() => load(true)} disabled={refreshing} aria-label="Refresh current visit" title="Refresh current visit">
+            <Icon>↻</Icon>
+          </button>
         </div>
         {currentVisit ? (
-          <div className="record-fields">
-            <div><small>Hospital</small><p>{currentVisit.hospitalName}</p></div>
-            <div><small>Doctor</small><p>{currentVisit.doctorName}</p></div>
+          <div className="record-fields worker-current-visit">
+            <div><small>Hospital</small><p>{currentVisit.hospitalName || "—"}</p></div>
+            <div><small>Doctor</small><p>{currentVisit.doctorName || "—"}</p></div>
             <div><small>Specialization</small><p>{currentVisit.doctorSpecialization || "—"}</p></div>
             <div><small>Visit started</small><p>{formatDateTime(currentVisit.startedAt)}</p></div>
             <div><small>Status</small><p><span className="status-badge status-active">ACTIVE</span></p></div>
           </div>
         ) : (
-          <p>Your next visit will appear here when a hospital starts an encounter for you.</p>
+          <div className="worker-empty-inline"><span className="worker-empty-icon">✓</span><div><strong>You are not currently checked in.</strong><p>No active clinical encounter is associated with your worker record.</p></div></div>
         )}
-      </div>
+      </section>
 
-      <div className="panel">
-        <div className="section-toolbar"><div><span className="eyebrow">Your records</span><h2>Access your health information</h2></div><button className="button button-primary" type="button" onClick={() => navigate("/worker/medical-history")}>View medical history</button></div>
-        <p>Clinical records are maintained by authorized doctors and remain available to you through your own account. Your portal is read-only for clinical information.</p>
+      <section className="worker-quick-grid" aria-label="Health record shortcuts">
+        <button className="worker-quick-card" type="button" onClick={() => navigate("/worker/medical-history")}>
+          <span className="worker-quick-icon">▤</span><span><strong>Medical history</strong><small>Review visits, diagnoses, treatments and clinical notes.</small></span><span className="worker-quick-arrow">→</span>
+        </button>
+        <button className="worker-quick-card" type="button" onClick={() => navigate("/worker/prescriptions")}>
+          <span className="worker-quick-icon">Rx</span><span><strong>Prescriptions</strong><small>Review medicines and instructions issued during visits.</small></span><span className="worker-quick-arrow">→</span>
+        </button>
+        <button className="worker-quick-card" type="button" onClick={() => navigate("/worker/documents")}>
+          <span className="worker-quick-icon">□</span><span><strong>Documents</strong><small>Open medical documents attached to your records.</small></span><span className="worker-quick-arrow">→</span>
+        </button>
+        <button className="worker-quick-card" type="button" onClick={() => navigate("/worker/profile")}>
+          <span className="worker-quick-icon">○</span><span><strong>Profile</strong><small>Keep your contact and emergency details current.</small></span><span className="worker-quick-arrow">→</span>
+        </button>
+      </section>
+
+      <div className="dashboard-note worker-privacy-note">
+        <strong>Privacy by design</strong>
+        <span>Your clinical information is read-only in the worker portal. Only authorized healthcare staff can create or update clinical records.</span>
       </div>
     </RoleLayout>
   );
