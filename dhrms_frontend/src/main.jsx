@@ -11,6 +11,7 @@ import "./worker-overrides.css";
 import "./worker-polish.css";
 import "./worker-superdesign.css";
 import "./worker-ux-v2.css";
+import "./dark-theme.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
