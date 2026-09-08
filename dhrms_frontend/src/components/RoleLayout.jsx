@@ -20,8 +20,9 @@ const roleNavigation = {
   ],
   WORKER: [
     { to: "/worker", label: "Dashboard", end: true },
-    { to: "/worker/profile", label: "My Profile" },
+    { to: "/worker/qr", label: "My QR" },
     { to: "/worker/medical-history", label: "Medical History" },
+    { to: "/worker/profile", label: "My Profile" },
   ],
 };
 
@@ -42,10 +43,10 @@ const RoleLayout = ({ title, description, actions, children }) => {
         <nav className="sidebar-nav" aria-label="Primary navigation">
           {navItems.map((item) => <NavLink key={item.to} to={item.to} end={item.end} className={({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`}><span className="nav-dot" />{item.label}</NavLink>)}
         </nav>
-        <div className="sidebar-footer"><div className="sidebar-user"><div className="avatar">{(user?.email || "U").charAt(0).toUpperCase()}</div><div className="sidebar-user-copy"><strong>{user?.email || "User"}</strong><small>{roleNames[user?.role] || user?.role || "Account"}</small></div></div><button className="button button-secondary sidebar-logout" onClick={handleLogout}>Sign out</button></div>
+        <div className="sidebar-footer"><div className="sidebar-user"><div className="avatar">{(user?.email || "U").charAt(0).toUpperCase()}</div><div className="sidebar-user-copy"><strong>{user?.email || "User"}</strong><small>{roleNames[user?.role] || user?.role || "Account"}</small></div></div><button className="button button-secondary sidebar-logout" onClick={handleLogout} type="button">Sign out</button></div>
       </aside>
       <main className="content-area">
-        <header className="page-header"><div><p className="eyebrow">{roleNames[user?.role] || "DHRMS"}</p><h1>{title}</h1>{description && <p className="page-description">{description}</p>}</div>{actions?.length > 0 && <div className="header-actions">{actions.map((action) => <button key={action.label} type="button" className={action.variant === "secondary" ? "button button-secondary" : "button button-primary"} onClick={action.onClick}>{action.label}</button>)}</div>}</header>
+        <header className="page-header"><div><p className="eyebrow">{roleNames[user?.role] || "DHRMS"}</p><h1>{title}</h1>{description && <p className="page-description">{description}</p>}</div>{actions?.length > 0 && <div className="header-actions">{actions.map((action) => <button key={action.label} type="button" disabled={action.disabled} className={action.variant === "secondary" ? "button button-secondary" : "button button-primary"} onClick={action.onClick}>{action.label}</button>)}</div>}</header>
         <div className="breadcrumbs"><button type="button" onClick={() => navigate("/")}>DHRMS</button><span>/</span><span>{location.pathname.split("/").filter(Boolean).pop() || "dashboard"}</span></div>
         <section className="page-content">{children}</section>
       </main>
