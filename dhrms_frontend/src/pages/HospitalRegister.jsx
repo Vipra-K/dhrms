@@ -2,9 +2,21 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { registerHospital } from "../services/authService";
 
-const ArrowIcon = ({ direction = "right" }) => <svg viewBox="0 0 20 20" aria-hidden="true" className="public-icon">{direction === "left" ? <path d="M12.5 4.5 7 10l5.5 5.5M7.5 10H16" /> : <path d="M7.5 4.5 13 10l-5.5 5.5M4 10h9" />}</svg>;
-const RegisterIcon = () => <svg viewBox="0 0 20 20" aria-hidden="true" className="public-icon"><path d="M10 4v12M4 10h12" /></svg>;
-const LoginIcon = () => <svg viewBox="0 0 20 20" aria-hidden="true" className="public-icon"><path d="M11 4h5v12h-5M10 10H4m0 0 3-3M4 10l3 3" /></svg>;
+const ArrowIcon = ({ direction = "right" }) => (
+  <svg viewBox="0 0 20 20" aria-hidden="true" className="public-icon">
+    {direction === "left" ? (
+      <path d="M12.5 4.5 7 10l5.5 5.5M7.5 10H16" />
+    ) : (
+      <path d="M4 10h11M10.5 5.5 15 10l-4.5 4.5" />
+    )}
+  </svg>
+);
+
+const RegisterIcon = () => (
+  <svg viewBox="0 0 20 20" aria-hidden="true" className="public-icon">
+    <path d="M10 4v12M4 10h12" />
+  </svg>
+);
 
 const HospitalRegister = () => {
   const navigate = useNavigate();
@@ -23,7 +35,7 @@ const HospitalRegister = () => {
     try {
       const response = await registerHospital(form);
       setSuccess(response.message || "Hospital account created successfully.");
-      setTimeout(() => navigate("/login"), 1400);
+      setTimeout(() => navigate("/login/hospital"), 1400);
     } catch (err) {
       setError(err.response?.data?.error || "We couldn't create the hospital account. Please review the details and try again.");
     } finally {
@@ -32,18 +44,20 @@ const HospitalRegister = () => {
   };
 
   return (
-    <div className="public-auth-shell">
+    <div className="public-auth-shell public-register-shell">
       <div className="public-auth-wrap public-register-wrap">
         <main className="public-auth-card public-register-card">
           <div className="public-register-topbar">
-            <button className="public-icon-btn public-register-back" type="button" onClick={() => navigate("/login")} title="Back to portal selection" aria-label="Back to portal selection"><ArrowIcon direction="left" /></button>
+            <button className="public-icon-btn public-register-back" type="button" onClick={() => navigate("/login")} title="Back to portal selection" aria-label="Back to portal selection">
+              <ArrowIcon direction="left" />
+            </button>
           </div>
 
           <header className="public-register-head">
             <div className="public-register-icon"><RegisterIcon /></div>
-            <span className="public-kicker">Hospital account</span>
+            <span className="public-kicker">Hospital registration</span>
             <h1>Register your hospital</h1>
-            <p>Set up your hospital profile to manage authorized workers, doctors and healthcare records in DHRMS.</p>
+            <p>Set up your hospital account to manage authorised workers, doctors and healthcare workflows.</p>
           </header>
 
           {error && <div className="public-alert public-alert-error" role="alert">{error}</div>}
@@ -62,10 +76,16 @@ const HospitalRegister = () => {
               <div className="public-field"><label htmlFor="district">District</label><input id="district" className="public-input" name="district" value={form.district} onChange={handleChange} placeholder="District" /></div>
             </div>
 
-            <button type="submit" className="public-btn public-btn-primary public-submit" disabled={loading}><span>{loading ? "Creating account…" : "Create hospital account"}</span>{loading ? null : <RegisterIcon />}</button>
+            <button type="submit" className="public-btn public-btn-primary public-submit" disabled={loading}>
+              <span>{loading ? "Creating account…" : "Create hospital account"}</span>
+              {loading ? null : <RegisterIcon />}
+            </button>
           </form>
 
-          <div className="public-form-footer public-register-footer"><span>Already have an account?</span><Link className="public-icon-link" to="/login" title="Sign in" aria-label="Sign in"><LoginIcon /></Link></div>
+          <div className="public-form-footer public-register-footer">
+            <span>Already have a hospital account?</span>
+            <Link className="public-text-link public-register-login-link" to="/login/hospital">Login <ArrowIcon /></Link>
+          </div>
         </main>
       </div>
     </div>
