@@ -23,7 +23,7 @@ export class WorkerRegistrationService {
       emergencyContactRelation: worker.emergencyContactRelation, employerName: worker.employerName, worksiteName: worker.worksiteName,
       worksiteAddress: worker.worksiteAddress, worksiteDistrict: worker.worksiteDistrict, jobRole: worker.jobRole,
       registrationStatus: worker.registrationStatus, active: worker.active, createdAt: worker.createdAt, updatedAt: worker.updatedAt,
-      qrStatus: worker.qrCode?.status || 'NOT_ISSUED', qrContent: worker.qrCode?.qrContent || null, qrImage: null,
+      qrStatus: worker.qrCode?.status || 'NOT_ISSUED', qrContent: worker.qrCode?.qrContent || null, qrImage: null as string | null,
     };
   }
 
