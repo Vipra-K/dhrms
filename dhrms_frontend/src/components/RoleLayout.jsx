@@ -21,12 +21,12 @@ const roleNavigation = {
     { to: "/doctor/workers", label: "Active Visits" },
   ],
   WORKER: [
-    { to: "/worker", label: "Dashboard", end: true },
+    { to: "/worker", label: "Overview", end: true },
     { to: "/worker/qr", label: "My QR" },
-    { to: "/worker/medical-history", label: "Medical History" },
+    { to: "/worker/medical-history", label: "Medical history" },
     { to: "/worker/prescriptions", label: "Prescriptions" },
     { to: "/worker/documents", label: "Documents" },
-    { to: "/worker/profile", label: "My Profile" },
+    { to: "/worker/profile", label: "Profile" },
   ],
 };
 
@@ -42,6 +42,7 @@ const RoleLayout = ({ title, description, actions, children }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const navItems = useMemo(() => roleNavigation[user?.role] || [], [user?.role]);
+  const isWorker = user?.role === "WORKER";
 
   const handleLogout = () => {
     logout();
@@ -49,7 +50,7 @@ const RoleLayout = ({ title, description, actions, children }) => {
   };
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell ${isWorker ? "role-worker" : ""}`}>
       <aside className="sidebar" aria-label={`${roleNames[user?.role] || "DHRMS"} navigation`}>
         <button className="sidebar-brand brand-button" onClick={() => navigate("/")} type="button">
           <span className="brand-mark">D</span>
@@ -82,8 +83,9 @@ const RoleLayout = ({ title, description, actions, children }) => {
           {actions?.length > 0 && (
             <div className="header-actions">
               {actions.map((action) => (
-                <button key={action.label} type="button" disabled={action.disabled} className={action.variant === "secondary" ? "button button-secondary" : "button button-primary"} onClick={action.onClick}>
-                  {action.label}
+                <button key={action.label} type="button" disabled={action.disabled} aria-label={action.label} title={action.label} className={action.variant === "secondary" ? "button button-secondary" : "button button-primary"} onClick={action.onClick}>
+                  {action.icon ? <span aria-hidden="true">{action.icon}</span> : null}
+                  <span>{action.label}</span>
                 </button>
               ))}
             </div>
