@@ -10,6 +10,7 @@ import "./worker.css";
 import "./worker-overrides.css";
 import "./worker-polish.css";
 import "./worker-superdesign.css";
+import "./worker-ux-v2.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
