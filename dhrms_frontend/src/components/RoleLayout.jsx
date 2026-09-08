@@ -9,6 +9,7 @@ const roleNavigation = {
   HOSPITAL: [
     { to: "/hospital", label: "Dashboard", end: true },
     { to: "/hospital/workers/scan", label: "Start Visit" },
+    { to: "/hospital/find-worker", label: "Find Worker" },
     { to: "/hospital/workers", label: "Visits" },
     { to: "/hospital/doctors", label: "Doctors" },
   ],

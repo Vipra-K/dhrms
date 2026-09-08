@@ -55,11 +55,13 @@ const WorkerQrScanner = () => {
     } finally { setStarting(false); }
   };
 
-  return <RoleLayout title="Start a worker visit" description="Identify the worker, verify the identity, and create a temporary healthcare encounter.">
+  return <RoleLayout title="Start a worker visit" description="Identify the worker, verify the identity, and create a temporary healthcare encounter." actions={[
+    { label: "Find by Phone/ID", onClick: () => navigate("/hospital/find-worker"), variant: "secondary" },
+  ]}>
     {error && <div className="alert error" role="alert">{error}</div>}
     <div className="scanner-layout">
       <div className="panel scanner-panel">
-        {!worker ? <><div className="panel-heading"><div><span className="eyebrow">Step 1</span><h2>Scan worker QR</h2><p>Ask the worker to show their DHRMS QR card and place it inside the frame.</p></div></div><div id="worker-qr-reader" className="qr-reader" aria-busy={scanning} /></> : <>
+        {!worker ? <><div className="panel-heading"><div><span className="eyebrow">Step 1</span><h2>Scan worker QR</h2><p>Ask the worker to show their DHRMS QR card and place it inside the frame, or search by phone/ID below.</p></div></div><div id="worker-qr-reader" className="qr-reader" aria-busy={scanning} /><div style={{ marginTop: "1rem", textAlign: "center" }}><button type="button" className="button button-secondary" onClick={() => navigate("/hospital/find-worker")}>Find worker by Phone or Worker ID instead</button></div></> : <>
           <div className="panel-heading"><div><span className="eyebrow">Step 2</span><h2>Confirm worker</h2><p>This identifies the worker; it does not permanently connect them to this hospital.</p></div></div>
           <div className="scan-success"><span className="status-badge status-active">Verified worker</span><div className="scan-person"><span className="avatar">{(worker.fullName || "W").charAt(0)}</span><div><h3>{worker.fullName}</h3><p>{worker.workerCode}</p></div></div><div className="scan-details"><span><small>Blood group</small><strong>{worker.bloodGroup || "—"}</strong></span><span><small>Phone</small><strong>{worker.phone || "—"}</strong></span><span><small>Date of birth</small><strong>{worker.dateOfBirth ? String(worker.dateOfBirth).slice(0, 10) : "—"}</strong></span></div></div>
           <div className="field"><label htmlFor="doctor">Doctor for this visit</label><select id="doctor" className="select" value={doctorId} onChange={(e) => setDoctorId(e.target.value)}><option value="">Select an active doctor</option>{doctors.map((doctor) => <option key={doctor.id} value={doctor.id}>{doctor.fullName}{doctor.specialization ? ` · ${doctor.specialization}` : ""}</option>)}</select></div>

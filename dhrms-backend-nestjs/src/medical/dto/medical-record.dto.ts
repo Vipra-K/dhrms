@@ -1,8 +1,9 @@
+import { Type } from 'class-transformer';
 import { IsDateString, IsInt, IsNotEmpty, IsOptional, MaxLength } from 'class-validator';
 
 export class MedicalRecordDto {
   @IsDateString() visitDate!: string;
-  @IsOptional() @IsInt() encounterId?: number;
+  @IsOptional() @Type(() => Number) @IsInt() encounterId?: number;
   @IsOptional() @MaxLength(2000) symptoms?: string;
   @IsNotEmpty() @MaxLength(2000) diagnosis!: string;
   @IsOptional() @MaxLength(3000) treatment?: string;

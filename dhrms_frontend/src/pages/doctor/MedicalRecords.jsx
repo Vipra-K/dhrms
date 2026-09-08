@@ -16,7 +16,7 @@ const MedicalRecords = ({ workerId, encounterId }) => {
   useEffect(() => { let ignore = false; (async () => { try { const data = await getMedicalRecords(workerId); if (!ignore) setRecords(data); } catch (err) { if (!ignore) setError(getApiError(err, "Unable to load medical records.")); } finally { if (!ignore) setLoading(false); } })(); return () => { ignore = true; }; }, [workerId]);
 
   const submitRecord = async (e) => { e.preventDefault(); setSaving(true); setError(""); try {
-    const data = { ...recordForm, ...(recordTarget ? {} : { encounterId: String(encounterId) }) };
+    const data = { ...recordForm, ...(recordTarget ? {} : { encounterId: Number(encounterId) }) };
     const saved = recordTarget ? await updateMedicalRecord(recordTarget.id, data) : await createMedicalRecord(workerId, data);
     let attachments = saved.attachments || []; if (attachmentFiles.length) attachments = [...attachments, ...(await uploadMedicalAttachments(saved.id, attachmentFiles))];
     const withAttachments = { ...saved, attachments }; setRecords((current) => recordTarget ? current.map((r) => r.id === saved.id ? withAttachments : r) : [withAttachments, ...current]);

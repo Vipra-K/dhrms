@@ -72,6 +72,21 @@ export class WorkerQrService {
     return this.toLookupResponse(worker);
   }
 
+  async getWorkerFromCode(workerCode: string) {
+    const code = workerCode.trim();
+    if (!code) throw new BadRequestException('Worker ID is required');
+
+    const worker = await this.prisma.worker.findFirst({
+      where: {
+        workerCode: code,
+        active: true,
+      },
+    });
+
+    if (!worker) throw new NotFoundException('Worker not found');
+    return this.toLookupResponse(worker);
+  }
+
   async revokeQr(hospitalUserId: bigint, workerId: bigint) {
     const worker = await this.ownedWorker(hospitalUserId, workerId);
     const existing = await this.prisma.workerQrCode.findUnique({ where: { workerId } });

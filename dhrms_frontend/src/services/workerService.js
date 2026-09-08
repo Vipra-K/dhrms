@@ -19,6 +19,7 @@ export const getOrCreateWorkerQr = async (workerId) => {
 };
 export const lookupWorkerByQr = async (qrContent) => (await api.post("/hospitals/workers/qr/lookup", { qrContent })).data;
 export const lookupWorkerByPhone = async (phone) => (await api.post("/hospitals/workers/phone/lookup", { phone })).data;
+export const lookupWorkerByCode = async (workerCode) => (await api.post("/hospitals/workers/code/lookup", { workerCode })).data;
 export const getWorkerAssignment = async (workerId) => (await api.get(`/hospitals/workers/${workerId}/assignment`)).data;
 export const getWorkerAssignmentHistory = async (workerId) => (await api.get(`/hospitals/workers/${workerId}/assignment/history`)).data;
 export const assignWorkerToDoctor = async (workerId, doctorId) => (await api.post(`/hospitals/workers/${workerId}/assignment`, { doctorId: String(doctorId) })).data;
