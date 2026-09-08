@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthenticatedRequest, JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Roles } from '../auth/roles.decorator';
 import { RolesGuard } from '../auth/roles.guard';
@@ -13,6 +13,8 @@ import { WorkerService } from './worker.service';
 @Roles('HOSPITAL')
 export class WorkerController {
   constructor(private readonly workerQrService: WorkerQrService, private readonly workerService: WorkerService) {}
+  @Get()
+  getWorkers(@Req() req: AuthenticatedRequest) { return this.workerService.getWorkers(req.user!.id); }
   @Post('/qr/lookup')
   lookupWorkerByQr(@Req() req: AuthenticatedRequest, @Body() body: WorkerQrLookupDto) { return this.workerQrService.getWorkerFromQr(req.user!.id, body.qrContent); }
   @Post('/phone/lookup')
