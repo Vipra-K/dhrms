@@ -54,17 +54,15 @@ const FindWorker = () => {
     setStarting(true); setError(""); setSuccess("");
     try {
       await startEncounter(worker.id, doctorId);
-      // Hospital users must remain in hospital-scoped routes. The doctor owns the clinical encounter UI.
       setSuccess("Visit started successfully. The worker has been assigned to the selected doctor.");
-      setTimeout(() => navigate("/hospital/active-visits"), 700);
-    }
-    catch (err) { setError(getApiError(err, "Unable to start the visit.")); }
+      setTimeout(() => navigate("/hospital/workers"), 700);
+    } catch (err) { setError(getApiError(err, "Unable to start the visit.")); }
     finally { setStarting(false); }
   };
 
   const relationship = worker?.hospitalRelationshipStatus;
 
-  return <RoleLayout title="Find Worker" description="Identify a worker by phone number, then add them to this hospital before starting a visit." actions={[{ label: "Scan Worker QR", onClick: () => navigate("/hospital/workers/scan"), variant: "secondary" }]}>
+  return <RoleLayout title="Find Worker" description="Identify a worker by phone number, then add them to this hospital before starting a visit." actions={[{ label: "Scan Worker QR", onClick: () => navigate("/hospital/workers/scan"), variant: "secondary" }, { label: "Manage Workers", onClick: () => navigate("/hospital/manage-workers"), variant: "secondary" }]}>
     {error && <div className="alert error" role="alert">{error}</div>}
     {success && <div className="alert success" role="status">{success}</div>}
     <div className="scanner-layout">
@@ -82,7 +80,7 @@ const FindWorker = () => {
           {relationship === "ACTIVE" && <><div className="field" style={{ marginTop: "1rem" }}><label htmlFor="doctor">Doctor for this visit</label><select id="doctor" className="select" value={doctorId} onChange={(e) => setDoctorId(e.target.value)}><option value="">Select an active doctor</option>{doctors.map((doctor) => <option key={doctor.id} value={doctor.id}>{doctor.fullName}{doctor.specialization ? ` · ${doctor.specialization}` : ""}</option>)}</select></div>{doctors.length === 0 && <div className="alert error">No active clinical doctor is available at this hospital.</div>}<div className="modal-actions" style={{ marginTop: "1rem" }}><button type="button" className="button button-secondary" onClick={() => { setWorker(null); setValue(""); setSuccess(""); }}>Clear</button><button type="button" className="button button-primary" onClick={handleStartVisit} disabled={starting || !doctorId || doctors.length === 0}>{starting ? "Starting visit…" : "Start visit"}</button></div></>}
         </div>}
       </div>
-      <aside className="card scanner-help"><span className="eyebrow">Hospital workflow</span><h3>Relationship first, visit second</h3><ol><li>Find the worker by phone or scan their QR.</li><li>If they are not associated with this hospital, click <strong>Add to hospital</strong>.</li><li>Select the doctor handling the current visit.</li><li>Start the encounter. Completing the visit will end only the doctor relationship.</li></ol></aside>
+      <aside className="card scanner-help"><span className="eyebrow">Hospital workflow</span><h3>Relationship first, visit second</h3><ol><li>Find the worker by phone or scan their QR.</li><li>If they are not associated with this hospital, click <strong>Add to hospital</strong>.</li><li>Select the doctor handling the current visit.</li><li>Start the encounter. Completing the visit will end only the doctor assignment.</li><li>Use <strong>Manage Workers</strong> when the hospital needs to end its relationship with a worker.</li></ol></aside>
     </div>
   </RoleLayout>;
 };
