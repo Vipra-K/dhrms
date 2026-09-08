@@ -49,13 +49,12 @@ const RoleLogin = ({ role }) => {
       <div className="public-auth-wrap">
         <div className="public-auth-card public-auth-split">
           <section className="public-auth-intro">
-            <button className="public-brand" type="button" onClick={() => navigate("/")}><span className="public-brand-mark">D</span>DHRMS</button>
+            <button className="public-icon-btn public-auth-back" type="button" onClick={() => navigate("/")} title="Back to DHRMS home" aria-label="Back to DHRMS home"><ArrowIcon direction="left" /></button>
             <div className="public-auth-intro-copy"><span className="public-kicker">{config.label} portal</span><h1>Secure access to the right records.</h1><p>{config.description}</p></div>
             <div className="public-auth-points"><div>✓ Secure role-based access</div><div>✓ Role-specific workflows</div><div>✓ Controlled access to health records</div></div>
           </section>
 
           <main className="public-auth-form">
-            <button className="public-icon-btn public-back-icon" type="button" onClick={() => navigate("/login")} title="Choose another portal" aria-label="Choose another portal"><ArrowIcon direction="left" /></button>
             <div className="public-form-head"><span className="public-form-code">{config.code} / {config.label} access</span><h2>Sign in to DHRMS</h2><p>Use your DHRMS credentials to continue to your workspace.</p></div>
             {error && <div className="public-alert public-alert-error" role="alert">{error}</div>}
             <form onSubmit={handleSubmit} className="public-form">
