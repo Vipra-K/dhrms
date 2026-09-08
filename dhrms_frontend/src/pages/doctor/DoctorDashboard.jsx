@@ -27,7 +27,7 @@ const DoctorDashboard = () => {
       const data = await getMyDoctorDashboard();
       setDashboard(data || {});
     } catch (err) {
-      setError(getApiError(err, "Unable to load your clinical dashboard."));
+      setError(getApiError(err, "Unable to load the dashboard."));
     } finally {
       setLoading(false);
     }
@@ -37,20 +37,17 @@ const DoctorDashboard = () => {
     load();
   }, [load]);
 
-  // Keep every hook above the conditional returns. This prevents the
-  // React "Rendered more hooks than during the previous render" error
-  // when the dashboard changes from loading -> loaded state.
   if (loading && !dashboard) {
     return (
-      <RoleLayout title="Clinical dashboard">
-        <div className="loading-card">Loading your clinical workspace…</div>
+      <RoleLayout title="Dashboard">
+        <div className="loading-card">Loading dashboard…</div>
       </RoleLayout>
     );
   }
 
   if (error && !dashboard) {
     return (
-      <RoleLayout title="Clinical dashboard">
+      <RoleLayout title="Dashboard">
         <div className="alert error" role="alert">{error}</div>
         <button className="button button-primary" type="button" onClick={load}>Try again</button>
       </RoleLayout>
@@ -65,24 +62,21 @@ const DoctorDashboard = () => {
   const completedToday = counts.completedVisits ?? 0;
   const assignedWorkers = counts.assignedWorkers ?? 0;
   const todayVisits = counts.visitsToday ?? 0;
-  const workloadLabel = activeCount === 0
-    ? "No active encounters"
-    : `${activeCount} encounter${activeCount === 1 ? "" : "s"} requiring attention`;
 
   const metrics = [
-    { label: "Active encounters", value: activeCount, helper: activeCount ? "Currently in your clinical queue" : "Your queue is clear", icon: "01" },
-    { label: "Today's visits", value: todayVisits, helper: "Records created today", icon: "02" },
-    { label: "Completed today", value: completedToday, helper: "Encounters closed today", icon: "03" },
-    { label: "Assigned workers", value: assignedWorkers, helper: "Workers currently assigned to you", icon: "04" },
+    { label: "Active visits", value: activeCount, helper: "Needs attention" },
+    { label: "Today's visits", value: todayVisits, helper: "Today" },
+    { label: "Completed", value: completedToday, helper: "Today" },
+    { label: "My workers", value: assignedWorkers, helper: "Assigned" },
   ];
 
   return (
     <RoleLayout
-      title="Clinical dashboard"
+      title="Dashboard"
       description={`${doctor.specialization || "Doctor"}${doctor.department ? ` · ${doctor.department}` : ""}`}
       actions={[
         { label: "Refresh", onClick: load, variant: "secondary", disabled: loading },
-        { label: "Open active visits", onClick: () => navigate("/doctor/workers") },
+        { label: "Active visits", onClick: () => navigate("/doctor/workers") },
       ]}
     >
       <div className="doctor-dashboard">
@@ -90,31 +84,27 @@ const DoctorDashboard = () => {
 
         <section className="doctor-hero" aria-labelledby="doctor-welcome-title">
           <div className="doctor-hero-copy">
-            <span className="doctor-kicker">Clinical workspace</span>
-            <h2 id="doctor-welcome-title">Good to see you, Dr. {doctor.fullName || "Doctor"}.</h2>
-            <p>Your dashboard keeps current encounters, today's workload, and recent clinical activity in one focused workspace. Start with the patients who need attention now.</p>
+            <span className="doctor-kicker">Doctor workspace</span>
+            <h2 id="doctor-welcome-title">Good morning, Dr. {doctor.fullName || "Doctor"}.</h2>
+            <p>Review active visits and recent activity from one place.</p>
           </div>
           <div className="doctor-identity">
-            <small>Signed in as</small>
+            <small>Doctor</small>
             <strong>{doctor.fullName || "Doctor"}</strong>
-            <span>{doctor.specialization || "Doctor"}{doctor.department ? ` · ${doctor.department}` : ""}</span>
+            <span>{doctor.specialization || "—"}{doctor.department ? ` · ${doctor.department}` : ""}</span>
           </div>
         </section>
 
         <section aria-labelledby="today-heading">
           <div className="doctor-section-head">
-            <div>
-              <span className="eyebrow">Today at a glance</span>
-              <h2 id="today-heading">Your clinical workload</h2>
-              <p>Key activity indicators from your current DHRMS workspace.</p>
-            </div>
+            <div><span className="eyebrow">Overview</span><h2 id="today-heading">Today</h2></div>
           </div>
           <div className="doctor-metrics" style={{ marginTop: 12 }}>
             {metrics.map((metric) => (
               <article className="doctor-metric" key={metric.label}>
                 <div className="doctor-metric-top">
                   <span className="doctor-metric-label">{metric.label}</span>
-                  <span className="doctor-metric-icon">{metric.icon}</span>
+                  <span className="doctor-metric-icon">•</span>
                 </div>
                 <strong>{metric.value}</strong>
                 <p>{metric.helper}</p>
@@ -126,17 +116,17 @@ const DoctorDashboard = () => {
         <section className="doctor-workload" aria-labelledby="active-heading">
           <div className="doctor-section-head">
             <div>
-              <span className="eyebrow">Priority queue</span>
-              <h2 id="active-heading">Active encounters</h2>
-              <p>{workloadLabel}. Open an encounter to review the worker record and continue clinical documentation.</p>
+              <span className="eyebrow">Current</span>
+              <h2 id="active-heading">Active visits</h2>
+              <p>{activeCount ? `${activeCount} active visit${activeCount === 1 ? "" : "s"}.` : "No active visits."}</p>
             </div>
             <button className="button button-secondary" type="button" onClick={() => navigate("/doctor/workers")}>View all</button>
           </div>
 
           {activeVisits.length === 0 ? (
             <div className="doctor-empty">
-              <strong>Your active queue is clear.</strong>
-              <p>New hospital encounters assigned to you will appear here. You can use Active Visits to review your current clinical workload at any time.</p>
+              <strong>No active visits</strong>
+              <p>New visits will appear here when assigned.</p>
             </div>
           ) : (
             <div className="table-card">
@@ -149,7 +139,7 @@ const DoctorDashboard = () => {
                       <td>{visit.hospitalName || "—"}</td>
                       <td>{formatTime(visit.startedAt)}</td>
                       <td><span className="doctor-visit-status">Active</span></td>
-                      <td><button className="button button-primary button-small" type="button" onClick={() => navigate(`/doctor/encounters/${visit.id}`)}>Open encounter</button></td>
+                      <td><button className="button button-primary button-small" type="button" onClick={() => navigate(`/doctor/encounters/${visit.id}`)}>Open</button></td>
                     </tr>
                   ))}
                 </tbody>
@@ -161,15 +151,14 @@ const DoctorDashboard = () => {
         <section className="doctor-recent" aria-labelledby="recent-heading">
           <div className="doctor-section-head">
             <div>
-              <span className="eyebrow">Clinical activity</span>
+              <span className="eyebrow">History</span>
               <h2 id="recent-heading">Recent visits</h2>
-              <p>A concise record of your latest completed encounters.</p>
             </div>
           </div>
           {recentVisits.length === 0 ? (
             <div className="doctor-empty">
-              <strong>No completed visits yet.</strong>
-              <p>Once an encounter is completed, its clinical activity will appear here for quick reference.</p>
+              <strong>No recent visits</strong>
+              <p>Completed visits will appear here.</p>
             </div>
           ) : (
             <div className="table-card">
@@ -180,8 +169,8 @@ const DoctorDashboard = () => {
                     <tr key={visit.id}>
                       <td><div className="person-cell"><span className="doctor-avatar">{(visit.workerName || "W").charAt(0).toUpperCase()}</span><div><strong>{visit.workerName || "Unknown worker"}</strong><small>{visit.workerCode || "—"}</small></div></div></td>
                       <td>{formatDate(visit.visitDate)}</td>
-                      <td><span className="doctor-diagnosis">{visit.diagnosis || "No diagnosis recorded"}</span></td>
-                      <td><button className="button button-ghost button-small" type="button" onClick={() => navigate(`/doctor/workers/${visit.workerId}`)}>View worker</button></td>
+                      <td><span className="doctor-diagnosis">{visit.diagnosis || "—"}</span></td>
+                      <td><button className="button button-ghost button-small" type="button" onClick={() => navigate(`/doctor/workers/${visit.workerId}`)}>View</button></td>
                     </tr>
                   ))}
                 </tbody>
