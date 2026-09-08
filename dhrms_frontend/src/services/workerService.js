@@ -22,3 +22,5 @@ export const getMyWorker = async (workerId) => (await api.get(`/doctors/me/worke
 export const getMyWorkerProfile = async () => (await api.get("/workers/me")).data;
 export const updateMyWorkerProfile = async (worker) => (await api.put("/workers/me", worker)).data;
 export const getMyWorkerMedicalRecords = async () => (await api.get("/workers/me/medical-records")).data;
+export const getMyWorkerQr = async () => (await api.get("/workers/me/qr")).data;
+export const getMyCurrentVisit = async () => (await api.get("/workers/me/current-visit")).data;
