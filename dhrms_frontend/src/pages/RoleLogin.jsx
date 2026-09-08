@@ -5,10 +5,10 @@ import { useAuth } from "../context/AuthContext";
 import { getApiError } from "../services/api";
 
 const roleConfig = {
-  REGISTRATION_OFFICER: { label: "Registration Officer", description: "Verify workers and issue permanent DHRMS identities.", redirect: "/registration" },
-  HOSPITAL: { label: "Hospital", description: "Manage doctors and conduct worker healthcare visits.", redirect: "/hospital" },
-  DOCTOR: { label: "Doctor", description: "Handle active visits and manage clinical records.", redirect: "/doctor" },
-  WORKER: { label: "Worker", description: "View your profile and personal medical history.", redirect: "/worker" },
+  REGISTRATION_OFFICER: { label: "Registration Officer", description: "Register workers, verify identity and issue permanent DHRMS identities.", redirect: "/registration", code: "R" },
+  HOSPITAL: { label: "Hospital", description: "Manage workers, doctors and healthcare visits from one operational workspace.", redirect: "/hospital", code: "H" },
+  DOCTOR: { label: "Doctor", description: "Work with assigned workers and maintain clinical records and prescriptions.", redirect: "/doctor", code: "D" },
+  WORKER: { label: "Worker", description: "Access your profile, QR identity and personal medical history.", redirect: "/worker", code: "W" },
 };
 
 const RoleLogin = ({ role }) => {
@@ -23,16 +23,50 @@ const RoleLogin = ({ role }) => {
   if (!config) return null;
 
   const handleSubmit = async (event) => {
-    event.preventDefault(); setError(""); setLoading(true);
+    event.preventDefault();
+    setError("");
+    setLoading(true);
     try {
       const response = await login(form.email, form.password);
-      if (response.role !== role) { setError(`This is not a ${config.label.toLowerCase()} account.`); return; }
-      loginUser(response); navigate(config.redirect, { replace: true });
-    } catch (err) { setError(getApiError(err, "Invalid email or password.")); }
-    finally { setLoading(false); }
+      if (response.role !== role) {
+        setError(`This is not a ${config.label.toLowerCase()} account.`);
+        return;
+      }
+      loginUser(response);
+      navigate(config.redirect, { replace: true });
+    } catch (err) {
+      setError(getApiError(err, "Invalid email or password."));
+    } finally {
+      setLoading(false);
+    }
   };
 
-  return <div className="auth-page auth-split"><section className="auth-brand-panel"><button className="auth-brand" onClick={() => navigate("/")} type="button">DHRMS</button><span className="landing-pill">{config.label} portal</span><h1>Healthcare records, without the clutter.</h1><p>{config.description}</p><div className="auth-feature-list"><span>✓ Secure role-based access</span><span>✓ Simple, focused workspace</span><span>✓ Fast access to relevant records</span></div></section><main className="auth-panel role-auth-panel"><div className="auth-panel-heading"><span className="eyebrow">{config.label} access</span><h2>Welcome back</h2><p>Sign in to continue to your DHRMS workspace.</p></div>{error && <div className="alert error" role="alert">{error}</div>}<form onSubmit={handleSubmit} className="auth-form"><div className="field"><label htmlFor="email">Email</label><input id="email" className="input" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required autoComplete="email" /></div><div className="field"><label htmlFor="password">Password</label><input id="password" className="input" type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required autoComplete="current-password" /></div><button type="submit" className="button button-primary button-full" disabled={loading}>{loading ? "Signing in…" : `Sign in as ${config.label}`}</button></form><div className="auth-switch"><span>Need another portal?</span><Link to="/login">Choose a role</Link></div>{role === "HOSPITAL" && <Link to="/hospital/register" className="button button-secondary button-full">Register hospital</Link>}</main></div>;
+  return (
+    <div className="public-auth-shell">
+      <div className="public-auth-wrap">
+        <div className="public-auth-card public-auth-split">
+          <section className="public-auth-intro">
+            <button className="public-brand" type="button" onClick={() => navigate("/")}><span className="public-brand-mark">D</span>DHRMS</button>
+            <div style={{ marginTop: 48 }}><span className="public-kicker">{config.label} portal</span><h1>Healthcare records, without the clutter.</h1><p>{config.description}</p></div>
+            <div className="public-auth-points"><div>✓ Secure role-based access</div><div>✓ Focused workspace for your role</div><div>✓ Fast access to relevant records</div></div>
+          </section>
+
+          <main className="public-auth-form">
+            <button className="public-back" type="button" onClick={() => navigate("/login")}>← Choose another portal</button>
+            <div className="public-form-head"><span style={{ color: "#9da8ff", fontSize: 10, fontWeight: 800, letterSpacing: ".14em", textTransform: "uppercase" }}>{config.code} / {config.label} access</span><h2>Welcome back</h2><p>Sign in with your DHRMS account to continue.</p></div>
+            {error && <div className="public-alert public-alert-error" role="alert">{error}</div>}
+            <form onSubmit={handleSubmit} className="public-form">
+              <div className="public-field"><label htmlFor="email">Email address</label><input id="email" className="public-input" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required autoComplete="email" placeholder="you@example.com" /></div>
+              <div className="public-field"><label htmlFor="password">Password</label><input id="password" className="public-input" type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required autoComplete="current-password" placeholder="Enter your password" /></div>
+              <button type="submit" className="public-btn public-btn-primary" style={{ width: "100%", marginTop: 4 }} disabled={loading}>{loading ? "Signing in…" : `Sign in as ${config.label}`}<span>→</span></button>
+            </form>
+            <div className="public-form-footer" style={{ marginTop: 18 }}><span style={{ color: "#667386", fontSize: 10 }}>Need another portal?</span><Link className="public-text-link" to="/login">Choose a role</Link></div>
+            {role === "HOSPITAL" && <Link to="/hospital/register" className="public-btn public-btn-secondary" style={{ width: "100%", marginTop: 10 }}>Register a new hospital</Link>}
+          </main>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default RoleLogin;
