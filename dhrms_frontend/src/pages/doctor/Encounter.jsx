@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import RoleLayout from "../../components/RoleLayout";
 import MedicalRecords from "./MedicalRecords";
 import "./medical-records.css";
-import { getDoctorEncounter, completeEncounter } from "../../services/encounterService";
+import { completeEncounter, getAiWorkerHistorySummary, getDoctorEncounter } from "../../services/encounterService";
 import { getApiError } from "../../services/api";
 
 const Encounter = () => {
@@ -13,6 +13,9 @@ const Encounter = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [completing, setCompleting] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiSummary, setAiSummary] = useState(null);
+  const [aiError, setAiError] = useState("");
 
   const load = useCallback(async () => {
     try {
@@ -34,6 +37,20 @@ const Encounter = () => {
     () => new Intl.DateTimeFormat(undefined, { dateStyle: "full" }).format(new Date()),
     [],
   );
+
+  const analyzeHistory = async () => {
+    if (!encounter?.workerId) return;
+    setAiLoading(true);
+    setAiError("");
+    try {
+      const result = await getAiWorkerHistorySummary(encounter.workerId);
+      setAiSummary(result);
+    } catch (err) {
+      setAiError(getApiError(err, "Unable to analyze the worker history."));
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
   const finish = async () => {
     if (encounter?.status !== "ACTIVE") return;
@@ -92,6 +109,32 @@ const Encounter = () => {
 
           {encounter.status === "ACTIVE" ? (
             <>
+              <div className="panel">
+                <div className="section-toolbar">
+                  <div>
+                    <span className="eyebrow">AI assistant</span>
+                    <h2>Medical history summary</h2>
+                    <p>Let Gemini review the worker's recent medical records and prescriptions and highlight information that may be useful during this visit.</p>
+                  </div>
+                  <button
+                    className="button button-primary"
+                    type="button"
+                    onClick={analyzeHistory}
+                    disabled={aiLoading}
+                  >
+                    {aiLoading ? "Analyzing…" : "🧠 Analyze history"}
+                  </button>
+                </div>
+                {aiError && <div className="alert error" role="alert">{aiError}</div>}
+                {aiSummary && (
+                  <div className="ai-summary" style={{ marginTop: 16, whiteSpace: "pre-wrap", lineHeight: 1.6 }}>
+                    <strong>AI Clinical History Summary</strong>
+                    <p>{aiSummary.summary}</p>
+                    <small>Based on {aiSummary.recordsAnalyzed} recent medical record{aiSummary.recordsAnalyzed === 1 ? "" : "s"}. Verify important information against the original records.</small>
+                  </div>
+                )}
+              </div>
+
               <div className="alert info" role="status">
                 <strong>Current visit.</strong> The medical record date is assigned automatically by the system. Create or edit the record below, then add prescriptions and attachments as needed.
               </div>
