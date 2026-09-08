@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, ForbiddenException, ConflictException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateWorkerDto } from './dto/create-worker.dto';
@@ -103,6 +103,37 @@ export class WorkerService {
       data: { ...request, dateOfBirth: request.dateOfBirth ? new Date(request.dateOfBirth) : undefined },
     });
     return this.toResponse(updated);
+  }
+
+  async terminateHospitalRelationship(hospitalUserId: bigint, workerId: bigint) {
+    const { hospital, worker } = await this.getOwnedWorker(hospitalUserId, workerId);
+
+    const activeEncounter = await this.prisma.encounter.findFirst({
+      where: { workerId: worker.id, hospitalId: hospital.id, status: 'ACTIVE' },
+    });
+    if (activeEncounter) {
+      throw new ConflictException('Cannot terminate the hospital relationship while the worker has an active visit. Complete the visit first.');
+    }
+
+    const updated = await this.prisma.$transaction(async (tx) => {
+      await tx.doctorWorkerAssignment.updateMany({
+        where: { workerId: worker.id, hospitalId: hospital.id, active: true },
+        data: { active: false, endedAt: new Date() },
+      });
+
+      return tx.worker.update({
+        where: { id: worker.id },
+        data: { hospitalId: null },
+      });
+    });
+
+    return {
+      workerId: Number(updated.id),
+      workerCode: updated.workerCode,
+      hospitalId: null,
+      hospitalRelationshipStatus: 'TERMINATED',
+      terminatedAt: new Date(),
+    };
   }
 
   async deactivateWorker(hospitalUserId: bigint, workerId: bigint) {
