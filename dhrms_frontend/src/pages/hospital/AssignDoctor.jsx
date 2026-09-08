@@ -4,6 +4,7 @@ import RoleLayout from "../../components/RoleLayout";
 import { getApiError } from "../../services/api";
 import { getHospitalDoctors } from "../../services/doctorService";
 import { assignWorkerToDoctor, getWorkers } from "../../services/workerService";
+import "./AssignDoctor.css";
 
 const AssignDoctor = () => {
   const navigate = useNavigate();
@@ -32,9 +33,7 @@ const AssignDoctor = () => {
     }
   };
 
-  useEffect(() => {
-    loadData();
-  }, []);
+  useEffect(() => { loadData(); }, []);
 
   const filteredWorkers = useMemo(() => {
     const query = search.trim().toLowerCase();
