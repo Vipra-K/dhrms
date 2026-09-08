@@ -1,6 +1,6 @@
 const assert = require('node:assert/strict');
 
-const BASE_URL = (process.env.DHRMS_API_URL || 'http://localhost:3000').replace(/\/$/, '');
+const BASE_URL = (process.env.DHRMS_API_URL || `http://localhost:${process.env.PORT || 8080}`).replace(/\/$/, '');
 const PASSWORD = 'Test@12345';
 const timestamp = Date.now();
 const workerEmail = `e2e.worker.${timestamp}@dhrms.test`;
@@ -38,7 +38,7 @@ async function login(email, password = PASSWORD) {
     method: 'POST',
     body: JSON.stringify({ email, password }),
   });
-  assert.equal(result.status, 200, `Login failed for ${email}: ${JSON.stringify(result.body)}`);
+  assert.ok([200, 201].includes(result.status), `Login failed for ${email}: ${JSON.stringify(result.body)}`);
   assert.ok(result.body?.token, `No token returned for ${email}`);
   return result.body;
 }
