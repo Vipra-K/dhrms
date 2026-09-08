@@ -2,13 +2,14 @@ const baseURL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
 
 const request = async (method, path, body) => {
   const token = localStorage.getItem("token");
+  const isFormData = body instanceof FormData;
   const response = await fetch(`${baseURL}${path}`, {
     method,
     headers: {
-      "Content-Type": "application/json",
+      ...(isFormData ? {} : { "Content-Type": "application/json" }),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
-    ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+    ...(body === undefined ? {} : { body: isFormData ? body : JSON.stringify(body) }),
   });
 
   let data = null;
@@ -36,6 +37,7 @@ const api = {
   put: (path, body) => request("PUT", path, body),
   patch: (path, body) => request("PATCH", path, body),
   delete: (path) => request("DELETE", path),
+  upload: (path, formData) => request("POST", path, formData),
 };
 
 export const getApiError = (error, fallback = "Something went wrong.") => {

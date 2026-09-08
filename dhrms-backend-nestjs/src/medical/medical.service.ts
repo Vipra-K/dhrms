@@ -26,13 +26,13 @@ export class MedicalService {
 
   async listWorkerRecords(userId: bigint, workerId: bigint) {
     const doctor = await this.doctor(userId); await this.access(doctor.id, workerId);
-    const records = await this.prisma.medicalRecord.findMany({ where: { workerId }, orderBy: { visitDate: 'desc' }, include: { prescriptions: true, doctor: true } });
+    const records = await this.prisma.medicalRecord.findMany({ where: { workerId }, orderBy: { visitDate: 'desc' }, include: { prescriptions: true, doctor: true, attachments: { where: { status: 'ACTIVE' } } } });
     return records.map(r => this.recordResponse(r, doctor.id));
   }
 
   async getRecord(userId: bigint, recordId: bigint) {
     const doctor = await this.doctor(userId);
-    const record = await this.prisma.medicalRecord.findUnique({ where: { id: recordId }, include: { prescriptions: true, doctor: true } });
+    const record = await this.prisma.medicalRecord.findUnique({ where: { id: recordId }, include: { prescriptions: true, doctor: true, attachments: { where: { status: 'ACTIVE' } } } });
     if (!record) throw new NotFoundException('Medical record not found');
     await this.access(doctor.id, record.workerId);
     return this.recordResponse(record, doctor.id);
@@ -40,7 +40,7 @@ export class MedicalService {
 
   async createRecord(userId: bigint, workerId: bigint, dto: MedicalRecordDto) {
     const doctor = await this.doctor(userId); this.assertCanWrite(doctor); const assignment = await this.access(doctor.id, workerId);
-    const record = await this.prisma.medicalRecord.create({ data: { workerId, doctorId: doctor.id, hospitalId: assignment.hospitalId, visitDate: new Date(dto.visitDate), symptoms: dto.symptoms, diagnosis: dto.diagnosis, treatment: dto.treatment, notes: dto.notes }, include: { prescriptions: true, doctor: true } });
+    const record = await this.prisma.medicalRecord.create({ data: { workerId, doctorId: doctor.id, hospitalId: assignment.hospitalId, visitDate: new Date(dto.visitDate), symptoms: dto.symptoms, diagnosis: dto.diagnosis, treatment: dto.treatment, notes: dto.notes }, include: { prescriptions: true, doctor: true, attachments: true } });
     return this.recordResponse(record, doctor.id);
   }
 
@@ -50,7 +50,7 @@ export class MedicalService {
     if (!record) throw new NotFoundException('Medical record not found');
     await this.access(doctor.id, record.workerId);
     if (record.doctorId !== doctor.id) throw new ForbiddenException('Only the doctor who created this record can edit it');
-    const updated = await this.prisma.medicalRecord.update({ where: { id: recordId }, data: { visitDate: new Date(dto.visitDate), symptoms: dto.symptoms, diagnosis: dto.diagnosis, treatment: dto.treatment, notes: dto.notes }, include: { prescriptions: true, doctor: true } });
+    const updated = await this.prisma.medicalRecord.update({ where: { id: recordId }, data: { visitDate: new Date(dto.visitDate), symptoms: dto.symptoms, diagnosis: dto.diagnosis, treatment: dto.treatment, notes: dto.notes }, include: { prescriptions: true, doctor: true, attachments: { where: { status: 'ACTIVE' } } } });
     return this.recordResponse(updated, doctor.id);
   }
 
@@ -84,7 +84,7 @@ export class MedicalService {
   }
 
   private recordResponse(r: any, currentDoctorId: bigint) {
-    return { id: Number(r.id), workerId: Number(r.workerId), doctorId: Number(r.doctorId), doctorName: r.doctor?.fullName, hospitalId: Number(r.hospitalId), visitDate: r.visitDate, symptoms: r.symptoms, diagnosis: r.diagnosis, treatment: r.treatment, notes: r.notes, createdAt: r.createdAt, updatedAt: r.updatedAt, editable: r.doctorId === currentDoctorId, prescriptions: (r.prescriptions ?? []).map((p: any) => this.prescriptionResponse(p, currentDoctorId)) };
+    return { id: Number(r.id), workerId: Number(r.workerId), doctorId: Number(r.doctorId), doctorName: r.doctor?.fullName, hospitalId: Number(r.hospitalId), visitDate: r.visitDate, symptoms: r.symptoms, diagnosis: r.diagnosis, treatment: r.treatment, notes: r.notes, createdAt: r.createdAt, updatedAt: r.updatedAt, editable: r.doctorId === currentDoctorId, prescriptions: (r.prescriptions ?? []).map((p: any) => this.prescriptionResponse(p, currentDoctorId)), attachments: (r.attachments ?? []).map((a: any) => ({ id: Number(a.id), medicalRecordId: Number(a.medicalRecordId), fileName: a.fileName, mimeType: a.mimeType, fileSize: a.fileSize, status: a.status, createdAt: a.createdAt })) };
   }
 
   private prescriptionResponse(p: any, currentDoctorId: bigint) {

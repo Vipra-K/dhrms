@@ -152,11 +152,12 @@ export class WorkerService {
   async getMyMedicalRecords(userId: bigint) {
     const worker = await this.prisma.worker.findUnique({ where: { userId } });
     if (!worker) throw new NotFoundException('Worker profile not found');
-    const records = await this.prisma.medicalRecord.findMany({ where: { workerId: worker.id }, orderBy: { visitDate: 'desc' }, include: { hospital: true, doctor: true, prescriptions: true } });
+    const records = await this.prisma.medicalRecord.findMany({ where: { workerId: worker.id }, orderBy: { visitDate: 'desc' }, include: { hospital: true, doctor: true, prescriptions: true, attachments: { where: { status: 'ACTIVE' } } } });
     return records.map((record) => ({
       id: Number(record.id), visitDate: record.visitDate, hospitalName: record.hospital.name, doctorName: record.doctor.fullName,
       symptoms: record.symptoms, diagnosis: record.diagnosis, treatment: record.treatment, notes: record.notes, updatedAt: record.updatedAt,
       prescriptions: record.prescriptions.map((p) => ({ id: Number(p.id), medicineName: p.medicineName, dosage: p.dosage, frequency: p.frequency, duration: p.duration, instructions: p.instructions })),
+      attachments: record.attachments.map((a) => ({ id: Number(a.id), fileName: a.fileName, mimeType: a.mimeType, fileSize: a.fileSize, status: a.status, createdAt: a.createdAt })),
     }));
   }
 

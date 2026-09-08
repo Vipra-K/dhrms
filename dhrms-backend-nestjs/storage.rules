@@ -1,0 +1,10 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Medical files are served only by the authenticated NestJS API using the
+    // Admin SDK. Do not grant direct browser reads or writes.
+    match /medical-records/{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -18,6 +18,7 @@ model User {
   hospital Hospital?
   doctor Doctor?
   worker Worker?
+  uploadedMedicalAttachments MedicalRecordAttachment[] @relation("MedicalAttachmentUploader")
   @@map("users")
 }
 
@@ -76,6 +77,26 @@ model Doctor {
   @@index([licenseNumber], map: "idx_doctor_license")
   @@index([hospitalId], map: "idx_doctor_hospital")
   @@map("doctors")
+}
+
+model MedicalRecordAttachment {
+  id BigInt @id @default(autoincrement())
+  medicalRecordId BigInt @map("medical_record_id")
+  fileName String @map("file_name") @db.VarChar(255)
+  storagePath String @unique @map("storage_path") @db.VarChar(700)
+  mimeType String @map("mime_type") @db.VarChar(100)
+  fileSize Int @map("file_size")
+  uploadedById BigInt @map("uploaded_by_id")
+  status String @default("ACTIVE") @db.VarChar(20)
+  revokedAt DateTime? @map("revoked_at")
+  revokedById BigInt? @map("revoked_by_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  medicalRecord MedicalRecord @relation(fields: [medicalRecordId], references: [id])
+  uploadedBy User @relation("MedicalAttachmentUploader", fields: [uploadedById], references: [id])
+  @@index([medicalRecordId, status], map: "idx_medical_attachment_record_status")
+  @@index([uploadedById], map: "idx_medical_attachment_uploader")
+  @@map("medical_record_attachments")
 }
 
 model Worker {
@@ -142,6 +163,7 @@ model MedicalRecord {
   hospital Hospital @relation(fields: [hospitalId], references: [id])
   doctor Doctor @relation(fields: [doctorId], references: [id])
   prescriptions Prescription[]
+  attachments MedicalRecordAttachment[]
   @@index([workerId], map: "idx_medical_record_worker")
   @@index([doctorId], map: "idx_medical_record_doctor")
   @@index([hospitalId], map: "idx_medical_record_hospital")
