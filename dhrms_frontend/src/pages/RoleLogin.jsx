@@ -8,10 +8,10 @@ const ArrowIcon = ({ direction = "right" }) => <svg viewBox="0 0 20 20" aria-hid
 const LoginIcon = () => <svg viewBox="0 0 20 20" aria-hidden="true" className="public-icon"><path d="M11 4h5v12h-5M10 10H4m0 0 3-3M4 10l3 3" /></svg>;
 
 const roleConfig = {
-  REGISTRATION_OFFICER: { label: "Registration Officer", description: "Register workers, verify identity and issue permanent DHRMS identities.", redirect: "/registration", code: "R" },
-  HOSPITAL: { label: "Hospital", description: "Manage workers, doctors and healthcare visits from one operational workspace.", redirect: "/hospital", code: "H" },
-  DOCTOR: { label: "Doctor", description: "Work with assigned workers and maintain clinical records and prescriptions.", redirect: "/doctor", code: "D" },
-  WORKER: { label: "Worker", description: "Access your profile, QR identity and personal medical history.", redirect: "/worker", code: "W" },
+  REGISTRATION_OFFICER: { label: "Registration Officer", description: "Register workers, verify identity and maintain accurate DHRMS records.", redirect: "/registration", code: "R" },
+  HOSPITAL: { label: "Hospital", description: "Manage workers, doctors and healthcare workflows from one secure workspace.", redirect: "/hospital", code: "H" },
+  DOCTOR: { label: "Doctor", description: "Manage assigned workers and maintain the clinical records relevant to their care.", redirect: "/doctor", code: "D" },
+  WORKER: { label: "Worker", description: "Access your profile, verified QR identity and personal health records.", redirect: "/worker", code: "W" },
 };
 
 const RoleLogin = ({ role }) => {
@@ -20,7 +20,7 @@ const RoleLogin = ({ role }) => {
   const { loginUser } = useAuth();
   const config = roleConfig[role];
   const [form, setForm] = useState({ email: "", password: "" });
-  const [error, setError] = useState(searchParams.get("reason") === "session-expired" ? "Your session expired. Please sign in again." : "");
+  const [error, setError] = useState(searchParams.get("reason") === "session-expired" ? "Your session has expired. Please sign in again." : "");
   const [loading, setLoading] = useState(false);
 
   if (!config) return null;
@@ -32,13 +32,13 @@ const RoleLogin = ({ role }) => {
     try {
       const response = await login(form.email, form.password);
       if (response.role !== role) {
-        setError(`This is not a ${config.label.toLowerCase()} account.`);
+        setError(`This account does not have ${config.label.toLowerCase()} access.`);
         return;
       }
       loginUser(response);
       navigate(config.redirect, { replace: true });
     } catch (err) {
-      setError(getApiError(err, "Invalid email or password."));
+      setError(getApiError(err, "We couldn't sign you in. Check your credentials and try again."));
     } finally {
       setLoading(false);
     }
@@ -50,21 +50,21 @@ const RoleLogin = ({ role }) => {
         <div className="public-auth-card public-auth-split">
           <section className="public-auth-intro">
             <button className="public-brand" type="button" onClick={() => navigate("/")}><span className="public-brand-mark">D</span>DHRMS</button>
-            <div className="public-auth-intro-copy"><span className="public-kicker">{config.label} portal</span><h1>Healthcare records, without the clutter.</h1><p>{config.description}</p></div>
-            <div className="public-auth-points"><div>✓ Secure role-based access</div><div>✓ Focused workspace for your role</div><div>✓ Fast access to relevant records</div></div>
+            <div className="public-auth-intro-copy"><span className="public-kicker">{config.label} portal</span><h1>Secure access to the right records.</h1><p>{config.description}</p></div>
+            <div className="public-auth-points"><div>✓ Secure role-based access</div><div>✓ Role-specific workflows</div><div>✓ Controlled access to health records</div></div>
           </section>
 
           <main className="public-auth-form">
             <button className="public-icon-btn public-back-icon" type="button" onClick={() => navigate("/login")} title="Choose another portal" aria-label="Choose another portal"><ArrowIcon direction="left" /></button>
-            <div className="public-form-head"><span className="public-form-code">{config.code} / {config.label} access</span><h2>Welcome back</h2><p>Sign in with your DHRMS account to continue.</p></div>
+            <div className="public-form-head"><span className="public-form-code">{config.code} / {config.label} access</span><h2>Sign in to DHRMS</h2><p>Use your DHRMS credentials to continue to your workspace.</p></div>
             {error && <div className="public-alert public-alert-error" role="alert">{error}</div>}
             <form onSubmit={handleSubmit} className="public-form">
               <div className="public-field"><label htmlFor="email">Email address</label><input id="email" className="public-input" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required autoComplete="email" placeholder="you@example.com" /></div>
               <div className="public-field"><label htmlFor="password">Password</label><input id="password" className="public-input" type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required autoComplete="current-password" placeholder="Enter your password" /></div>
-              <button type="submit" className="public-btn public-btn-primary public-submit" disabled={loading}><span>{loading ? "Signing in…" : `Sign in as ${config.label}`}</span>{loading ? null : <LoginIcon />}</button>
+              <button type="submit" className="public-btn public-btn-primary public-submit" disabled={loading}><span>{loading ? "Signing in…" : "Sign in"}</span>{loading ? null : <LoginIcon />}</button>
             </form>
-            <div className="public-form-footer"><span className="public-form-hint">Need another portal?</span><Link className="public-text-link" to="/login">Choose a role <ArrowIcon /></Link></div>
-            {role === "HOSPITAL" && <Link to="/hospital/register" className="public-btn public-btn-secondary public-submit">Register a new hospital <span className="public-add-icon">+</span></Link>}
+            <div className="public-form-footer"><span className="public-form-hint">Different role?</span><Link className="public-text-link" to="/login">Select another portal <ArrowIcon /></Link></div>
+            {role === "HOSPITAL" && <Link to="/hospital/register" className="public-btn public-btn-secondary public-submit">Register a hospital <span className="public-add-icon">+</span></Link>}
           </main>
         </div>
       </div>
