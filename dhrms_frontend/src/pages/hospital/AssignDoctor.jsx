@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import RoleLayout from "../../components/RoleLayout";
 import { getApiError } from "../../services/api";
 import { getHospitalDoctors } from "../../services/doctorService";
@@ -7,9 +7,10 @@ import { assignWorkerToDoctor, getWorkers } from "../../services/workerService";
 
 const AssignDoctor = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [workers, setWorkers] = useState([]);
   const [doctors, setDoctors] = useState([]);
-  const [workerId, setWorkerId] = useState("");
+  const [workerId, setWorkerId] = useState(searchParams.get("workerId") || "");
   const [doctorId, setDoctorId] = useState("");
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
@@ -43,6 +44,10 @@ const AssignDoctor = () => {
 
   const selectedWorker = workers.find((worker) => String(worker.id) === String(workerId));
   const selectedDoctor = doctors.find((doctor) => String(doctor.id) === String(doctorId));
+
+  useEffect(() => {
+    if (selectedWorker?.assignedDoctor?.id) setDoctorId(String(selectedWorker.assignedDoctor.id));
+  }, [selectedWorker]);
 
   const handleAssign = async (event) => {
     event.preventDefault();
@@ -109,14 +114,7 @@ const AssignDoctor = () => {
                 const selected = String(worker.id) === String(workerId);
                 const currentDoctor = worker.assignedDoctor?.name || worker.assignedDoctor?.fullName || "No doctor assigned";
                 return (
-                  <button
-                    key={worker.id}
-                    className={`assignment-option ${selected ? "selected" : ""}`}
-                    type="button"
-                    role="radio"
-                    aria-checked={selected}
-                    onClick={() => { setWorkerId(String(worker.id)); setSuccess(""); setError(""); }}
-                  >
+                  <button key={worker.id} className={`assignment-option ${selected ? "selected" : ""}`} type="button" role="radio" aria-checked={selected} onClick={() => { setWorkerId(String(worker.id)); setSuccess(""); setError(""); }}>
                     <span className="avatar">{(worker.fullName || "W").charAt(0).toUpperCase()}</span>
                     <span className="assignment-option-copy">
                       <strong>{worker.fullName || "Worker"}</strong>
@@ -146,10 +144,7 @@ const AssignDoctor = () => {
 
             {doctors.length === 0 && !loading && <div className="alert error">No active clinical doctors are available at this hospital.</div>}
 
-            {selectedWorker?.assignedDoctor && <div className="info-card">
-              <small>Current assignment</small>
-              <strong>{selectedWorker.assignedDoctor.name || selectedWorker.assignedDoctor.fullName}</strong>
-            </div>}
+            {selectedWorker?.assignedDoctor && <div className="info-card"><small>Current assignment</small><strong>{selectedWorker.assignedDoctor.name || selectedWorker.assignedDoctor.fullName}</strong></div>}
 
             <div className="modal-actions">
               <button className="button button-secondary" type="button" onClick={() => navigate(selectedWorker ? `/hospital/workers/${selectedWorker.id}` : "/hospital/manage-workers")}>View worker</button>
