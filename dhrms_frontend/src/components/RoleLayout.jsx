@@ -11,6 +11,7 @@ const roleNavigation = {
     { to: "/hospital/workers/scan", label: "Start Visit" },
     { to: "/hospital/find-worker", label: "Find Worker" },
     { to: "/hospital/workers", label: "Visits" },
+    { to: "/hospital/manage-workers", label: "Manage Workers" },
     { to: "/hospital/doctors", label: "Doctors" },
   ],
   DOCTOR: [
