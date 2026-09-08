@@ -102,6 +102,12 @@ export class MedicalAttachmentService {
     const attachment = await this.prisma.medicalRecordAttachment.findUnique({ where: { id: this.id(attachmentIdText) } });
     if (!attachment || attachment.status !== 'ACTIVE') throw new NotFoundException('Medical attachment not found');
     await this.recordFor(user, attachment.medicalRecordId, true);
+
+    // Remove the physical object from Supabase before marking the database
+    // record as revoked. This prevents a revoked medical file from remaining
+    // accessible in storage while the application hides it.
+    await this.storage.delete(attachment.storagePath);
+
     const revoked = await this.prisma.medicalRecordAttachment.update({ where: { id: attachment.id }, data: { status: 'REVOKED', revokedAt: new Date(), revokedById: user.id } });
     return this.response(revoked);
   }
