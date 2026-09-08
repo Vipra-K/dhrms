@@ -63,10 +63,9 @@ export class SupabaseStorageService {
 
   async delete(path: string) {
     this.ensureConfigured();
-    const response = await fetch(`${this.url}/storage/v1/object/${encodeURIComponent(this.bucketName)}`, {
-      method: 'POST',
-      headers: { ...this.headers('application/json'), Prefer: 'return=minimal' },
-      body: JSON.stringify({ prefixes: [path] }),
+    const response = await fetch(this.objectUrl(path), {
+      method: 'DELETE',
+      headers: this.headers(),
     });
 
     if (!response.ok) {
