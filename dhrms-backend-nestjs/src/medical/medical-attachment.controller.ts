@@ -28,7 +28,8 @@ export class MedicalAttachmentController {
     response.setHeader('Content-Length', attachment.fileSize);
     response.setHeader('Content-Disposition', `inline; filename*=UTF-8''${encodeURIComponent(attachment.fileName)}`);
     response.setHeader('Cache-Control', 'private, no-store');
-    this.attachments.stream(attachment.storagePath).on('error', () => response.destroy()).pipe(response);
+    const stream = await this.attachments.stream(attachment.storagePath);
+    stream.on('error', () => response.destroy()).pipe(response);
   }
 
   @Delete('medical-record-attachments/:attachmentId')
