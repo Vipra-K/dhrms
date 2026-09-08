@@ -39,15 +39,23 @@ export class DoctorService {
     const endOfDay = new Date(startOfDay);
     endOfDay.setDate(endOfDay.getDate() + 1);
 
-    const [assignedWorkers, visitsToday, recentRecords] = await Promise.all([
+    const [assignedWorkers, activeVisits, visitsToday, completedVisits, recentRecords, activeEncounters] = await Promise.all([
       this.prisma.doctorWorkerAssignment.count({ where: { doctorId: doctor.id, active: true } }),
+      this.prisma.encounter.count({ where: { doctorId: doctor.id, status: 'ACTIVE' } }),
       this.prisma.medicalRecord.count({ where: { doctorId: doctor.id, visitDate: { gte: startOfDay, lt: endOfDay } } }),
+      this.prisma.encounter.count({ where: { doctorId: doctor.id, status: 'COMPLETED', completedAt: { gte: startOfDay, lt: endOfDay } } }),
       this.prisma.medicalRecord.findMany({ where: { doctorId: doctor.id }, include: { worker: true }, orderBy: { visitDate: 'desc' }, take: 5 }),
+      this.prisma.encounter.findMany({ where: { doctorId: doctor.id, status: 'ACTIVE' }, include: { worker: true, hospital: true }, orderBy: { startedAt: 'asc' }, take: 10 }),
     ]);
 
     return {
       doctor: this.response(doctor),
-      counts: { assignedWorkers, visitsToday },
+      counts: { assignedWorkers, activeVisits, visitsToday, completedVisits },
+      activeVisits: activeEncounters.map((encounter) => ({
+        id: Number(encounter.id), workerId: Number(encounter.workerId), workerCode: encounter.worker.workerCode,
+        workerName: encounter.worker.fullName, hospitalId: Number(encounter.hospitalId), hospitalName: encounter.hospital.name,
+        startedAt: encounter.startedAt,
+      })),
       recentVisits: recentRecords.map((record) => ({ id: Number(record.id), visitDate: record.visitDate, workerId: Number(record.workerId), workerCode: record.worker.workerCode, workerName: record.worker.fullName, diagnosis: record.diagnosis })),
     };
   }
