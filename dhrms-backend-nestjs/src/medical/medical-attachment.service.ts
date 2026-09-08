@@ -32,8 +32,9 @@ export class MedicalAttachmentService {
     if (user.role === 'DOCTOR') {
       const doctor = await this.prisma.doctor.findUnique({ where: { userId: user.id } });
       if (!doctor) throw new NotFoundException('Doctor profile not found');
-      const assignment = await this.prisma.doctorWorkerAssignment.findFirst({ where: { doctorId: doctor.id, workerId: record.workerId, hospitalId: record.hospitalId, active: true } });
-      if (!assignment) throw new ForbiddenException('You are not authorized to access this medical record');
+      const encounter = await this.prisma.encounter.findFirst({ where: { doctorId: doctor.id, workerId: record.workerId, status: 'ACTIVE' } });
+      if (!encounter) throw new ForbiddenException('You are not authorized to access this medical record');
+      if (encounter.hospitalId !== record.hospitalId) throw new ForbiddenException('You are not authorized to access this medical record');
       if (write) {
         if (doctor.status !== 'ACTIVE' || doctor.role === 'READ_ONLY') throw new ForbiddenException('Read-only or inactive doctors cannot modify medical attachments');
         if (record.doctorId !== doctor.id) throw new ForbiddenException('Only the doctor who created this visit can modify its attachments');
@@ -102,12 +103,7 @@ export class MedicalAttachmentService {
     const attachment = await this.prisma.medicalRecordAttachment.findUnique({ where: { id: this.id(attachmentIdText) } });
     if (!attachment || attachment.status !== 'ACTIVE') throw new NotFoundException('Medical attachment not found');
     await this.recordFor(user, attachment.medicalRecordId, true);
-
-    // Remove the physical object from Supabase before marking the database
-    // record as revoked. This prevents a revoked medical file from remaining
-    // accessible in storage while the application hides it.
     await this.storage.delete(attachment.storagePath);
-
     const revoked = await this.prisma.medicalRecordAttachment.update({ where: { id: attachment.id }, data: { status: 'REVOKED', revokedAt: new Date(), revokedById: user.id } });
     return this.response(revoked);
   }
