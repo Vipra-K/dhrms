@@ -2,7 +2,6 @@ import { Body, Controller, Get, Param, Patch, Post, Put, Req, UseGuards } from '
 import { AuthenticatedRequest, JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Roles } from '../auth/roles.decorator';
 import { RolesGuard } from '../auth/roles.guard';
-import { CreateWorkerDto } from './dto/create-worker.dto';
 import { UpdateWorkerDto } from './dto/update-worker.dto';
 import { WorkerQrLookupDto } from './dto/worker-qr-lookup.dto';
 import { WorkerQrService } from './worker-qr.service';
@@ -14,24 +13,12 @@ import { WorkerService } from './worker.service';
 export class WorkerController {
   constructor(private readonly workerService: WorkerService, private readonly workerQrService: WorkerQrService) {}
 
-  @Post('/:workerId/qr')
-  generateQr(@Req() req: AuthenticatedRequest, @Param('workerId') workerId: string) {
-    return this.workerQrService.generateQr(req.user!.id, BigInt(workerId));
-  }
-
-  @Get('/:workerId/qr')
-  getWorkerQr(@Req() req: AuthenticatedRequest, @Param('workerId') workerId: string) {
-    return this.workerQrService.getWorkerQr(req.user!.id, BigInt(workerId));
-  }
-
   @Post('/qr/lookup')
   async lookupWorkerByQr(@Req() req: AuthenticatedRequest, @Body() body: WorkerQrLookupDto) {
     const worker = await this.workerQrService.getWorkerFromQr(body.qrContent);
-    return this.workerService.getWorker(req.user!.id, worker.id);
+    return this.workerService.getRegisteredWorker(worker.id);
   }
 
-  @Post()
-  createWorker(@Req() req: AuthenticatedRequest, @Body() body: CreateWorkerDto) { return this.workerService.createWorker(req.user!.id, body); }
   @Get()
   getWorkers(@Req() req: AuthenticatedRequest) { return this.workerService.getWorkers(req.user!.id); }
   @Get('/code/:workerCode')
