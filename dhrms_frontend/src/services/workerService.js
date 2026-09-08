@@ -7,6 +7,7 @@ export const createWorker = async (worker) => (await api.post("/hospitals/worker
 export const updateWorker = async (workerId, worker) => (await api.put(`/hospitals/workers/${workerId}`, worker)).data;
 export const activateWorker = async (workerId) => (await api.patch(`/hospitals/workers/${workerId}/activate`)).data;
 export const deactivateWorker = async (workerId) => (await api.patch(`/hospitals/workers/${workerId}/deactivate`)).data;
+export const terminateHospitalRelationship = async (workerId) => (await api.patch(`/hospitals/workers/${workerId}/terminate-relationship`)).data;
 export const generateWorkerQr = async (workerId) => (await api.post(`/hospitals/workers/${workerId}/qr`)).data;
 export const viewWorkerQr = async (workerId) => (await api.get(`/hospitals/workers/${workerId}/qr`)).data;
 export const getOrCreateWorkerQr = async (workerId) => {
