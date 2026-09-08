@@ -22,10 +22,10 @@ const HospitalRegister = () => {
     setLoading(true);
     try {
       const response = await registerHospital(form);
-      setSuccess(response.message || "Hospital registered successfully.");
+      setSuccess(response.message || "Hospital account created successfully.");
       setTimeout(() => navigate("/login"), 1400);
     } catch (err) {
-      setError(err.response?.data?.error || "Hospital registration failed.");
+      setError(err.response?.data?.error || "We couldn't create the hospital account. Please review the details and try again.");
     } finally {
       setLoading(false);
     }
@@ -42,9 +42,9 @@ const HospitalRegister = () => {
 
           <header className="public-register-head">
             <div className="public-register-icon"><span>+</span></div>
-            <span className="public-kicker">Hospital registration</span>
-            <h1>Create a hospital account</h1>
-            <p>Set up your hospital profile and start managing doctors, workers, and healthcare visits.</p>
+            <span className="public-kicker">Hospital account</span>
+            <h1>Register your hospital</h1>
+            <p>Create a DHRMS hospital account to manage authorized workers, doctors and healthcare workflows.</p>
           </header>
 
           {error && <div className="public-alert public-alert-error" role="alert">{error}</div>}
@@ -63,10 +63,10 @@ const HospitalRegister = () => {
               <div className="public-field"><label htmlFor="district">District</label><input id="district" className="public-input" name="district" value={form.district} onChange={handleChange} placeholder="District" /></div>
             </div>
 
-            <button type="submit" className="public-btn public-btn-primary public-submit" disabled={loading}><span>{loading ? "Registering hospital…" : "Register hospital"}</span>{loading ? null : <RegisterIcon />}</button>
+            <button type="submit" className="public-btn public-btn-primary public-submit" disabled={loading}><span>{loading ? "Creating account…" : "Create hospital account"}</span>{loading ? null : <RegisterIcon />}</button>
           </form>
 
-          <div className="public-form-footer public-register-footer"><span>Already registered?</span><Link className="public-icon-link" to="/login" title="Sign in" aria-label="Sign in"><LoginIcon /></Link></div>
+          <div className="public-form-footer public-register-footer"><span>Already have an account?</span><Link className="public-icon-link" to="/login" title="Sign in" aria-label="Sign in"><LoginIcon /></Link></div>
         </main>
       </div>
     </div>
