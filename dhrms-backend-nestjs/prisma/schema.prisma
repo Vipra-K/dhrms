@@ -19,6 +19,7 @@ model User {
   doctor Doctor?
   worker Worker?
   uploadedMedicalAttachments MedicalRecordAttachment[] @relation("MedicalAttachmentUploader")
+  registeredWorkers Worker[] @relation("WorkerRegistrar")
   @@map("users")
 }
 
@@ -85,6 +86,13 @@ model Worker {
   id BigInt @id @default(autoincrement())
   userId BigInt? @unique @map("user_id")
   hospitalId BigInt? @map("hospital_id")
+  registeredById BigInt? @map("registered_by_id")
+  registrationStatus String @default("VERIFIED") @map("registration_status") @db.VarChar(20)
+  employerName String? @map("employer_name") @db.VarChar(200)
+  worksiteName String? @map("worksite_name") @db.VarChar(255)
+  worksiteAddress String? @map("worksite_address") @db.VarChar(300)
+  worksiteDistrict String? @map("worksite_district") @db.VarChar(100)
+  jobRole String? @map("job_role") @db.VarChar(100)
   workerCode String @unique @map("worker_code") @db.VarChar(50)
   fullName String @map("full_name") @db.VarChar(200)
   dateOfBirth DateTime? @map("date_of_birth") @db.Date
@@ -100,6 +108,7 @@ model Worker {
   updatedAt DateTime @updatedAt @map("updated_at")
   user User? @relation(fields: [userId], references: [id])
   hospital Hospital? @relation(fields: [hospitalId], references: [id])
+  registeredBy User? @relation("WorkerRegistrar", fields: [registeredById], references: [id])
   qrCode WorkerQrCode?
   assignments DoctorWorkerAssignment[]
   encounters Encounter[]
@@ -108,6 +117,7 @@ model Worker {
   @@index([workerCode], map: "idx_worker_code")
   @@index([fullName], map: "idx_worker_name")
   @@index([hospitalId], map: "idx_worker_hospital")
+  @@index([registeredById], map: "idx_worker_registrar")
   @@map("workers")
 }
 
