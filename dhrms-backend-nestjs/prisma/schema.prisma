@@ -20,7 +20,22 @@ model User {
   worker Worker?
   uploadedMedicalAttachments MedicalRecordAttachment[] @relation("MedicalAttachmentUploader")
   registeredWorkers Worker[] @relation("WorkerRegistrar")
+  sessions AuthSession[]
   @@map("users")
+}
+
+model AuthSession {
+  id String @id @db.Uuid
+  userId BigInt @map("user_id")
+  expiresAt DateTime @map("expires_at")
+  revokedAt DateTime? @map("revoked_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId])
+  @@index([expiresAt])
+  @@index([userId, revokedAt])
+  @@map("auth_sessions")
 }
 
 model HfrFacility {
