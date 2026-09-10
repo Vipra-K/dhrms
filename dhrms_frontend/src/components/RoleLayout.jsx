@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import "../registration-dark.css";
 
@@ -11,7 +11,6 @@ const Icon = ({ name }) => {
     doctor: <><circle cx="12" cy="7" r="4"/><path d="M5 21a7 7 0 0 1 14 0"/><path d="M19 5v4m-2-2h4"/></>,
     link: <><path d="M10 13a5 5 0 0 0 7.5.4l2-2a5 5 0 0 0-7.1-7.1l-1.2 1.2"/><path d="M14 11a5 5 0 0 0-7.5-.4l-2 2a5 5 0 0 0 7.1 7.1l1.2-1.2"/></>,
     scan: <><path d="M4 7V5a1 1 0 0 1 1-1h2M17 4h2a1 1 0 0 1 1 1v2M20 17v2a1 1 0 0 1-1 1h-2M7 20H5a1 1 0 0 1-1-1v-2"/><path d="M8 12h8M12 8v8"/></>,
-    search: <><circle cx="11" cy="11" r="6.5"/><path d="m16 16 5 5"/></>,
   };
   return <svg className="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name] || paths.grid}</svg>;
 };
@@ -53,10 +52,9 @@ const roleNames = {
   WORKER: "Worker",
 };
 
-const RoleLayout = ({ title, description, actions, children, hideBreadcrumbs = false, hideHeader = false }) => {
+const RoleLayout = ({ title, description, actions, children, hideHeader = false }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
   const navItems = useMemo(() => roleNavigation[user?.role] || [], [user?.role]);
   const isWorker = user?.role === "WORKER";
   const isHospital = user?.role === "HOSPITAL";
@@ -75,7 +73,6 @@ const RoleLayout = ({ title, description, actions, children, hideBreadcrumbs = f
           <span className="brand-mark"><span>D</span></span>
           <span><strong>DHRMS</strong><small>Digital Health Records</small></span>
         </button>
-
         <div className="sidebar-workspace">
           <span className="sidebar-section-label">{isHospital ? "Hospital workspace" : isDoctor ? "Clinical workspace" : "Workspace"}</span>
           <nav className="sidebar-nav" aria-label="Primary navigation">
@@ -83,13 +80,11 @@ const RoleLayout = ({ title, description, actions, children, hideBreadcrumbs = f
               <div className="sidebar-group-label" key={`${item.group}-${index}`}>{item.group}</div>
             ) : (
               <NavLink key={item.to} to={item.to} end={item.end} className={({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`}>
-                <Icon name={item.icon} />
-                <span>{item.label}</span>
+                <Icon name={item.icon} /><span>{item.label}</span>
               </NavLink>
             ))}
           </nav>
         </div>
-
         <div className="sidebar-footer">
           {isHospital && <button className="sidebar-quick-action" type="button" onClick={() => navigate("/hospital/workers/scan")}><span className="quick-action-icon"><Icon name="scan" /></span><span><strong>Start a visit</strong><small>Scan or identify a worker</small></span><span className="quick-action-arrow">→</span></button>}
           <div className="sidebar-user">
@@ -99,25 +94,11 @@ const RoleLayout = ({ title, description, actions, children, hideBreadcrumbs = f
           <button className="button button-secondary sidebar-logout" onClick={handleLogout} type="button">Sign out</button>
         </div>
       </aside>
-
       <main className="content-area">
         {!hideHeader && <header className="page-header">
-          <div className="page-title-stack">
-            <h1>{title}</h1>
-            {description && <p className="page-description">{description}</p>}
-          </div>
-          {actions?.length > 0 && (
-            <div className="header-actions">
-              {actions.map((action) => (
-                <button key={action.label} type="button" disabled={action.disabled} aria-label={action.label} title={action.label} className={action.variant === "secondary" ? "button button-secondary" : "button button-primary"} onClick={action.onClick}>
-                  {action.icon ? <span aria-hidden="true">{action.icon}</span> : null}
-                  <span>{action.label}</span>
-                </button>
-              ))}
-            </div>
-          )}
+          <div className="page-title-stack"><h1>{title}</h1>{description && <p className="page-description">{description}</p>}</div>
+          {actions?.length > 0 && <div className="header-actions">{actions.map((action) => <button key={action.label} type="button" disabled={action.disabled} aria-label={action.label} title={action.label} className={action.variant === "secondary" ? "button button-secondary" : "button button-primary"} onClick={action.onClick}>{action.icon ? <span aria-hidden="true">{action.icon}</span> : null}<span>{action.label}</span></button>)}</div>}
         </header>}
-        {!hideBreadcrumbs && <div className="breadcrumbs" aria-label="Breadcrumb"><button type="button" onClick={() => navigate("/")}>Home</button><span aria-hidden="true">/</span><span>{location.pathname.split("/").filter(Boolean).pop()?.replaceAll("-", " ") || "dashboard"}</span></div>}
         <section className="page-content">{children}</section>
       </main>
     </div>
