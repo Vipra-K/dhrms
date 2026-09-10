@@ -36,18 +36,15 @@ const WorkerDashboard = () => {
 
   useEffect(() => { load(); }, [load]);
 
-  if (loading) return <RoleLayout title="Dashboard" hideBreadcrumbs><div className="loading-card">Loading dashboard…</div></RoleLayout>;
-  if (error && !profile) return <RoleLayout title="Dashboard" hideBreadcrumbs><div className="alert error" role="alert">{error}</div><button className="button button-primary" type="button" onClick={() => load()}>Try again</button></RoleLayout>;
+  if (loading) return <RoleLayout title="Dashboard" hideBreadcrumbs hideHeader><div className="loading-card">Loading dashboard…</div></RoleLayout>;
+  if (error && !profile) return <RoleLayout title="Dashboard" hideBreadcrumbs hideHeader><div className="alert error" role="alert">{error}</div><button className="button button-primary" type="button" onClick={() => load()}>Try again</button></RoleLayout>;
 
   return (
     <RoleLayout
       title="Dashboard"
       description="Your worker details and current care status."
       hideBreadcrumbs
-      actions={[
-        { label: "My QR", onClick: () => navigate("/worker/qr") },
-        { label: refreshing ? "Refreshing…" : "Refresh", onClick: () => load(true), variant: "secondary", disabled: refreshing },
-      ]}
+      hideHeader
     >
       {error && <div className="alert error" role="alert">{error}</div>}
 
