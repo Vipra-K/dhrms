@@ -33,8 +33,8 @@ const HospitalDashboard = () => {
 
   const recentVisits = useMemo(() => activeVisits.slice(0, 6), [activeVisits]);
 
-  if (loading) return <RoleLayout title="Hospital overview"><div className="loading-card">Loading hospital overview…</div></RoleLayout>;
-  if (error) return <RoleLayout title="Hospital overview"><div className="alert error" role="alert">{error}</div></RoleLayout>;
+  if (loading) return <RoleLayout title="Hospital overview" hideHeader hideBreadcrumbs><div className="loading-card">Loading hospital overview…</div></RoleLayout>;
+  if (error) return <RoleLayout title="Hospital overview" hideHeader hideBreadcrumbs><div className="alert error" role="alert">{error}</div></RoleLayout>;
 
   const { hospital, counts } = dashboard;
 
@@ -42,6 +42,8 @@ const HospitalDashboard = () => {
     <RoleLayout
       title="Hospital overview"
       description={`${hospital.name}${hospital.code ? ` · ${hospital.code}` : ""}${hospital.city ? ` · ${hospital.city}` : ""}`}
+      hideHeader
+      hideBreadcrumbs
       actions={[
         { label: "Start visit", onClick: () => navigate("/hospital/workers/scan") },
         { label: "Find worker", onClick: () => navigate("/hospital/find-worker"), variant: "secondary" },
