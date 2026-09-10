@@ -53,7 +53,7 @@ const roleNames = {
   WORKER: "Worker",
 };
 
-const RoleLayout = ({ title, description, actions, children, hideBreadcrumbs = false }) => {
+const RoleLayout = ({ title, description, actions, children, hideBreadcrumbs = false, hideHeader = false }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -103,7 +103,7 @@ const RoleLayout = ({ title, description, actions, children, hideBreadcrumbs = f
       </aside>
 
       <main className="content-area">
-        <header className="page-header">
+        {!hideHeader && <header className="page-header">
           <div className="page-title-stack">
             <div className="page-context"><span>{roleNames[user?.role] || "DHRMS"}</span>{currentSection && <><span className="context-separator">/</span><span>{currentSection}</span></>}</div>
             <h1>{title}</h1>
@@ -119,7 +119,7 @@ const RoleLayout = ({ title, description, actions, children, hideBreadcrumbs = f
               ))}
             </div>
           )}
-        </header>
+        </header>}
         {!hideBreadcrumbs && <div className="breadcrumbs" aria-label="Breadcrumb"><button type="button" onClick={() => navigate("/")}>Home</button><span aria-hidden="true">/</span><span>{location.pathname.split("/").filter(Boolean).pop()?.replaceAll("-", " ") || "dashboard"}</span></div>}
         <section className="page-content">{children}</section>
       </main>
