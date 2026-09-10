@@ -39,7 +39,7 @@ const DoctorDashboard = () => {
 
   if (loading && !dashboard) {
     return (
-      <RoleLayout title="Dashboard">
+      <RoleLayout title="Dashboard" hideHeader hideBreadcrumbs>
         <div className="loading-card">Loading dashboard…</div>
       </RoleLayout>
     );
@@ -47,7 +47,7 @@ const DoctorDashboard = () => {
 
   if (error && !dashboard) {
     return (
-      <RoleLayout title="Dashboard">
+      <RoleLayout title="Dashboard" hideHeader hideBreadcrumbs>
         <div className="alert error" role="alert">{error}</div>
         <button className="button button-primary" type="button" onClick={load}>Try again</button>
       </RoleLayout>
@@ -74,6 +74,8 @@ const DoctorDashboard = () => {
     <RoleLayout
       title="Dashboard"
       description={`${doctor.specialization || "Doctor"}${doctor.department ? ` · ${doctor.department}` : ""}`}
+      hideHeader
+      hideBreadcrumbs
       actions={[
         { label: "Refresh", onClick: load, variant: "secondary", disabled: loading },
         { label: "Active visits", onClick: () => navigate("/doctor/workers") },
