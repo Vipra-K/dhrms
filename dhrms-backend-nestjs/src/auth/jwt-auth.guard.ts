@@ -16,6 +16,7 @@ export interface AuthenticatedRequest extends Request {
     role: string;
     status: string;
   };
+  authSessionId?: string;
 }
 
 @Injectable()
@@ -33,18 +34,38 @@ export class JwtAuthGuard implements CanActivate {
       throw new UnauthorizedException('Authentication required');
     }
 
-    const token = header.substring(7);
+    const token = header.substring(7).trim();
+    if (!token) throw new UnauthorizedException('Authentication required');
+
     const secret = this.config.get<string>('JWT_SECRET');
     if (!secret) throw new UnauthorizedException('JWT secret is not configured');
 
     try {
-      const payload = jwt.verify(token, secret) as jwt.JwtPayload & { userId?: number };
-      if (payload.userId === undefined) throw new UnauthorizedException('Invalid token');
+      const payload = jwt.verify(token, secret, {
+        algorithms: ['HS256'],
+      }) as jwt.JwtPayload & { userId?: number; sid?: string };
 
-      const user = await this.prisma.user.findUnique({ where: { id: BigInt(payload.userId) } });
-      if (!user || user.status !== 'ACTIVE') throw new UnauthorizedException('Invalid token');
+      if (payload.userId === undefined || !payload.sid) {
+        throw new UnauthorizedException('Invalid token');
+      }
 
-      request.user = user;
+      const session = await this.prisma.authSession.findUnique({
+        where: { id: payload.sid },
+        include: { user: true },
+      });
+
+      if (
+        !session ||
+        session.userId !== BigInt(payload.userId) ||
+        session.revokedAt !== null ||
+        session.expiresAt.getTime() <= Date.now() ||
+        session.user.status !== 'ACTIVE'
+      ) {
+        throw new UnauthorizedException('Invalid or expired session');
+      }
+
+      request.user = session.user;
+      request.authSessionId = session.id;
       return true;
     } catch (error) {
       if (error instanceof UnauthorizedException) throw error;
