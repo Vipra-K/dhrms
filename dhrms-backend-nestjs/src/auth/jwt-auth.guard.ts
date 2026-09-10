@@ -9,14 +9,22 @@ import * as jwt from 'jsonwebtoken';
 import type { Request } from 'express';
 import { PrismaService } from '../prisma/prisma.service';
 
+export interface AuthenticatedUser {
+  id: bigint;
+  email: string;
+  role: string;
+  status: string;
+}
+
 export interface AuthenticatedRequest extends Request {
-  user?: {
-    id: bigint;
-    email: string;
-    role: string;
-    status: string;
-  };
-  authSessionId?: string;
+  user: AuthenticatedUser;
+  /** ID of the persisted auth session represented by the JWT sid claim. */
+  authSessionId: string;
+}
+
+interface JwtSessionPayload extends jwt.JwtPayload {
+  userId?: number;
+  sid?: string;
 }
 
 @Injectable()
@@ -43,7 +51,7 @@ export class JwtAuthGuard implements CanActivate {
     try {
       const payload = jwt.verify(token, secret, {
         algorithms: ['HS256'],
-      }) as jwt.JwtPayload & { userId?: number; sid?: string };
+      }) as JwtSessionPayload;
 
       if (payload.userId === undefined || !payload.sid) {
         throw new UnauthorizedException('Invalid token');
