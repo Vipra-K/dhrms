@@ -7,3 +7,4 @@ export const getDoctorEncounter = async (encounterId) => (await api.get(`/encoun
 export const completeEncounter = async (encounterId) => (await api.post(`/encounters/doctor/${encounterId}/complete`)).data;
 export const getWorkerEncounterHistory = async (workerId) => (await api.get(`/encounters/worker/${workerId}/history`)).data;
 export const getAiWorkerHistorySummary = async (workerId) => (await api.get(`/ai/worker/${workerId}/summary`)).data;
+export const chatWithAiWorkerHistory = async (workerId, question, history = []) => (await api.post(`/ai/worker/${workerId}/chat`, { question, history })).data;
