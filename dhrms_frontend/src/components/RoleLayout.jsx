@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import "../registration-dark.css";
 
@@ -56,7 +56,6 @@ const roleNames = {
 const RoleLayout = ({ title, description, actions, children }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
   const navItems = useMemo(() => roleNavigation[user?.role] || [], [user?.role]);
   const isWorker = user?.role === "WORKER";
   const isHospital = user?.role === "HOSPITAL";
@@ -67,8 +66,6 @@ const RoleLayout = ({ title, description, actions, children }) => {
     logout();
     navigate("/login", { replace: true });
   };
-
-  const currentSection = navItems.find((item) => item.to && (item.end ? location.pathname === item.to : location.pathname.startsWith(item.to)))?.label;
 
   return (
     <div className={`app-shell ${isWorker ? "role-worker" : ""} ${isHospital ? "role-hospital" : ""} ${isRegistrationOfficer ? "role-registration" : ""} ${isDoctor ? "role-doctor" : ""}`}>
@@ -105,7 +102,6 @@ const RoleLayout = ({ title, description, actions, children }) => {
       <main className="content-area">
         <header className="page-header">
           <div className="page-title-stack">
-            <div className="page-context"><span>{roleNames[user?.role] || "DHRMS"}</span>{currentSection && <><span className="context-separator">/</span><span>{currentSection}</span></>}</div>
             <h1>{title}</h1>
             {description && <p className="page-description">{description}</p>}
           </div>
@@ -120,7 +116,6 @@ const RoleLayout = ({ title, description, actions, children }) => {
             </div>
           )}
         </header>
-        <div className="breadcrumbs" aria-label="Breadcrumb"><button type="button" onClick={() => navigate("/")}>Home</button><span aria-hidden="true">/</span><span>{location.pathname.split("/").filter(Boolean).pop()?.replaceAll("-", " ") || "dashboard"}</span></div>
         <section className="page-content">{children}</section>
       </main>
     </div>
