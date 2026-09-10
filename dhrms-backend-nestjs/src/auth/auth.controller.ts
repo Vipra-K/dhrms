@@ -15,20 +15,12 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Get('session')
   getCurrentSession(@Req() request: AuthenticatedRequest) {
-    if (!request.authSessionId) {
-      throw new Error('Authenticated session is missing');
-    }
-
     return this.authService.getCurrentSession(request.authSessionId);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('logout')
   logout(@Req() request: AuthenticatedRequest) {
-    if (!request.authSessionId) {
-      return { message: 'Logged out successfully' };
-    }
-
     return this.authService.logout(request.authSessionId);
   }
 }
