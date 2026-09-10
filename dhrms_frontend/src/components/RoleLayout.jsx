@@ -53,7 +53,7 @@ const roleNames = {
   WORKER: "Worker",
 };
 
-const RoleLayout = ({ title, description, actions, children }) => {
+const RoleLayout = ({ title, description, actions, children, hideBreadcrumbs = false }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const navItems = useMemo(() => roleNavigation[user?.role] || [], [user?.role]);
@@ -116,6 +116,7 @@ const RoleLayout = ({ title, description, actions, children }) => {
             </div>
           )}
         </header>
+        {!hideBreadcrumbs && <div className="breadcrumbs" aria-label="Breadcrumb"><button type="button" onClick={() => navigate("/")}>Home</button><span aria-hidden="true">/</span><span>{location.pathname.split("/").filter(Boolean).pop()?.replaceAll("-", " ") || "dashboard"}</span></div>}
         <section className="page-content">{children}</section>
       </main>
     </div>
