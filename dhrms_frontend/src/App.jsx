@@ -8,6 +8,7 @@ import DoctorManagement from "./pages/hospital/DoctorManagement";
 import DoctorProfile from "./pages/hospital/DoctorProfile";
 import AssignDoctor from "./pages/hospital/AssignDoctor";
 import ProtectedRoute from "./routes/ProtectedRoute";
+import RootRedirect from "./routes/RootRedirect";
 import DoctorDashboard from "./pages/doctor/DoctorDashboard";
 import ActiveVisits from "./pages/hospital/ActiveVisits";
 import WorkerQrScanner from "./pages/hospital/WorkerQrScanner";
@@ -31,7 +32,7 @@ const Protected = ({ role, children }) => <ProtectedRoute allowedRoles={[role]}>
 const App = () => (
   <BrowserRouter>
     <Routes>
-      <Route path="/" element={<Home />} />
+      <Route path="/" element={<RootRedirect />} />
       <Route path="/home" element={<Home />} />
       <Route path="/login" element={<RoleLoginPicker />} />
       <Route path="/login/hospital" element={<RoleLogin role="HOSPITAL" />} />
