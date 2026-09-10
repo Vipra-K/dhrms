@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import "../registration-dark.css";
 
@@ -56,6 +56,7 @@ const roleNames = {
 const RoleLayout = ({ title, description, actions, children, hideBreadcrumbs = false, hideHeader = false }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const navItems = useMemo(() => roleNavigation[user?.role] || [], [user?.role]);
   const isWorker = user?.role === "WORKER";
   const isHospital = user?.role === "HOSPITAL";
