@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import "./pages/hospital-pages.css";
+import "./hospital-pages.css";
 import { useNavigate } from "react-router-dom";
 import RoleLayout from "../components/RoleLayout";
 import { getHospitalDashboard } from "../services/hospitalService";
