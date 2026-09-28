@@ -70,9 +70,6 @@ const AdminDashboard = () => {
         <nav className="admin-nav">
           <span className="admin-nav-label">ADMINISTRATION</span>
           <div className="admin-nav-link active"><span>▦</span> Overview</div>
-          <span className="admin-nav-label">ANALYTICS</span>
-          <div className="admin-nav-link"><span>◈</span> Workforce</div>
-          <div className="admin-nav-link"><span>⌂</span> Hospitals</div>
         </nav>
 
         <div className="admin-sidebar-footer">
@@ -89,7 +86,6 @@ const AdminDashboard = () => {
           <div>
             <span className="admin-kicker">SYSTEM OVERVIEW</span>
             <h1>Analytics dashboard</h1>
-            <p>Monitor workers, registration officers, hospitals and clinical activity across DHRMS.</p>
           </div>
           <button className="admin-refresh" type="button" onClick={() => load()} disabled={loading}>
             {loading ? "Refreshing…" : "Refresh"}
@@ -100,7 +96,7 @@ const AdminDashboard = () => {
 
         <section className="admin-filters">
           <div className="admin-filter-heading">
-            <div><strong>Filters</strong><span>Apply filters to workforce and hospital analytics.</span></div>
+            <div><strong>Filters</strong></div>
             <button type="button" onClick={resetFilters}>Reset</button>
           </div>
           <div className="admin-filter-grid">
@@ -144,7 +140,7 @@ const AdminDashboard = () => {
 
           <section className="admin-grid-two">
             <article className="admin-card">
-              <div className="admin-card-heading"><div><h2>Workers by district</h2><span>Registered worker distribution</span></div></div>
+              <div className="admin-card-heading"><div><h2>Workers by district</h2></div></div>
               <div className="admin-bars">
                 {data.workerByDistrict.length === 0 ? <div className="admin-empty">No worker data for this filter.</div> :
                   data.workerByDistrict.map((item) => <div className="admin-bar-row" key={item.district}><div><span>{item.district}</span><b>{item.count}</b></div><i><em style={{ width: (item.count / maxDistrict) * 100 + "%" }} /></i></div>)}
@@ -152,7 +148,7 @@ const AdminDashboard = () => {
             </article>
 
             <article className="admin-card">
-              <div className="admin-card-heading"><div><h2>Blood group distribution</h2><span>Worker records in current filter</span></div></div>
+              <div className="admin-card-heading"><div><h2>Blood group distribution</h2></div></div>
               <div className="admin-bars">
                 {data.workerByBloodGroup.length === 0 ? <div className="admin-empty">No worker data for this filter.</div> :
                   data.workerByBloodGroup.map((item) => <div className="admin-bar-row" key={item.bloodGroup}><div><span>{item.bloodGroup}</span><b>{item.count}</b></div><i><em style={{ width: (item.count / maxBlood) * 100 + "%" }} /></i></div>)}
@@ -162,7 +158,7 @@ const AdminDashboard = () => {
 
           <section className="admin-card">
             <div className="admin-card-heading">
-              <div><h2>Worker registrations</h2><span>Monthly registration volume for the selected workforce filter</span></div>
+              <div><h2>Worker registrations</h2></div>
             </div>
             <div className="admin-months">
               {data.registrationsByMonth.length === 0 ? <div className="admin-empty">No registration history for this filter.</div> :
@@ -173,7 +169,7 @@ const AdminDashboard = () => {
           <section className="admin-grid-two">
             <article className="admin-card">
               <div className="admin-card-heading">
-                <div><h2>Workers by registration officer</h2><span>{averagePerOfficer} workers per active officer on average</span></div>
+                <div><h2>Workers by registration officer</h2></div>
               </div>
               <div className="admin-table-wrap">
                 <table className="admin-table"><thead><tr><th>Officer</th><th>Status</th><th>Workers</th></tr></thead><tbody>
@@ -183,7 +179,7 @@ const AdminDashboard = () => {
             </article>
 
             <article className="admin-card">
-              <div className="admin-card-heading"><div><h2>Hospital network</h2><span>Workers, doctors and active encounters</span></div></div>
+              <div className="admin-card-heading"><div><h2>Hospital network</h2></div></div>
               <div className="admin-table-wrap">
                 <table className="admin-table"><thead><tr><th>Hospital</th><th>Workers</th><th>Doctors</th><th>Visits</th></tr></thead><tbody>
                   {data.hospitalPerformance.map((hospital) => <tr key={hospital.id}><td><strong>{hospital.name}</strong><small>{hospital.district || "—"} · {hospital.code}</small></td><td>{hospital.workerCount}</td><td>{hospital.doctorCount}</td><td>{hospital.encounterCount}</td></tr>)}
