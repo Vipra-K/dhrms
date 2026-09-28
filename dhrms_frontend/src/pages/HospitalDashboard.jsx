@@ -16,9 +16,36 @@ const Icon = ({ name }) => {
     scan: <><path d="M4 7V5a1 1 0 0 1 1-1h2M17 4h2a1 1 0 0 1 1 1v2M20 17v2a1 1 0 0 1-1 1h-2M7 20H5a1 1 0 0 1-1-1v-2" /><path d="M8 12h8M12 8v8" /></>,
     search: <><circle cx="11" cy="11" r="6" /><path d="m16 16 4 4" /></>,
     arrow: <path d="M5 12h14m-6-6 6 6-6 6" />,
-    alert: <><path d="M10.3 3.7 2.9 17a2 2 0 0 0 1.7 3h14.8a2 2 0 0 0 1.7-3L13.7 3.7a2 2 0 0 0-3.4 0Z" /><path d="M12 9v4m0 4h.01" /></>
+    alert: <><path d="M10.3 3.7 2.9 17a2 2 0 0 0 1.7 3h14.8a2 2 0 0 0 1.7-3L13.7 3.7a2 2 0 0 0-3.4 0Z" /><path d="M12 9v4m0 4h.01" /></>,
   };
   return <svg className="hospital-dashboard-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name]}</svg>;
+};
+
+const getAssignedDoctor = (record) =>
+  record?.assignedDoctor?.doctor ??
+  record?.assignedDoctor ??
+  record?.doctor ??
+  null;
+
+const getDoctorName = (visit, worker) => {
+  const doctor = visit?.doctor ?? visit?.assignedDoctor ?? getAssignedDoctor(worker);
+  return (
+    visit?.doctorName ??
+    doctor?.fullName ??
+    doctor?.name ??
+    visit?.doctor?.name ??
+    "Unassigned"
+  );
+};
+
+const getDoctorSpecialization = (visit, worker) => {
+  const doctor = visit?.doctor ?? visit?.assignedDoctor ?? getAssignedDoctor(worker);
+  return (
+    visit?.doctorSpecialization ??
+    doctor?.specialization ??
+    doctor?.speciality ??
+    "Clinical team"
+  );
 };
 
 const HospitalDashboard = () => {
@@ -51,6 +78,25 @@ const HospitalDashboard = () => {
     return () => { ignore = true; };
   }, []);
 
+  const workersById = useMemo(() => {
+    const map = new Map();
+    (workerRecords || []).forEach((worker) => {
+      if (worker?.id != null) map.set(String(worker.id), worker);
+      if (worker?.workerCode) map.set(`code:${worker.workerCode}`, worker);
+    });
+    return map;
+  }, [workerRecords]);
+
+  const getWorkerForVisit = (visit) => {
+    if (visit?.workerId != null && workersById.has(String(visit.workerId))) {
+      return workersById.get(String(visit.workerId));
+    }
+    if (visit?.workerCode && workersById.has(`code:${visit.workerCode}`)) {
+      return workersById.get(`code:${visit.workerCode}`);
+    }
+    return null;
+  };
+
   const recentVisits = useMemo(() => activeVisits.slice(0, 6), [activeVisits]);
 
   if (loading) {
@@ -67,22 +113,24 @@ const HospitalDashboard = () => {
     activeVisits
       .map((visit) => visit.workerId ?? visit.worker?.id)
       .filter((id) => id !== undefined && id !== null)
-      .map((id) => String(id))
+      .map((id) => String(id)),
   );
   const activeWorkerCodes = new Set(
     activeVisits
       .map((visit) => visit.workerCode ?? visit.worker?.workerCode)
       .filter(Boolean)
-      .map((code) => String(code))
+      .map((code) => String(code)),
   );
+
   const unassigned = workerRecords !== null
     ? workerRecords.filter((worker) => {
-        if (worker.assignedDoctor) return false;
+        if (getAssignedDoctor(worker)) return false;
         if (activeWorkerIds.has(String(worker.id))) return false;
         if (worker.workerCode && activeWorkerCodes.has(String(worker.workerCode))) return false;
         return true;
       }).length
     : (counts.unassignedWorkers ?? 0);
+
   const doctors = counts.activeDoctors ?? 0;
 
   return (
@@ -134,17 +182,23 @@ const HospitalDashboard = () => {
           ) : (
             <div className="hospital-visits">
               <div className="hospital-visits-head"><span>Worker</span><span>Doctor</span><span>Started</span><span>Status</span></div>
-              {recentVisits.map((visit) => (
-                <div className="hospital-visit-row" key={visit.id}>
-                  <div className="hospital-worker">
-                    <span className="hospital-worker-avatar">{(visit.workerName || "W").charAt(0).toUpperCase()}</span>
-                    <div><strong>{visit.workerName || "Worker"}</strong><small>{visit.workerCode || "Worker record"}</small></div>
+              {recentVisits.map((visit) => {
+                const worker = getWorkerForVisit(visit);
+                return (
+                  <div className="hospital-visit-row" key={visit.id}>
+                    <div className="hospital-worker">
+                      <span className="hospital-worker-avatar">{(visit.workerName || worker?.fullName || "W").charAt(0).toUpperCase()}</span>
+                      <div><strong>{visit.workerName || worker?.fullName || "Worker"}</strong><small>{visit.workerCode || worker?.workerCode || "Worker record"}</small></div>
+                    </div>
+                    <div className="hospital-doctor">
+                      <strong>{getDoctorName(visit, worker)}</strong>
+                      <small>{getDoctorSpecialization(visit, worker)}</small>
+                    </div>
+                    <span className="hospital-started">{visit.startedAt ? new Date(visit.startedAt).toLocaleString([], { dateStyle: "medium", timeStyle: "short" }) : "—"}</span>
+                    <span className="status-badge status-active">ACTIVE</span>
                   </div>
-                  <div className="hospital-doctor"><strong>{visit.doctorName || "Doctor"}</strong><small>{visit.doctorSpecialization || "Clinical team"}</small></div>
-                  <span className="hospital-started">{visit.startedAt ? new Date(visit.startedAt).toLocaleString([], { dateStyle: "medium", timeStyle: "short" }) : "—"}</span>
-                  <span className="status-badge status-active">ACTIVE</span>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </section>
