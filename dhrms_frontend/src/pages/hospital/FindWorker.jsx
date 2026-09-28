@@ -69,7 +69,6 @@ const FindWorker = () => {
   return (
     <RoleLayout
       title="Find worker"
-      description="Find a worker by registered phone number."
       actions={[
         { label: "Scan QR", onClick: () => navigate("/hospital/workers/scan"), variant: "secondary" },
         { label: "Workers", onClick: () => navigate("/hospital/manage-workers"), variant: "secondary" },
@@ -81,9 +80,7 @@ const FindWorker = () => {
         <section className="panel scanner-panel">
           <div className="panel-heading">
             <div>
-              <span className="eyebrow">Worker lookup</span>
               <h2>Search by phone</h2>
-              <p>Use the worker's registered phone number.</p>
             </div>
           </div>
           <form onSubmit={handleSearch}>
@@ -112,9 +109,7 @@ const FindWorker = () => {
             <div style={{ marginTop: "22px" }}>
               <div className="panel-heading">
                 <div>
-                  <span className="eyebrow">Worker</span>
-                  <h2>{worker.fullName || "Worker"}</h2>
-                  <p>{worker.workerCode || "Worker record"}</p>
+                  <h2>{worker.fullName || "Worker"}</h2><span className="worker-code">{worker.workerCode || "Worker record"}</span>
                 </div>
               </div>
               <div className="scan-success">
@@ -133,9 +128,7 @@ const FindWorker = () => {
 
               {relationship === "AVAILABLE" && (
                 <div className="panel" style={{ marginTop: "12px" }}>
-                  <span className="eyebrow">Next step</span>
                   <h3>Add to hospital</h3>
-                  <p>Add this worker to this hospital's directory.</p>
                   <button
                     type="button"
                     className="button button-primary"
@@ -155,15 +148,6 @@ const FindWorker = () => {
             </div>
           )}
         </section>
-        <aside className="card scanner-help">
-          <span className="eyebrow">Workflow</span>
-          <h3>Identify → Add → Manage</h3>
-          <ol>
-            <li>Find the worker using their unique phone number.</li>
-            <li>Add them to the hospital directory if needed.</li>
-            <li>Open their profile to view medical records and assign doctors.</li>
-          </ol>
-        </aside>
       </div>
     </RoleLayout>
   );
