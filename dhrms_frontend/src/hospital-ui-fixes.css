@@ -1,0 +1,247 @@
+/* Hospital workspace polish: larger operational UI and clean QR start screen. */
+
+.role-hospital .sidebar-link {
+  min-height: 48px;
+  padding: 12px 14px;
+  gap: 12px;
+  font-size: 15px;
+}
+
+.role-hospital .sidebar-link .nav-icon {
+  width: 21px;
+  height: 21px;
+  stroke-width: 1.8;
+}
+
+.role-hospital .sidebar-section-label,
+.role-hospital .sidebar-group-label {
+  font-size: 12px;
+}
+
+.role-hospital .page-header h1 {
+  font-size: 32px;
+}
+
+.role-hospital .button {
+  min-height: 44px;
+  padding: 11px 16px;
+  font-size: 14px;
+}
+
+.role-hospital .input,
+.role-hospital .select,
+.role-hospital .textarea {
+  min-height: 48px;
+  font-size: 15px;
+}
+
+.role-hospital .field label {
+  font-size: 13px;
+}
+
+.role-hospital .panel h2,
+.role-hospital .card h3,
+.role-hospital .section-toolbar h2,
+.role-hospital .panel-heading h2 {
+  font-size: 22px;
+}
+
+.role-hospital .panel p,
+.role-hospital .card p {
+  font-size: 14px;
+}
+
+.role-hospital .table th {
+  font-size: 11px;
+  padding: 15px 18px;
+}
+
+.role-hospital .table td {
+  font-size: 14px;
+  padding: 17px 18px;
+}
+
+.role-hospital .person-cell strong {
+  font-size: 15px;
+}
+
+.role-hospital .person-cell small {
+  font-size: 12px;
+}
+
+.role-hospital .avatar {
+  width: 40px;
+  height: 40px;
+  font-size: 14px;
+}
+
+/* QR start screen */
+.role-hospital .hospital-visit-start-panel {
+  min-height: 470px;
+  padding: 32px;
+}
+
+.hospital-scan-choice {
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  text-align: center;
+}
+
+.hospital-scan-choice h2 {
+  font-size: 26px !important;
+  margin: 0;
+}
+
+.hospital-scan-choice-actions {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  width: min(560px, 100%);
+}
+
+.hospital-scan-choice-button {
+  min-width: 190px;
+  min-height: 52px !important;
+  font-size: 15px !important;
+}
+
+.hospital-active-scanner {
+  width: min(720px, 100%);
+  margin: 0 auto;
+}
+
+.hospital-scanner-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding-bottom: 22px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--hospital-border);
+}
+
+.hospital-scanner-toolbar h2 {
+  margin: 0;
+  font-size: 24px !important;
+}
+
+.role-hospital .qr-reader-clean,
+.role-hospital .hospital-qr-reader-clean {
+  max-width: 560px;
+  min-height: 340px;
+  margin: 0 auto;
+  padding: 18px;
+  border: 1px solid var(--hospital-border);
+  border-radius: 16px;
+  background: #080d14;
+  overflow: hidden;
+}
+
+.role-hospital .hospital-qr-reader-clean video {
+  width: 100% !important;
+  height: auto !important;
+  border-radius: 12px;
+}
+
+.role-hospital .hospital-qr-reader-clean img,
+.role-hospital .hospital-qr-reader-clean button,
+.role-hospital .hospital-qr-reader-clean a {
+  display: none !important;
+}
+
+/* Dashboard sizing and icon hierarchy */
+.role-hospital .hospital-dashboard-icon {
+  width: 21px;
+  height: 21px;
+  stroke-width: 2;
+}
+
+.role-hospital .hospital-metric-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+}
+
+.role-hospital .hospital-metric>div>span {
+  font-size: 12px;
+}
+
+.role-hospital .hospital-metric strong {
+  font-size: 30px;
+}
+
+.role-hospital .hospital-metric small {
+  font-size: 12px;
+}
+
+.role-hospital .hospital-worker-avatar {
+  width: 42px;
+  height: 42px;
+  font-size: 14px;
+}
+
+.role-hospital .hospital-worker strong,
+.role-hospital .hospital-doctor strong {
+  font-size: 14px;
+}
+
+.role-hospital .hospital-worker small,
+.role-hospital .hospital-doctor small,
+.role-hospital .hospital-started {
+  font-size: 12px;
+}
+
+.role-hospital .hospital-actions button {
+  min-height: 66px;
+  padding: 16px 18px;
+}
+
+.role-hospital .hospital-actions button>span {
+  width: 40px;
+  height: 40px;
+}
+
+.role-hospital .hospital-actions button strong {
+  font-size: 14px;
+}
+
+@media (max-width: 760px) {
+  .role-hospital .hospital-visit-start-panel {
+    min-height: 380px;
+    padding: 22px;
+  }
+
+  .hospital-scan-choice {
+    min-height: 320px;
+  }
+
+  .hospital-scan-choice-actions {
+    flex-direction: column;
+  }
+
+  .hospital-scan-choice-button {
+    width: 100%;
+  }
+
+  .hospital-scanner-toolbar {
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 520px) {
+  .role-hospital .hospital-visit-start-panel {
+    padding: 18px;
+  }
+
+  .hospital-scanner-toolbar {
+    flex-direction: column;
+  }
+
+  .hospital-scanner-toolbar .button {
+    width: 100%;
+  }
+}
