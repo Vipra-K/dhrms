@@ -68,7 +68,87 @@ const MyProfile = () => {
           <div className="section-toolbar"><div><span className="eyebrow">Personal information</span><h2>{editing ? "Update your details" : "Your information"}</h2><p>{editing ? "Only information available to your worker account can be changed." : "Keep your contact information current so authorized staff can reach you when required."}</p></div>{!editing && <button className="button button-primary" type="button" onClick={() => { setError(""); setSuccess(""); setForm(worker); setEditing(true); }}>Edit profile</button>}</div>
           {editing ? (
             <form className="form-grid worker-profile-form" onSubmit={save}>
-              {fields.map(([key, label, type]) => <div className={`field ${key === "address" ? "full" : ""}`} key={key}><label htmlFor={`worker-${key}`}>{label}</label><input id={`worker-${key}`} className="input" type={type} value={key === "dateOfBirth" ? String(form[key] || "").slice(0, 10) : form[key] || ""} onChange={(e) => setForm({ ...form, [key]: e.target.value })} disabled={key === "fullName"} /></div>)}
+              {fields.map(([key, label, type]) => {
+                const isFull = key === "address";
+                if (key === "gender") {
+                  return (
+                    <div className="field" key={key}>
+                      <label htmlFor={`worker-${key}`}>{label}</label>
+                      <select
+                        id={`worker-${key}`}
+                        className="select"
+                        value={form[key] || ""}
+                        onChange={(e) => setForm({ ...form, [key]: e.target.value })}
+                      >
+                        <option value="">Select gender</option>
+                        <option value="MALE">Male</option>
+                        <option value="FEMALE">Female</option>
+                        <option value="OTHER">Other</option>
+                      </select>
+                    </div>
+                  );
+                }
+                if (key === "bloodGroup") {
+                  return (
+                    <div className="field" key={key}>
+                      <label htmlFor={`worker-${key}`}>{label}</label>
+                      <select
+                        id={`worker-${key}`}
+                        className="select"
+                        value={form[key] || ""}
+                        onChange={(e) => setForm({ ...form, [key]: e.target.value })}
+                      >
+                        <option value="">Select blood group</option>
+                        <option value="A+">A+</option>
+                        <option value="A-">A-</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B-</option>
+                        <option value="AB+">AB+</option>
+                        <option value="AB-">AB-</option>
+                        <option value="O+">O+</option>
+                        <option value="O-">O-</option>
+                      </select>
+                    </div>
+                  );
+                }
+                if (key === "emergencyContactRelation") {
+                  return (
+                    <div className="field" key={key}>
+                      <label htmlFor={`worker-${key}`}>{label}</label>
+                      <select
+                        id={`worker-${key}`}
+                        className="select"
+                        value={form[key] || ""}
+                        onChange={(e) => setForm({ ...form, [key]: e.target.value })}
+                      >
+                        <option value="">Select relationship</option>
+                        <option value="Spouse">Spouse</option>
+                        <option value="Parent">Parent</option>
+                        <option value="Child">Child</option>
+                        <option value="Sibling">Sibling</option>
+                        <option value="Relative">Relative</option>
+                        <option value="Friend">Friend</option>
+                        <option value="Employer">Employer</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+                  );
+                }
+                return (
+                  <div className={`field ${isFull ? "full" : ""}`} key={key}>
+                    <label htmlFor={`worker-${key}`}>{label}{key === "phone" ? " (Required & Unique)" : ""}</label>
+                    <input
+                      id={`worker-${key}`}
+                      className="input"
+                      type={type}
+                      value={key === "dateOfBirth" ? String(form[key] || "").slice(0, 10) : form[key] || ""}
+                      onChange={(e) => setForm({ ...form, [key]: e.target.value })}
+                      disabled={key === "fullName"}
+                      required={key === "phone"}
+                    />
+                  </div>
+                );
+              })}
               <div className="field full"><div className="modal-actions"><button type="button" className="button button-secondary" onClick={() => { setEditing(false); setForm(worker); }}>Cancel</button><button className="button button-primary" disabled={saving}>{saving ? "Saving…" : "Save changes"}</button></div></div>
             </form>
           ) : (

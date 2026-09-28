@@ -146,8 +146,7 @@ const WorkerProfile = () => {
             <div>
               <span className="eyebrow">Hospital relationship</span>
               <h2>Current hospital association</h2>
-              <p>The worker account and medical history remain active independently of this hospital relationship.</p>
-            </div>
+              </div>
           </div>
           <div className="worker-profile-danger">
             <div className="worker-profile-danger-copy">
