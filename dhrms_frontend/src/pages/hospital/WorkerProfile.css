@@ -249,3 +249,15 @@
     width:100%;
   }
 }
+
+/* Final worker profile polish */
+.worker-profile-page{gap:16px}
+.worker-profile-hero{padding:30px 32px;min-height:118px}
+.worker-profile-card{padding:26px}
+.worker-profile-detail{padding:18px 14px}
+.worker-profile-detail-value{font-size:16px}
+.worker-profile-relationship-actions{justify-content:flex-end}
+@media(max-width:600px){
+  .worker-profile-hero{padding:22px}
+  .worker-profile-card{padding:22px}
+}
