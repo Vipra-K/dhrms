@@ -45,6 +45,7 @@ export class AdminService {
       workerBloodGroups,
       officerUsers,
       officerWorkerGroups,
+      hospitalWorkerGroups,
       hospitals,
       recentWorkers,
     ] = await Promise.all([
@@ -93,6 +94,11 @@ export class AdminService {
       }),
       this.prisma.worker.groupBy({
         by: ['registeredById'],
+        where: workerWhere,
+        _count: { _all: true },
+      }),
+      this.prisma.worker.groupBy({
+        by: ['hospitalId'],
         where: workerWhere,
         _count: { _all: true },
       }),
@@ -163,7 +169,7 @@ export class AdminService {
         district: row.district,
         city: row.city,
         status: row.status,
-        workerCount: row._count.workers,
+        workerCount: hospitalWorkerGroups.find((group) => group.hospitalId === row.id)?._count._all || 0,
         doctorCount: row._count.doctors,
         encounterCount: row._count.encounters,
       })),
