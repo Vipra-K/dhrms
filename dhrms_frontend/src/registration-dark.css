@@ -50,3 +50,11 @@
   .role-registration .toolbar-actions{width:100%;flex-wrap:wrap}
   .role-registration .toolbar-actions .input{min-width:0}
 }
+
+/* Hospital sidebar footer alignment */
+.role-hospital .sidebar-user-copy{padding-left:1px}
+.role-hospital .sidebar-logout{
+  text-align:left;
+  padding-left:57px;
+  justify-content:flex-start;
+}
