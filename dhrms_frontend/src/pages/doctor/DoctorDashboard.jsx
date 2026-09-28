@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import RoleLayout from "../../components/RoleLayout";
 import { getMyDoctorDashboard } from "../../services/doctorService";
 import { getApiError } from "../../services/api";
+import "../../doctor-dashboard.css";
+import "./doctor-pages.css";
 
 const formatTime = (value) => {
   if (!value) return "—";
@@ -73,7 +75,6 @@ const DoctorDashboard = () => {
   return (
     <RoleLayout
       title="Dashboard"
-      description={`${doctor.specialization || "Doctor"}${doctor.department ? ` · ${doctor.department}` : ""}`}
       hideHeader
       hideBreadcrumbs
       actions={[
@@ -86,9 +87,9 @@ const DoctorDashboard = () => {
 
         <section className="doctor-hero" aria-labelledby="doctor-welcome-title">
           <div className="doctor-hero-copy">
-            <span className="doctor-kicker">Doctor workspace</span>
-            <h2 id="doctor-welcome-title">Good morning, {doctor.fullName || "Doctor"}.</h2>
-            <p>Review active visits and recent activity from one place.</p>
+            <span className="doctor-kicker">Clinical workspace</span>
+            <h2 id="doctor-welcome-title">{doctor.fullName || "Doctor"}</h2>
+            <p>{doctor.specialization || "Doctor"}{doctor.department ? ` · ${doctor.department}` : ""}</p>
           </div>
           <div className="doctor-identity">
             <small>Doctor</small>
@@ -99,7 +100,7 @@ const DoctorDashboard = () => {
 
         <section aria-labelledby="today-heading">
           <div className="doctor-section-head">
-            <div><span className="eyebrow">Overview</span><h2 id="today-heading">Today</h2></div>
+            <div><h2 id="today-heading">Today</h2></div>
           </div>
           <div className="doctor-metrics" style={{ marginTop: 12 }}>
             {metrics.map((metric) => (
@@ -118,9 +119,8 @@ const DoctorDashboard = () => {
         <section className="doctor-workload" aria-labelledby="active-heading">
           <div className="doctor-section-head">
             <div>
-              <span className="eyebrow">Current</span>
               <h2 id="active-heading">Active visits</h2>
-              <p>{activeCount ? `${activeCount} active visit${activeCount === 1 ? "" : "s"}.` : "No active visits."}</p>
+              
             </div>
             <button className="button button-secondary" type="button" onClick={() => navigate("/doctor/workers")}>View all</button>
           </div>
@@ -153,7 +153,6 @@ const DoctorDashboard = () => {
         <section className="doctor-recent" aria-labelledby="recent-heading">
           <div className="doctor-section-head">
             <div>
-              <span className="eyebrow">History</span>
               <h2 id="recent-heading">Recent visits</h2>
             </div>
           </div>
