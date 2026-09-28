@@ -438,3 +438,14 @@
 @media(min-width:901px){
   .role-hospital .scanner-layout>.panel{min-height:460px}
 }
+
+/* Single-column lookup/scan workflow */
+.role-hospital .scanner-layout{
+  grid-template-columns:minmax(0,1fr);
+}
+.role-hospital .scanner-panel{
+  width:100%;
+}
+.role-hospital .scanner-help{
+  display:none!important;
+}
