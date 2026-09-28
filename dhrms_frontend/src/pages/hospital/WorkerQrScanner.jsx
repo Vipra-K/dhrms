@@ -88,13 +88,13 @@ const WorkerQrScanner = () => {
         <section className="panel scanner-panel">
           {!worker ? (
             <>
-              <div className="panel-heading"><div><span className="eyebrow">Worker identification</span><h2>Scan worker QR</h2></div></div>
+              <div className="panel-heading scanner-heading"><div><h2>Scan worker QR</h2><p>Position the worker ID QR code inside the scanner.</p></div></div>
               <div id="worker-qr-reader" className="qr-reader" aria-busy={scanning} />
-              <div className="hospital-scan-alt"><button type="button" className="button button-secondary" onClick={() => navigate("/hospital/find-worker")}>Find worker instead</button></div>
+              <div className="hospital-scan-alt"><button type="button" className="button button-secondary" onClick={() => navigate("/hospital/find-worker")}>Find by phone</button></div>
             </>
           ) : (
             <>
-              <div className="panel-heading"><div><span className="eyebrow">Worker identified</span><h2>Worker details</h2></div></div>
+              <div className="panel-heading scanner-heading"><div><h2>Worker details</h2></div></div>
               <div className="scan-success"><span className={`status-badge ${relationshipTone}`}>{relationshipLabel}</span><div className="scan-person"><span className="avatar">{(worker.fullName || "W").charAt(0).toUpperCase()}</span><div><h3>{worker.fullName || "Worker"}</h3><p>{worker.workerCode || "Worker record"}</p></div></div><div className="scan-details"><span><small>Phone</small><strong>{worker.phone || "—"}</strong></span><span><small>Blood group</small><strong>{worker.bloodGroup || "—"}</strong></span></div></div>
               {relationship === "AVAILABLE" && <div className="panel" style={{ marginTop: "12px" }}><h3>Add worker</h3><button type="button" className="button button-primary" onClick={handleAddToHospital} disabled={adding}>{adding ? "Adding…" : "Add to hospital"}</button></div>}
               {relationship === "OTHER_HOSPITAL" && <div className="alert error" style={{ marginTop: "12px" }}>This worker is currently associated with another hospital. That hospital must end its relationship before this worker can be added here.</div>}
