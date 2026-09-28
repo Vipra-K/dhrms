@@ -530,3 +530,18 @@
   .role-hospital .scan-success{padding:18px}
   .role-hospital .row-actions .button{flex:1}
 }
+
+.role-hospital .worker-directory-search-row{
+  display:flex;
+  margin:20px 0;
+}
+.role-hospital .worker-directory-search-row .input{
+  width:100%;
+}
+.role-hospital .worker-directory-search-row + .loading-card,
+.role-hospital .worker-directory-search-row + .empty-state-card{
+  margin-top:4px;
+}
+@media(max-width:640px){
+  .role-hospital .worker-directory-search-row{margin:16px 0}
+}
