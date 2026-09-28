@@ -62,10 +62,10 @@ const MyProfile = () => {
           <h2>{worker.fullName}</h2>
           <p>{worker.workerCode || "Worker ID unavailable"}</p>
           <span className={`worker-profile-status ${worker.active ? "is-active" : "is-inactive"}`}><i aria-hidden="true" /> {worker.active ? "Active identity" : "Inactive identity"}</span>
-          <div className="worker-profile-note"><strong>Clinical records are protected</strong><span>Your profile information is separate from your clinical history. Changes are recorded through your DHRMS account.</span></div>
+          
         </aside>
         <section className="panel worker-profile-panel">
-          <div className="section-toolbar"><div><span className="eyebrow">Personal information</span><h2>{editing ? "Update your details" : "Your information"}</h2><p>{editing ? "Only information available to your worker account can be changed." : "Keep your contact information current so authorized staff can reach you when required."}</p></div>{!editing && <button className="button button-primary" type="button" onClick={() => { setError(""); setSuccess(""); setForm(worker); setEditing(true); }}>Edit profile</button>}</div>
+          <div className="section-toolbar"><div><span className="eyebrow">Personal information</span><h2>{editing ? "Update your details" : "Your information"}</h2></div>{!editing && <button className="button button-primary" type="button" onClick={() => { setError(""); setSuccess(""); setForm(worker); setEditing(true); }}>Edit profile</button>}</div>
           {editing ? (
             <form className="form-grid worker-profile-form" onSubmit={save}>
               {fields.map(([key, label, type]) => {
