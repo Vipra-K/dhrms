@@ -97,7 +97,7 @@ const WorkerProfile = () => {
   return (
     <RoleLayout
       title="Worker profile"
-      actions={[{ label: "Back to workers", onClick: () => navigate("/hospital/workers"), variant: "secondary" }]}
+      actions={[{ label: "Back", onClick: () => navigate("/hospital/manage-workers"), variant: "secondary" }]}
     >
       <div className="worker-profile-page">
         {(error || success) && <div className={`alert ${error ? "error" : "success"}`}>{error || success}</div>}
@@ -147,7 +147,7 @@ const WorkerProfile = () => {
           </section>
         </div>
 
-        <div className="worker-profile-relationship-actions">
+        <div className="worker-profile-relationship-actions" aria-label="Worker relationship">
           <button className="button button-secondary worker-profile-end-button" onClick={handleTerminateRelationship} disabled={terminating}>
             {terminating ? "Ending…" : "End relationship"}
           </button>
