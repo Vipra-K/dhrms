@@ -74,7 +74,7 @@ const WorkerQrScanner = () => {
   };
 
   const relationship = worker?.hospitalRelationshipStatus;
-  const relationshipLabel = relationship === "ACTIVE" ? "Hospital relationship active" : relationship === "AVAILABLE" ? "Ready to add to hospital" : relationship === "OTHER_HOSPITAL" ? "Associated with another hospital" : relationship;
+  const relationshipLabel = relationship === "ACTIVE" ? "ACTIVE" : relationship === "AVAILABLE" ? "NEW WORKER" : relationship === "OTHER_HOSPITAL" ? "OTHER HOSPITAL" : relationship;
   const relationshipTone = relationship === "ACTIVE" ? "status-active" : relationship === "OTHER_HOSPITAL" ? "status-suspended" : "status-inactive";
 
   return (
@@ -88,7 +88,7 @@ const WorkerQrScanner = () => {
         <section className="panel scanner-panel">
           {!worker ? (
             <>
-              <div className="panel-heading scanner-heading"><div><h2>Scan worker QR</h2><p>Position the worker ID QR code inside the scanner.</p></div></div>
+              <div className="panel-heading scanner-heading"><div><h2>Scan worker QR</h2></div></div>
               <div id="worker-qr-reader" className="qr-reader" aria-busy={scanning} />
               <div className="hospital-scan-alt"><button type="button" className="button button-secondary" onClick={() => navigate("/hospital/find-worker")}>Find by phone</button></div>
             </>
