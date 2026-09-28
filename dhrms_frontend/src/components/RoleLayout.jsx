@@ -24,8 +24,8 @@ const roleNavigation = {
   HOSPITAL: [
     { group: "Operations" },
     { to: "/hospital", label: "Overview", icon: "grid", end: true },
-    { to: "/hospital/workers/scan", label: "Start visit", icon: "scan" },
-    { to: "/hospital/workers", label: "Active visits", icon: "pulse" },
+    { to: "/hospital/workers/scan", label: "Start visit", icon: "scan", end: true },
+    { to: "/hospital/workers", label: "Active visits", icon: "pulse", end: true },
     { group: "People" },
     { to: "/hospital/manage-workers", label: "Workers", icon: "users" },
     { to: "/hospital/doctors", label: "Doctors", icon: "doctor" },
