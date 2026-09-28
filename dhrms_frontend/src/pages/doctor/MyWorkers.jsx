@@ -1,86 +1,82 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import RoleLayout from "../../components/RoleLayout";
 import { getMyWorkers } from "../../services/doctorService";
+import { getApiError } from "../../services/api";
+import "./doctor-pages.css";
 
 const MyWorkers = () => {
   const navigate = useNavigate();
-
   const [workers, setWorkers] = useState([]);
-
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    const loadWorkers = async () => {
-      try {
-        const data = await getMyWorkers();
+  const loadWorkers = async () => {
+    try {
+      setError("");
+      setLoading(true);
+      setWorkers(await getMyWorkers());
+    } catch (err) {
+      setError(getApiError(err, "Unable to load workers."));
+    } finally {
+      setLoading(false);
+    }
+  };
 
-        setWorkers(data);
-      } catch (error) {
-        setError(error.response?.data?.error || "Failed to load workers");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadWorkers();
-  }, []);
-
-  if (loading) {
-    return <p>Loading workers...</p>;
-  }
+  useEffect(() => { loadWorkers(); }, []);
 
   return (
-    <div>
-      <h1>My Workers</h1>
+    <RoleLayout
+      title="My workers"
+      actions={[{ label: "Refresh", onClick: loadWorkers, variant: "secondary", disabled: loading }]}
+    >
+      <div className="doctor-page">
+        {error && <div className="alert error" role="alert">{error}</div>}
 
-      {error && <p>{error}</p>}
+        <section className="page-card panel">
+          <div className="toolbar">
+            <div>
+              <h2>Assigned workers</h2>
+              {!loading && <span className="muted">{workers.length} worker{workers.length === 1 ? "" : "s"}</span>}
+            </div>
+          </div>
 
-      {workers.length === 0 ? (
-        <p>No workers assigned to you.</p>
-      ) : (
-        <table>
-          <thead>
-            <tr>
-              <th>Worker ID</th>
-              <th>Name</th>
-              <th>Gender</th>
-              <th>Blood Group</th>
-              <th>Phone</th>
-              <th>Action</th>
-            </tr>
-          </thead>
+          {loading ? (
+            <div className="loading-card">Loading workers…</div>
+          ) : workers.length === 0 ? (
+            <div className="empty-state-card">
+              <h3>No workers assigned</h3>
+            </div>
+          ) : (
+            <div className="worker-grid" style={{ marginTop: 18 }}>
+              {workers.map((worker) => (
+                <article className="worker-card" key={worker.workerId}>
+                  <div className="worker-card-head">
+                    <span className="worker-avatar">{(worker.fullName || "W").charAt(0).toUpperCase()}</span>
+                    <div>
+                      <div className="worker-name">{worker.fullName || "Unknown worker"}</div>
+                      <div className="worker-code">{worker.workerCode || "—"}</div>
+                    </div>
+                  </div>
 
-          <tbody>
-            {workers.map((worker) => (
-              <tr key={worker.workerId}>
-                <td>{worker.workerCode}</td>
+                  <div className="worker-details">
+                    <div className="worker-detail"><small>Gender</small><strong>{worker.gender || "—"}</strong></div>
+                    <div className="worker-detail"><small>Blood group</small><strong>{worker.bloodGroup || "—"}</strong></div>
+                    <div className="worker-detail"><small>Phone</small><strong>{worker.phone || "—"}</strong></div>
+                  </div>
 
-                <td>{worker.fullName}</td>
-
-                <td>{worker.gender || "-"}</td>
-
-                <td>{worker.bloodGroup || "-"}</td>
-
-                <td>{worker.phone || "-"}</td>
-
-                <td>
-                  <button
-                    onClick={() =>
-                      navigate(`/doctor/workers/${worker.workerId}`)
-                    }
-                  >
-                    View Worker
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
-    </div>
+                  <div className="worker-card-footer">
+                    <button className="button button-primary button-small" type="button" onClick={() => navigate(`/doctor/workers/${worker.workerId}`)}>
+                      View
+                    </button>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
+      </div>
+    </RoleLayout>
   );
 };
 
