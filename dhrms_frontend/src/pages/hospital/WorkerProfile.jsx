@@ -7,6 +7,17 @@ import "./WorkerProfile.css";
 
 const valueOrDash = (value) => value || "—";
 
+const formatDate = (value) => {
+  if (!value) return "—";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return new Intl.DateTimeFormat("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  }).format(date);
+};
+
 const Detail = ({ label, value, full = false }) => (
   <div className={`worker-profile-detail ${full ? "full" : ""}`}>
     <span className="worker-profile-detail-label">{label}</span>
@@ -86,7 +97,6 @@ const WorkerProfile = () => {
   return (
     <RoleLayout
       title="Worker profile"
-      description="View worker information and hospital relationship status."
       actions={[{ label: "Back to workers", onClick: () => navigate("/hospital/workers"), variant: "secondary" }]}
     >
       <div className="worker-profile-page">
@@ -98,7 +108,6 @@ const WorkerProfile = () => {
               {worker.fullName?.charAt(0)?.toUpperCase() || "W"}
             </div>
             <div>
-              <span className="eyebrow">Worker</span>
               <h2 className="worker-profile-name">{worker.fullName}</h2>
               <p className="worker-profile-code">{worker.workerCode}</p>
             </div>
@@ -114,13 +123,12 @@ const WorkerProfile = () => {
           <section className="worker-profile-card">
             <div className="worker-profile-card-header">
               <div>
-                <span className="eyebrow">Personal information</span>
                 <h2>Identity details</h2>
               </div>
             </div>
             <div className="worker-profile-details">
               <Detail label="Worker ID" value={worker.workerCode} />
-              <Detail label="Date of birth" value={worker.dateOfBirth} />
+              <Detail label="Date of birth" value={formatDate(worker.dateOfBirth)} />
               <Detail label="Gender" value={worker.gender} />
               <Detail label="Blood group" value={worker.bloodGroup} />
             </div>
@@ -129,7 +137,6 @@ const WorkerProfile = () => {
           <section className="worker-profile-card">
             <div className="worker-profile-card-header">
               <div>
-                <span className="eyebrow">Contact information</span>
                 <h2>Contact & address</h2>
               </div>
             </div>
@@ -142,21 +149,13 @@ const WorkerProfile = () => {
 
         <section className="worker-profile-relationship">
           <div className="worker-profile-relationship-copy">
-            <div className="worker-profile-relationship-icon" aria-hidden="true">H</div>
             <div>
-              <span className="eyebrow">Hospital relationship</span>
-              <h2>Current hospital association</h2>
-              </div>
-          </div>
-          <div className="worker-profile-danger">
-            <div className="worker-profile-danger-copy">
-              <strong>End relationship</strong>
-              <span>Remove this worker from the hospital.</span>
+              <h2>Hospital association</h2>
             </div>
-            <button className="button button-secondary" onClick={handleTerminateRelationship} disabled={terminating}>
-              {terminating ? "Ending…" : "End relationship"}
-            </button>
           </div>
+          <button className="button button-secondary worker-profile-end-button" onClick={handleTerminateRelationship} disabled={terminating}>
+            {terminating ? "Ending…" : "End relationship"}
+          </button>
         </section>
       </div>
     </RoleLayout>

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import RoleLayout from "../components/RoleLayout";
 import { getHospitalDashboard } from "../services/hospitalService";
 import { getHospitalActiveEncounters } from "../services/encounterService";
+import { getWorkers } from "../services/workerService";
 import { getApiError } from "../services/api";
 import "./hospital-dashboard.css";
 
@@ -24,16 +25,22 @@ const HospitalDashboard = () => {
   const navigate = useNavigate();
   const [dashboard, setDashboard] = useState(null);
   const [activeVisits, setActiveVisits] = useState([]);
+  const [workerRecords, setWorkerRecords] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
     let ignore = false;
-    Promise.all([getHospitalDashboard(), getHospitalActiveEncounters()])
-      .then(([data, visits]) => {
+    Promise.all([
+      getHospitalDashboard(),
+      getHospitalActiveEncounters(),
+      getWorkers().catch(() => null),
+    ])
+      .then(([data, visits, workers]) => {
         if (ignore) return;
         setDashboard(data);
         setActiveVisits(visits || []);
+        setWorkerRecords(Array.isArray(workers) ? workers : null);
       })
       .catch((err) => {
         if (!ignore) setError(getApiError(err, "Unable to load hospital dashboard."));
@@ -55,8 +62,27 @@ const HospitalDashboard = () => {
   }
 
   const { hospital, counts } = dashboard;
-  const workers = counts.workers ?? 0;
-  const unassigned = counts.unassignedWorkers ?? 0;
+  const workers = workerRecords !== null ? workerRecords.length : (counts.workers ?? 0);
+  const activeWorkerIds = new Set(
+    activeVisits
+      .map((visit) => visit.workerId ?? visit.worker?.id)
+      .filter((id) => id !== undefined && id !== null)
+      .map((id) => String(id))
+  );
+  const activeWorkerCodes = new Set(
+    activeVisits
+      .map((visit) => visit.workerCode ?? visit.worker?.workerCode)
+      .filter(Boolean)
+      .map((code) => String(code))
+  );
+  const unassigned = workerRecords !== null
+    ? workerRecords.filter((worker) => {
+        if (worker.assignedDoctor) return false;
+        if (activeWorkerIds.has(String(worker.id))) return false;
+        if (worker.workerCode && activeWorkerCodes.has(String(worker.workerCode))) return false;
+        return true;
+      }).length
+    : (counts.unassignedWorkers ?? 0);
   const doctors = counts.activeDoctors ?? 0;
 
   return (

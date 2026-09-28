@@ -26,6 +26,8 @@ import Documents from "./pages/worker/Documents";
 import DoctorWorkerProfile from "./pages/doctor/DoctorWorkerProfile";
 import RegistrationOfficerDashboard from "./pages/registration/RegistrationOfficerDashboard";
 import Unauthorized from "./pages/Unauthorized";
+import AdminLogin from "./pages/AdminLogin";
+import AdminDashboard from "./pages/AdminDashboard";
 
 const Protected = ({ role, children }) => <ProtectedRoute allowedRoles={[role]}>{children}</ProtectedRoute>;
 
@@ -39,8 +41,10 @@ const App = () => (
       <Route path="/login/doctor" element={<RoleLogin role="DOCTOR" />} />
       <Route path="/login/worker" element={<RoleLogin role="WORKER" />} />
       <Route path="/login/registration-officer" element={<RoleLogin role="REGISTRATION_OFFICER" />} />
+      <Route path="/admin/login" element={<AdminLogin />} />
       <Route path="/hospital/register" element={<HospitalRegister />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
+      <Route path="/admin/dashboard" element={<Protected role="ADMIN"><AdminDashboard /></Protected>} />
       <Route path="/registration" element={<Protected role="REGISTRATION_OFFICER"><RegistrationOfficerDashboard /></Protected>} />
       <Route path="/registration/register" element={<Protected role="REGISTRATION_OFFICER"><RegistrationOfficerDashboard /></Protected>} />
       <Route path="/registration/workers" element={<Protected role="REGISTRATION_OFFICER"><RegistrationOfficerDashboard /></Protected>} />

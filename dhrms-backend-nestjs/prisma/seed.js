@@ -34,6 +34,7 @@ async function main() {
   }
 
   const users = [
+    { email: 'admin@dhrms.test', role: 'ADMIN' },
     { email: 'officer@dhrms.test', role: 'REGISTRATION_OFFICER' },
     { email: 'kochi.hospital@dhrms.test', role: 'HOSPITAL' },
     { email: 'ernakulam.hospital@dhrms.test', role: 'HOSPITAL' },
@@ -202,6 +203,7 @@ async function main() {
   console.log('DHRMS development seed completed.');
   console.log('Test password: Test@12345');
   console.log('Registration Officer: officer@dhrms.test');
+  console.log('Admin: admin@dhrms.test');
   console.log('Hospitals: 3');
   console.log('Doctors: 4');
 }
