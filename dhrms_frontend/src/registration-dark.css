@@ -99,3 +99,41 @@
   .role-registration .select,
   .role-registration .textarea{font-size:16px}
 }
+
+/* Worker profile — structured information layout */
+.role-registration .worker-profile-panel{padding:28px}
+.role-registration .worker-profile-header{display:flex;align-items:center;justify-content:space-between;gap:24px;padding-bottom:24px;border-bottom:1px solid var(--ro-border)}
+.role-registration .worker-profile-identity{display:flex;align-items:center;gap:16px;min-width:0}
+.role-registration .worker-profile-avatar{width:54px;height:54px;display:grid;place-items:center;flex:none;border-radius:15px;background:rgba(99,102,241,.14);color:#b9c1ff;font-size:20px;font-weight:800}
+.role-registration .worker-profile-identity h2{margin-top:3px;font-size:24px!important;line-height:1.2}
+.role-registration .worker-profile-identity p{margin-top:4px;font-size:13px!important;color:#7f8da2!important}
+.role-registration .worker-profile-actions{display:flex;align-items:center;gap:10px;flex:none}
+.role-registration .worker-profile-sections{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:22px}
+.role-registration .worker-profile-section{padding:18px;border:1px solid var(--ro-border);border-radius:14px;background:#0c131d}
+.role-registration .worker-profile-section h3{margin:0 0 15px;font-size:14px;color:#f4f7fb;letter-spacing:-.01em}
+.role-registration .worker-info-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 20px}
+.role-registration .worker-info-item{min-width:0}
+.role-registration .worker-info-item small{display:block;color:#718097;font-size:10px;text-transform:uppercase;letter-spacing:.08em}
+.role-registration .worker-info-item strong{display:block;margin-top:5px;color:#eef2f7;font-size:14px;line-height:1.35;overflow-wrap:anywhere}
+.role-registration .worker-info-wide{grid-column:1/-1}
+.role-registration .worker-qr-section{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-top:14px;padding:20px;border:1px solid var(--ro-border);border-radius:14px;background:linear-gradient(135deg,#0e1723,#0a1018)}
+.role-registration .worker-qr-section h3{font-size:16px;color:#fff}
+.role-registration .worker-qr-section p{margin-top:6px;max-width:520px;font-size:13px!important;color:#8f9caf!important}
+.role-registration .worker-qr-content{display:flex;align-items:center;gap:18px;flex:none}
+.role-registration .worker-qr-content img{width:128px;height:128px;object-fit:contain;padding:8px;background:#fff;border-radius:10px}
+.role-registration .worker-qr-actions{display:grid;gap:8px}
+.role-registration .worker-qr-actions .button{width:170px}
+@media(max-width:900px){
+  .role-registration .worker-profile-sections{grid-template-columns:1fr}
+}
+@media(max-width:640px){
+  .role-registration .worker-profile-panel{padding:20px}
+  .role-registration .worker-profile-header{align-items:flex-start;flex-direction:column}
+  .role-registration .worker-profile-actions{width:100%;justify-content:space-between}
+  .role-registration .worker-info-grid{grid-template-columns:1fr}
+  .role-registration .worker-info-wide{grid-column:auto}
+  .role-registration .worker-qr-section{align-items:flex-start;flex-direction:column}
+  .role-registration .worker-qr-content{width:100%;flex-direction:column;align-items:stretch}
+  .role-registration .worker-qr-content img{align-self:center}
+  .role-registration .worker-qr-actions .button{width:100%}
+}
