@@ -35,6 +35,14 @@ const RecordIcon = () => (
 );
 
 const roleConfig = {
+  ADMIN: {
+    label: "System Admin",
+    description: "Monitor DHRMS operations, workforce coverage and healthcare network activity.",
+    redirect: "/admin/dashboard",
+    code: "A",
+    headline: "A clear view of the DHRMS network.",
+    visual: "System administration and analytics",
+  },
   REGISTRATION_OFFICER: {
     label: "Registration Officer",
     description: "Register workers, verify identity and maintain accurate DHRMS records.",
