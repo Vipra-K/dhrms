@@ -59,7 +59,7 @@ const WorkerProfile = () => {
     try {
       await terminateHospitalRelationship(workerId);
       setSuccess("Hospital relationship ended.");
-      setTimeout(() => navigate("/hospital/workers", { replace: true }), 700);
+      setTimeout(() => navigate("/hospital/manage-workers", { replace: true }), 700);
     } catch (err) {
       setError(getApiError(err, "Unable to end hospital relationship."));
     } finally {
@@ -76,7 +76,7 @@ const WorkerProfile = () => {
       <RoleLayout title="Worker profile">
         <div className="worker-profile-page">
           <div className="alert error worker-profile-error">{error}</div>
-          <div><button className="button button-secondary" onClick={() => navigate("/hospital/workers")}>Back to workers</button></div>
+          <div><button className="button button-secondary" onClick={() => navigate("/hospital/manage-workers")}>Back to workers</button></div>
         </div>
       </RoleLayout>
     );
