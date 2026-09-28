@@ -52,3 +52,233 @@
 .role-doctor .ai-chat-message p{font-size:12px}
 @media(max-width:850px){.role-doctor .medical-record-card{grid-template-columns:1fr}.role-doctor .record-date{border-right:0;border-bottom:1px solid var(--border);text-align:left}.role-doctor .record-fields{grid-template-columns:1fr 1fr}}
 @media(max-width:600px){.role-doctor .medical-records-section .section-toolbar{padding:17px}.role-doctor .medical-records-section .section-toolbar .button{width:auto}.role-doctor .record-body{padding:18px}.role-doctor .record-fields{grid-template-columns:1fr}.role-doctor .ai-history-panel{padding:18px}.role-doctor .ai-actions{width:100%;flex-wrap:wrap}.role-doctor .ai-actions .button{flex:1}}
+
+
+/* Structured clinical forms */
+.role-doctor .clinical-form-modal{
+  width:min(980px,calc(100vw - 72px));
+  max-width:none;
+  max-height:calc(100vh - 48px);
+  overflow-y:auto;
+  overflow-x:hidden;
+  padding:0;
+  background:#0a1018;
+  border:1px solid rgba(148,163,184,.18);
+  border-radius:20px;
+  box-shadow:0 30px 90px rgba(0,0,0,.48);
+}
+.role-doctor .prescription-modal{
+  width:min(760px,calc(100vw - 72px));
+  max-width:none;
+  max-height:calc(100vh - 48px);
+  overflow-y:auto;
+  overflow-x:hidden;
+  padding:0;
+  background:#0a1018;
+  border:1px solid rgba(148,163,184,.18);
+  border-radius:20px;
+  box-shadow:0 30px 90px rgba(0,0,0,.48);
+}
+.role-doctor .clinical-modal-header{
+  position:sticky;
+  top:0;
+  z-index:5;
+  margin:0;
+  padding:24px 28px 20px;
+  background:rgba(10,16,24,.97);
+  border-bottom:1px solid rgba(148,163,184,.13);
+  backdrop-filter:blur(12px);
+}
+.role-doctor .clinical-modal-header h2{
+  margin-top:5px;
+  font-size:25px;
+  line-height:1.15;
+  letter-spacing:-.03em;
+}
+.role-doctor .clinical-modal-header p{
+  margin-top:6px;
+  color:#78879b;
+  font-size:12px;
+}
+.role-doctor .clinical-form{
+  display:grid;
+  gap:0;
+}
+.role-doctor .clinical-form-section{
+  padding:24px 28px;
+  border-bottom:1px solid rgba(148,163,184,.11);
+}
+.role-doctor .clinical-form-section-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom:20px;
+}
+.role-doctor .clinical-form-section-head>div{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.role-doctor .clinical-form-section-head>div>span{
+  width:28px;
+  height:28px;
+  display:grid;
+  place-items:center;
+  border-radius:8px;
+  background:rgba(99,102,241,.12);
+  border:1px solid rgba(129,140,248,.18);
+  color:#aeb7ff;
+  font-size:10px;
+  font-weight:800;
+}
+.role-doctor .clinical-form-section-head h3{
+  margin:0;
+  color:#f1f5f9;
+  font-size:16px;
+  line-height:1.2;
+}
+.role-doctor .clinical-form-section-head small{
+  color:#68778c;
+  font-size:10px;
+}
+.role-doctor .clinical-form-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:18px;
+}
+.role-doctor .clinical-form-grid.three-columns{
+  grid-template-columns:repeat(3,minmax(0,1fr));
+}
+.role-doctor .clinical-form-grid .field.full{
+  grid-column:1 / -1;
+}
+.role-doctor .clinical-form .field{
+  display:grid;
+  gap:8px;
+}
+.role-doctor .clinical-form .field label{
+  color:#b9c5d4;
+  font-size:11px;
+  font-weight:700;
+}
+.role-doctor .clinical-form .input,
+.role-doctor .clinical-form .textarea,
+.role-doctor .clinical-form .select-input{
+  width:100%;
+  box-sizing:border-box;
+  border:1px solid #263247;
+  border-radius:11px;
+  background:#101823;
+  color:#edf2f7;
+  outline:none;
+  font:inherit;
+  font-size:13px;
+  transition:border-color .16s ease,box-shadow .16s ease,background .16s ease;
+}
+.role-doctor .clinical-form .input,
+.role-doctor .clinical-form .select-input{
+  min-height:46px;
+  padding:0 13px;
+}
+.role-doctor .clinical-form .textarea{
+  min-height:108px;
+  padding:12px 13px;
+  resize:vertical;
+  line-height:1.55;
+}
+.role-doctor .clinical-form .select-input{
+  appearance:auto;
+  cursor:pointer;
+}
+.role-doctor .clinical-form .input::placeholder,
+.role-doctor .clinical-form .textarea::placeholder{
+  color:#5f6d80;
+}
+.role-doctor .clinical-form .input:focus,
+.role-doctor .clinical-form .textarea:focus,
+.role-doctor .clinical-form .select-input:focus{
+  border-color:#6875e8;
+  box-shadow:0 0 0 3px rgba(99,102,241,.11);
+  background:#121c29;
+}
+.role-doctor .clinical-form .clinical-secondary-input{
+  margin-top:8px;
+}
+.role-doctor .clinical-form .field-inline{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:10px;
+}
+.role-doctor .clinical-form .field-inline .button{
+  min-width:74px;
+}
+.role-doctor .clinical-form .file-input{
+  min-height:48px;
+  padding:10px 12px;
+  cursor:pointer;
+}
+.role-doctor .clinical-form .muted-note{
+  margin:0;
+  font-size:10px;
+  color:#68778c;
+}
+.role-doctor .attachment-preview-list{
+  margin-top:10px;
+}
+.role-doctor .clinical-form-footer{
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+  padding:20px 28px 24px;
+  background:#0a1018;
+}
+.role-doctor .clinical-form-footer .button{
+  min-width:132px;
+  min-height:44px;
+  font-size:13px;
+}
+@media(max-width:850px){
+  .role-doctor .clinical-form-modal,
+  .role-doctor .prescription-modal{
+    width:calc(100vw - 28px);
+    max-height:calc(100vh - 24px);
+    border-radius:16px;
+  }
+  .role-doctor .clinical-modal-header{
+    padding:20px;
+  }
+  .role-doctor .clinical-form-section{
+    padding:20px;
+  }
+  .role-doctor .clinical-form-grid,
+  .role-doctor .clinical-form-grid.three-columns{
+    grid-template-columns:1fr;
+  }
+  .role-doctor .clinical-form-grid .field.full{
+    grid-column:auto;
+  }
+  .role-doctor .clinical-form-footer{
+    padding:18px 20px 20px;
+  }
+}
+@media(max-width:520px){
+  .role-doctor .clinical-modal-header h2{
+    font-size:21px;
+  }
+  .role-doctor .clinical-form-section-head{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+  .role-doctor .clinical-form-footer{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+  }
+  .role-doctor .clinical-form-footer .button{
+    min-width:0;
+    width:100%;
+  }
+  .role-doctor .clinical-form .field-inline{
+    grid-template-columns:1fr;
+  }
+}
