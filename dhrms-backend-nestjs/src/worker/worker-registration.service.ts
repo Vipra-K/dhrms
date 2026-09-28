@@ -155,6 +155,13 @@ export class WorkerRegistrationService {
         emergencyContactRelation: dto.emergencyContactRelation, employerName: dto.employerName, worksiteName: dto.worksiteName,
         worksiteAddress: dto.worksiteAddress, worksiteDistrict: dto.worksiteDistrict, jobRole: dto.jobRole, active: true,
       } });
+    }).catch((err) => {
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+        const fields = Array.isArray(err.meta?.target) ? err.meta.target.join(', ') : '';
+        if (fields.includes('phone')) throw new BadRequestException('A worker with this phone number is already registered');
+        if (fields.includes('email')) throw new BadRequestException('Email is already registered');
+      }
+      throw err;
     });
 
     const qrContent = `DHRMS:${randomUUID().replace(/-/g, '')}`;
