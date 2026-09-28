@@ -86,7 +86,7 @@ const RoleLayout = ({ title, description, actions, children, hideHeader = false 
           </nav>
         </div>
         <div className="sidebar-footer">
-          {isHospital && <button className="sidebar-quick-action" type="button" onClick={() => navigate("/hospital/workers/scan")}><span className="quick-action-icon"><Icon name="scan" /></span><span><strong>Start a visit</strong><small>Scan or identify a worker</small></span><span className="quick-action-arrow">→</span></button>}
+
           <div className="sidebar-user">
             <div className="avatar" aria-hidden="true">{(user?.email || "U").charAt(0).toUpperCase()}</div>
             <div className="sidebar-user-copy"><strong>{user?.email || "User"}</strong><small>{roleNames[user?.role] || user?.role || "Account"}</small></div>
