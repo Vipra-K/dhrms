@@ -113,7 +113,7 @@ model Worker {
   dateOfBirth DateTime? @map("date_of_birth") @db.Date
   gender String? @db.VarChar(20)
   bloodGroup String? @map("blood_group") @db.VarChar(10)
-  phone String? @db.VarChar(20)
+  phone String @unique @db.VarChar(20)
   address String? @db.VarChar(300)
   emergencyContactName String? @map("emergency_contact_name") @db.VarChar(150)
   emergencyContactPhone String? @map("emergency_contact_phone") @db.VarChar(20)

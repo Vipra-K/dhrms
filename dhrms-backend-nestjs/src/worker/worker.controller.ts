@@ -1,7 +1,9 @@
-import { Body, Controller, Get, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Put, Req, UseGuards } from '@nestjs/common';
 import { AuthenticatedRequest, JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Roles } from '../auth/roles.decorator';
 import { RolesGuard } from '../auth/roles.guard';
+import { CreateWorkerDto } from './dto/create-worker.dto';
+import { UpdateWorkerDto } from './dto/update-worker.dto';
 import { WorkerCodeLookupDto } from './dto/worker-code-lookup.dto';
 import { WorkerPhoneLookupDto } from './dto/worker-phone-lookup.dto';
 import { WorkerQrLookupDto } from './dto/worker-qr-lookup.dto';
@@ -19,9 +21,19 @@ export class WorkerController {
     return this.workerService.getWorkers(req.user!.id);
   }
 
+  @Post()
+  createWorker(@Req() req: AuthenticatedRequest, @Body() body: CreateWorkerDto) {
+    return this.workerService.createWorker(req.user!.id, body);
+  }
+
   @Get('/:workerId')
   getWorker(@Req() req: AuthenticatedRequest, @Param('workerId') workerId: string) {
     return this.workerService.getWorker(req.user!.id, BigInt(workerId));
+  }
+
+  @Put('/:workerId')
+  updateWorker(@Req() req: AuthenticatedRequest, @Param('workerId') workerId: string, @Body() body: UpdateWorkerDto) {
+    return this.workerService.updateWorker(req.user!.id, BigInt(workerId), body);
   }
 
   @Post('/qr/lookup')

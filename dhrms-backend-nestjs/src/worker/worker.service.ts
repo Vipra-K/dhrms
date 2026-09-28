@@ -24,13 +24,20 @@ export class WorkerService {
 
   async createWorker(hospitalUserId: bigint, request: CreateWorkerDto) {
     const hospital = await this.getHospitalByUserId(hospitalUserId);
-    const existing = await this.prisma.user.findUnique({ where: { email: request.email } });
-    if (existing) throw new BadRequestException('Email is already registered');
+    if (!request.phone || !request.phone.trim()) {
+      throw new BadRequestException('Phone number is required');
+    }
+    const cleanPhone = request.phone.trim();
+    const existingEmail = await this.prisma.user.findUnique({ where: { email: request.email } });
+    if (existingEmail) throw new BadRequestException('Email is already registered');
+    const existingPhone = await this.prisma.worker.findUnique({ where: { phone: cleanPhone } });
+    if (existingPhone) throw new BadRequestException('A worker with this phone number is already registered');
+
     const result = await this.prisma.$transaction(async (tx) => {
       const user = await tx.user.create({ data: { email: request.email, passwordHash: await bcrypt.hash(request.password, 10), role: 'WORKER', status: 'ACTIVE' } });
       let workerCode: string;
       do { workerCode = `DHRMS-WKR-${Math.floor(Math.random() * 100000000).toString().padStart(8, '0')}`; } while (await tx.worker.findUnique({ where: { workerCode } }));
-      return tx.worker.create({ data: { userId: user.id, hospitalId: hospital.id, workerCode, fullName: request.fullName, dateOfBirth: request.dateOfBirth ? new Date(request.dateOfBirth) : undefined, gender: request.gender, bloodGroup: request.bloodGroup, phone: request.phone, address: request.address, emergencyContactName: request.emergencyContactName, emergencyContactPhone: request.emergencyContactPhone, emergencyContactRelation: request.emergencyContactRelation, active: true } });
+      return tx.worker.create({ data: { userId: user.id, hospitalId: hospital.id, workerCode, fullName: request.fullName, dateOfBirth: request.dateOfBirth ? new Date(request.dateOfBirth) : undefined, gender: request.gender, bloodGroup: request.bloodGroup, phone: cleanPhone, address: request.address, emergencyContactName: request.emergencyContactName, emergencyContactPhone: request.emergencyContactPhone, emergencyContactRelation: request.emergencyContactRelation, active: true } });
     });
     return { ...this.toResponse(result), hospitalId: Number(hospital.id), assignedDoctor: null };
   }
@@ -76,7 +83,13 @@ export class WorkerService {
 
   async updateWorker(hospitalUserId: bigint, workerId: bigint, request: UpdateWorkerDto) {
     await this.getOwnedWorker(hospitalUserId, workerId);
-    const updated = await this.prisma.worker.update({ where: { id: workerId }, data: { ...request, dateOfBirth: request.dateOfBirth ? new Date(request.dateOfBirth) : undefined } });
+    if (request.phone) {
+      const cleanPhone = request.phone.trim();
+      if (!cleanPhone) throw new BadRequestException('Phone number cannot be empty');
+      const existing = await this.prisma.worker.findFirst({ where: { phone: cleanPhone, NOT: { id: workerId } } });
+      if (existing) throw new BadRequestException('A worker with this phone number is already registered');
+    }
+    const updated = await this.prisma.worker.update({ where: { id: workerId }, data: { ...request, phone: request.phone ? request.phone.trim() : undefined, dateOfBirth: request.dateOfBirth ? new Date(request.dateOfBirth) : undefined } });
     return this.toResponse(updated);
   }
 
@@ -132,7 +145,13 @@ export class WorkerService {
     const worker = await this.prisma.worker.findUnique({ where: { userId } });
     if (!worker) throw new NotFoundException('Worker profile not found');
     if (!worker.active) throw new ForbiddenException('Worker account is inactive');
-    const updated = await this.prisma.worker.update({ where: { id: worker.id }, data: { ...request, dateOfBirth: request.dateOfBirth ? new Date(request.dateOfBirth) : undefined } });
+    if (request.phone) {
+      const cleanPhone = request.phone.trim();
+      if (!cleanPhone) throw new BadRequestException('Phone number cannot be empty');
+      const existing = await this.prisma.worker.findFirst({ where: { phone: cleanPhone, NOT: { id: worker.id } } });
+      if (existing) throw new BadRequestException('A worker with this phone number is already registered');
+    }
+    const updated = await this.prisma.worker.update({ where: { id: worker.id }, data: { ...request, phone: request.phone ? request.phone.trim() : undefined, dateOfBirth: request.dateOfBirth ? new Date(request.dateOfBirth) : undefined } });
     return this.toResponse(updated);
   }
 

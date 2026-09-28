@@ -87,7 +87,7 @@ const DoctorDashboard = () => {
         <section className="doctor-hero" aria-labelledby="doctor-welcome-title">
           <div className="doctor-hero-copy">
             <span className="doctor-kicker">Doctor workspace</span>
-            <h2 id="doctor-welcome-title">Good morning, Dr. {doctor.fullName || "Doctor"}.</h2>
+            <h2 id="doctor-welcome-title">Good morning, {doctor.fullName || "Doctor"}.</h2>
             <p>Review active visits and recent activity from one place.</p>
           </div>
           <div className="doctor-identity">

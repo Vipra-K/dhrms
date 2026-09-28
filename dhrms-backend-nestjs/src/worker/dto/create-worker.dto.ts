@@ -7,7 +7,7 @@ export class CreateWorkerDto {
   @IsOptional() dateOfBirth?: string;
   @IsOptional() @MaxLength(20) gender?: string;
   @IsOptional() @MaxLength(10) bloodGroup?: string;
-  @IsOptional() @MaxLength(20) phone?: string;
+  @IsNotEmpty({ message: 'Phone number is required' }) @IsString() @MaxLength(20) phone!: string;
   @IsOptional() @MaxLength(300) address?: string;
   @IsOptional() @MaxLength(150) emergencyContactName?: string;
   @IsOptional() @MaxLength(20) emergencyContactPhone?: string;

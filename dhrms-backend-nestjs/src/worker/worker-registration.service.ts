@@ -55,15 +55,15 @@ export class WorkerRegistrationService {
 
   async register(registrarId: bigint, dto: RegisterWorkerDto) {
     await this.assertOfficer(registrarId);
+    if (!dto.phone || !dto.phone.trim()) throw new BadRequestException('Phone number is required');
+    const cleanPhone = dto.phone.trim();
     if ((dto.email && !dto.password) || (!dto.email && dto.password)) throw new BadRequestException('Email and password must be provided together');
     if (dto.email) {
       const existing = await this.prisma.user.findUnique({ where: { email: dto.email } });
       if (existing) throw new BadRequestException('Email is already registered');
     }
-    if (dto.phone) {
-      const existingPhone = await this.prisma.worker.findFirst({ where: { phone: dto.phone } });
-      if (existingPhone) throw new BadRequestException('A worker with this phone number is already registered');
-    }
+    const existingPhone = await this.prisma.worker.findFirst({ where: { phone: cleanPhone } });
+    if (existingPhone) throw new BadRequestException('A worker with this phone number is already registered');
 
     const result = await this.prisma.$transaction(async (tx) => {
       const user = dto.email && dto.password ? await tx.user.create({ data: { email: dto.email, passwordHash: await bcrypt.hash(dto.password, 10), role: 'WORKER', status: 'ACTIVE' } }) : null;
@@ -72,7 +72,7 @@ export class WorkerRegistrationService {
       return tx.worker.create({ data: {
         userId: user?.id, registeredById: registrarId, registrationStatus: 'VERIFIED', workerCode, fullName: dto.fullName,
         dateOfBirth: dto.dateOfBirth ? new Date(dto.dateOfBirth) : undefined, gender: dto.gender, bloodGroup: dto.bloodGroup,
-        phone: dto.phone, address: dto.address, emergencyContactName: dto.emergencyContactName, emergencyContactPhone: dto.emergencyContactPhone,
+        phone: cleanPhone, address: dto.address, emergencyContactName: dto.emergencyContactName, emergencyContactPhone: dto.emergencyContactPhone,
         emergencyContactRelation: dto.emergencyContactRelation, employerName: dto.employerName, worksiteName: dto.worksiteName,
         worksiteAddress: dto.worksiteAddress, worksiteDistrict: dto.worksiteDistrict, jobRole: dto.jobRole, active: true,
       } });
