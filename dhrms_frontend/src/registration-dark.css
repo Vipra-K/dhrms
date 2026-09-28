@@ -58,3 +58,44 @@
   padding-left:57px;
   justify-content:flex-start;
 }
+
+/* Registration worker pages — larger, production-readable typography */
+.role-registration .sidebar-link{font-size:14px;min-height:44px}
+.role-registration .sidebar-section-label,
+.role-registration .sidebar-group-label{font-size:11px}
+.role-registration .sidebar-user-copy strong{font-size:13px}
+.role-registration .sidebar-user-copy small{font-size:11px}
+.role-registration .page-header h1{font-size:32px}
+.role-registration .page-content{font-size:14px}
+.role-registration .panel{padding:26px}
+.role-registration .panel-heading h2{font-size:21px}
+.role-registration .panel-heading p{font-size:14px}
+.role-registration .eyebrow{font-size:11px}
+.role-registration .field label{font-size:13px}
+.role-registration .input,
+.role-registration .select,
+.role-registration .textarea{min-height:48px;font-size:15px}
+.role-registration .button{min-height:44px;font-size:14px}
+.role-registration .button-small{font-size:13px;min-height:38px}
+.role-registration .profile-grid>div{padding:14px 0}
+.role-registration .profile-grid small{font-size:11px}
+.role-registration .profile-grid strong{font-size:14px}
+.role-registration .table th{font-size:11px}
+.role-registration .table td{font-size:14px}
+.role-registration .table .person-cell strong{font-size:15px}
+.role-registration .table .person-cell small{font-size:12px}
+.role-registration .status-badge{font-size:12px}
+.role-registration .workflow-card h3{font-size:30px!important}
+.role-registration .workflow-card p{font-size:13px}
+.role-registration .dashboard-welcome h2{font-size:30px}
+.role-registration .form-section-title{font-size:20px!important}
+.role-registration .empty-state-card h3{font-size:19px}
+.role-registration .empty-state-card p{font-size:14px}
+.role-registration .loading-card{font-size:14px}
+@media(max-width:760px){
+  .role-registration .page-header h1{font-size:28px}
+  .role-registration .panel{padding:20px}
+  .role-registration .input,
+  .role-registration .select,
+  .role-registration .textarea{font-size:16px}
+}
