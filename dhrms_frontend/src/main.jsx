@@ -14,6 +14,7 @@ import "./worker-ux-v2.css";
 import "./dark-theme.css";
 import "./doctor-dashboard.css";
 import "./admin.css";
+import "./hospital-ui-fixes.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
