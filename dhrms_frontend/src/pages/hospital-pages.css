@@ -306,3 +306,25 @@
   .role-hospital .sidebar-logout{padding-left:16px;justify-content:center;text-align:center}
   .role-hospital .hospital-dashboard-header h1{font-size:27px}
 }
+
+/* Keep hospital account controls fully inside the sidebar column. */
+.role-hospital .sidebar{
+  min-width:0;
+  overflow:hidden;
+}
+.role-hospital .sidebar-footer{
+  width:100%;
+  min-width:0;
+  max-width:100%;
+}
+.role-hospital .sidebar-user,
+.role-hospital .sidebar-logout{
+  width:100%;
+  min-width:0;
+  max-width:100%;
+  box-sizing:border-box;
+}
+.role-hospital .sidebar-user-copy{
+  min-width:0;
+  max-width:100%;
+}
