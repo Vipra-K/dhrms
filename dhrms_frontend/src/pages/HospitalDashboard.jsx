@@ -130,9 +130,9 @@ const HospitalDashboard = () => {
         )}
 
         <section className="hospital-actions">
-          <button type="button" onClick={() => navigate("/hospital/workers/scan")}><span><Icon name="scan" /></span><div><strong>Start visit</strong><small>Identify a worker</small></div><Icon name="arrow" /></button>
-          <button type="button" onClick={() => navigate("/hospital/find-worker")}><span><Icon name="search" /></span><div><strong>Find worker</strong><small>Search hospital workers</small></div><Icon name="arrow" /></button>
-          <button type="button" onClick={() => navigate("/hospital/doctors")}><span><Icon name="doctor" /></span><div><strong>Doctors</strong><small>View hospital doctors</small></div><Icon name="arrow" /></button>
+          <button type="button" onClick={() => navigate("/hospital/workers/scan")}><span><Icon name="scan" /></span><div><strong>Start visit</strong></div><Icon name="arrow" /></button>
+          <button type="button" onClick={() => navigate("/hospital/find-worker")}><span><Icon name="search" /></span><div><strong>Find worker</strong></div><Icon name="arrow" /></button>
+          <button type="button" onClick={() => navigate("/hospital/doctors")}><span><Icon name="doctor" /></span><div><strong>Doctors</strong></div><Icon name="arrow" /></button>
         </section>
       </div>
     </RoleLayout>
