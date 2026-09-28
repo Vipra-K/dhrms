@@ -93,10 +93,65 @@ const RegistrationOfficerDashboard = () => {
     popup.document.close();
   };
 
-  const profile = selectedWorker && <div className="panel">
-    <div className="panel-heading"><div><span className="eyebrow">Worker profile</span><h2>{selectedWorker.fullName}</h2><p>{selectedWorker.workerCode}</p></div><div className="row-actions"><span className={`status-badge ${selectedWorker.active ? "status-active" : "status-inactive"}`}>{selectedWorker.active ? "ACTIVE" : "INACTIVE"}</span><button className="button button-secondary button-small" type="button" onClick={() => setSelectedWorker(null)}>Close</button></div></div>
-    <div className="profile-grid">{[["Worker ID", selectedWorker.workerCode], ["Registration status", selectedWorker.registrationStatus], ["QR status", selectedWorker.qrStatus], ["Registered on", fmtDateTime(selectedWorker.createdAt)], ["Date of birth", fmtDate(selectedWorker.dateOfBirth)], ["Gender", dash(selectedWorker.gender)], ["Blood group", dash(selectedWorker.bloodGroup)], ["Phone", dash(selectedWorker.phone)], ["Address", dash(selectedWorker.address)], ["Employer", dash(selectedWorker.employerName)], ["Job role", dash(selectedWorker.jobRole)], ["Worksite", dash(selectedWorker.worksiteName)], ["District", dash(selectedWorker.worksiteDistrict)], ["Worksite address", dash(selectedWorker.worksiteAddress)], ["Emergency contact", dash(selectedWorker.emergencyContactName)], ["Emergency phone", dash(selectedWorker.emergencyContactPhone)], ["Relationship", dash(selectedWorker.emergencyContactRelation)]].map(([label, value]) => <div key={label}><small>{label}</small><strong>{value}</strong></div>)}</div>
-    {selectedWorker.qrImage && <div className="worker-id-card" style={{ marginTop: 18, textAlign: "center" }}><div className="id-card-brand">DHRMS <span>WORKER ID</span></div><img src={selectedWorker.qrImage} alt={`QR code for ${selectedWorker.workerCode}`} style={{ width: 260, maxWidth: "100%" }} /><p>Scan this QR at a DHRMS-enabled healthcare facility.</p><div className="modal-actions"><button className="button button-primary" type="button" onClick={() => downloadQr(selectedWorker)}>Download QR</button><button className="button button-secondary" type="button" onClick={() => printCard(selectedWorker)}>Print worker card</button></div></div>}
+  const profile = selectedWorker && <div className="panel worker-profile-panel">
+    <div className="worker-profile-header">
+      <div className="worker-profile-identity">
+        <span className="worker-profile-avatar">{selectedWorker.fullName?.charAt(0).toUpperCase()}</span>
+        <div>
+          <span className="eyebrow">Worker profile</span>
+          <h2>{selectedWorker.fullName}</h2>
+          <p>{selectedWorker.workerCode}</p>
+        </div>
+      </div>
+      <div className="worker-profile-actions">
+        <span className={`status-badge ${selectedWorker.active ? "status-active" : "status-inactive"}`}>{selectedWorker.active ? "ACTIVE" : "INACTIVE"}</span>
+        <button className="button button-secondary button-small" type="button" onClick={() => setSelectedWorker(null)}>Close</button>
+      </div>
+    </div>
+
+    <div className="worker-profile-sections">
+      <section className="worker-profile-section">
+        <h3>Identity</h3>
+        <div className="worker-info-grid">
+          {[["Worker ID", selectedWorker.workerCode], ["Registration status", selectedWorker.registrationStatus], ["QR status", selectedWorker.qrStatus], ["Registered on", fmtDateTime(selectedWorker.createdAt)]].map(([label, value]) => <div className="worker-info-item" key={label}><small>{label}</small><strong>{value}</strong></div>)}
+        </div>
+      </section>
+
+      <section className="worker-profile-section">
+        <h3>Personal details</h3>
+        <div className="worker-info-grid">
+          {[["Date of birth", fmtDate(selectedWorker.dateOfBirth)], ["Gender", dash(selectedWorker.gender)], ["Blood group", dash(selectedWorker.bloodGroup)], ["Phone", dash(selectedWorker.phone)], ["Address", dash(selectedWorker.address)]].map(([label, value]) => <div className={`worker-info-item ${label === "Address" ? "worker-info-wide" : ""}`} key={label}><small>{label}</small><strong>{value}</strong></div>)}
+        </div>
+      </section>
+
+      <section className="worker-profile-section">
+        <h3>Worksite details</h3>
+        <div className="worker-info-grid">
+          {[["Employer", dash(selectedWorker.employerName)], ["Job role", dash(selectedWorker.jobRole)], ["Worksite", dash(selectedWorker.worksiteName)], ["District", dash(selectedWorker.worksiteDistrict)], ["Worksite address", dash(selectedWorker.worksiteAddress)]].map(([label, value]) => <div className={`worker-info-item ${label === "Worksite address" ? "worker-info-wide" : ""}`} key={label}><small>{label}</small><strong>{value}</strong></div>)}
+        </div>
+      </section>
+
+      <section className="worker-profile-section">
+        <h3>Emergency contact</h3>
+        <div className="worker-info-grid">
+          {[["Contact name", dash(selectedWorker.emergencyContactName)], ["Emergency phone", dash(selectedWorker.emergencyContactPhone)], ["Relationship", dash(selectedWorker.emergencyContactRelation)]].map(([label, value]) => <div className="worker-info-item" key={label}><small>{label}</small><strong>{value}</strong></div>)}
+        </div>
+      </section>
+    </div>
+
+    {selectedWorker.qrImage && <div className="worker-qr-section">
+      <div>
+        <h3>Worker ID</h3>
+        <p>Use this QR code to identify the worker at a DHRMS-enabled healthcare facility.</p>
+      </div>
+      <div className="worker-qr-content">
+        <img src={selectedWorker.qrImage} alt={`QR code for ${selectedWorker.workerCode}`} />
+        <div className="worker-qr-actions">
+          <button className="button button-primary" type="button" onClick={() => downloadQr(selectedWorker)}>Download QR</button>
+          <button className="button button-secondary" type="button" onClick={() => printCard(selectedWorker)}>Print worker card</button>
+        </div>
+      </div>
+    </div>}
   </div>;
 
   const registrationForm = reviewing ? <div className="panel"><div className="panel-heading"><div><h2>Confirm worker details</h2></div></div><div className="profile-grid">{[["Full name", form.fullName], ["Date of birth", fmtDate(form.dateOfBirth)], ["Gender", dash(form.gender)], ["Blood group", dash(form.bloodGroup)], ["Phone", dash(form.phone)], ["Address", dash(form.address)], ["Employer", dash(form.employerName)], ["Job role", dash(form.jobRole)], ["Worksite", dash(form.worksiteName)], ["District", dash(form.worksiteDistrict)], ["Emergency contact", dash(form.emergencyContactName)], ["Emergency phone", dash(form.emergencyContactPhone)], ["Portal email", dash(form.email)]].map(([label, value]) => <div key={label}><small>{label}</small><strong>{value}</strong></div>)}</div><div className="modal-actions"><button className="button button-secondary" type="button" onClick={() => setReviewing(false)}>Back to edit</button><button className="button button-primary" type="button" disabled={saving} onClick={confirmRegistration}>{saving ? "Registering…" : "Confirm & register worker"}</button></div></div> : <form onSubmit={review} className="panel form-grid">
