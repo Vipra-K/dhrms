@@ -54,7 +54,8 @@ const Encounter = () => {
   const finish = async () => { if (encounter?.status !== "ACTIVE") return; if (!window.confirm("Complete this visit? Make sure all clinical information is saved.")) return; setCompleting(true); setError(""); try { await completeEncounter(encounterId); navigate("/doctor/workers", { replace: true }); } catch (err) { setError(getApiError(err, "Unable to complete the visit.")); } finally { setCompleting(false); } };
 
   return <RoleLayout title="Visit details" actions={[{ label: "Refresh", onClick: load, variant: "secondary", disabled: loading }, { label: "Back", onClick: () => navigate("/doctor/workers"), variant: "secondary" }]}>
-    <div className="doctor-page">\n    {loading && !encounter && <div className="loading-card">Loading visit…</div>}
+    <div className="doctor-page">
+    {loading && !encounter && <div className="loading-card">Loading visit…</div>}
     {error && <div className="alert error" role="alert">{error}</div>}
     {encounter && <>
       <div className="card worker-profile-header"><div className="person-cell"><span className="avatar">{(encounter.workerName || "W").charAt(0)}</span><div><span className="eyebrow">{encounter.workerCode}</span><h2>{encounter.workerName}</h2><p>{encounter.hospitalName}</p></div></div><span className={`status-badge ${encounter.status === "ACTIVE" ? "status-active" : "status-inactive"}`}>{encounter.status}</span></div>
@@ -77,6 +78,7 @@ const Encounter = () => {
         <div className="panel clinical-panel"><div className="section-toolbar"><div><h2>Complete visit</h2></div><button className="button button-primary" type="button" onClick={finish} disabled={completing}>{completing ? "Completing…" : "Complete visit"}</button></div></div>
       </> : <div className="empty-state-card"><h3>Visit completed</h3><button className="button button-secondary" type="button" onClick={() => navigate("/doctor/workers")}>Back to active visits</button></div>}
     </>}
-    </div>\n  </RoleLayout>;
+    </div>
+  </RoleLayout>;
 };
 export default Encounter;
