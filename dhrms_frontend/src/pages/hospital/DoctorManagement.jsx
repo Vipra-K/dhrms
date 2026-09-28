@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import "./../hospital-pages.css";
 import { useNavigate } from "react-router-dom";
 import RoleLayout from "../../components/RoleLayout";
 import { getDoctors, createDoctor, suspendDoctor, activateDoctor, deactivateDoctor } from "../../services/doctorService";
@@ -56,11 +57,11 @@ const DoctorManagement = () => {
   const activeDoctors = doctors.filter((doctor) => doctor.status === "ACTIVE").length;
 
   return (
-    <RoleLayout title="Doctors" description="Hospital doctor directory." actions={[{ label: "Register doctor", onClick: () => setShowForm(true) }]}>
+    <RoleLayout title="Doctors" actions={[{ label: "Register doctor", onClick: () => setShowForm(true) }]}>
       {(error || success) && <div className={`alert ${error ? "error" : "success"}`} role="alert">{error || success}</div>}
       <section className="panel">
         <div className="section-toolbar">
-          <div><span className="eyebrow">Doctors</span><h2>{doctors.length} doctor{doctors.length === 1 ? "" : "s"}</h2><p>{activeDoctors} active</p></div>
+          <div><span className="eyebrow">Doctors</span><h2>{doctors.length} doctor{doctors.length === 1 ? "" : "s"}</h2><span className="hospital-count-badge">{activeDoctors} active</span></div>
           <div className="toolbar-actions"><input className="input search-input" aria-label="Search doctors" placeholder="Search doctors" value={search} onChange={(e) => setSearch(e.target.value)} /><button className="button button-secondary" type="button" onClick={loadDoctors} disabled={initialLoading}>{initialLoading ? "Loading…" : "Refresh"}</button></div>
         </div>
         {initialLoading ? <div className="loading-card">Loading doctors…</div> : filteredDoctors.length === 0 ? (
