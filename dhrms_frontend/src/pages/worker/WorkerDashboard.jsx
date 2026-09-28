@@ -60,21 +60,6 @@ const WorkerDashboard = () => {
         <div className="dashboard-mark" aria-hidden="true">W</div>
       </section>
 
-      <div className="card-row worker-summary-grid">
-        <article className="card worker-summary-card">
-          <div className="worker-card-icon" aria-hidden="true">ID</div>
-          <div><span className="eyebrow">Worker ID</span><h2>{profile.workerCode || "—"}</h2><p>Verified worker record</p></div>
-        </article>
-        <article className="card worker-summary-card">
-          <div className="worker-card-icon" aria-hidden="true">+</div>
-          <div><span className="eyebrow">Care team</span><h2>{profile.hospital?.name || "Not assigned"}</h2><p>{profile.assignedDoctor?.name ? `Dr. ${profile.assignedDoctor.name}` : "No doctor assigned"}</p></div>
-        </article>
-        <article className="card worker-summary-card">
-          <div className={`worker-card-icon ${profile.active ? "is-active" : "is-inactive"}`} aria-hidden="true">●</div>
-          <div><span className="eyebrow">Status</span><h2>{profile.active ? "Active" : "Inactive"}</h2><p>{profile.active ? "Worker record active" : "Contact registration officer"}</p></div>
-        </article>
-      </div>
-
       <section className="panel worker-care-panel" aria-labelledby="current-care-title">
         <div className="section-toolbar">
           <div><span className="eyebrow">Care</span><h2 id="current-care-title">{currentVisit ? "Current visit" : "No active visit"}</h2></div>
