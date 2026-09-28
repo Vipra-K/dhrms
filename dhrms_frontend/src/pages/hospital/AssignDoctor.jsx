@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import "./../hospital-pages.css";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import RoleLayout from "../../components/RoleLayout";
 import { getApiError } from "../../services/api";
@@ -68,7 +69,7 @@ const AssignDoctor = () => {
   return (
     <RoleLayout
       title="Assign doctor"
-      description="Change a worker's current clinician assignment without creating a new visit."
+     
       actions={[{ label: "Find worker", onClick: () => navigate("/hospital/find-worker"), variant: "secondary" }, { label: "Manage doctors", onClick: () => navigate("/hospital/doctors"), variant: "secondary" }]}
     >
       {error && <div className="alert error" role="alert">{error}</div>}
@@ -76,7 +77,7 @@ const AssignDoctor = () => {
 
       <div className="scanner-layout">
         <section className="panel">
-          <div className="panel-heading"><div><span className="eyebrow">Worker directory</span><h2>Select a worker</h2><p>Only workers already associated with this hospital can be assigned.</p></div><button className="button button-secondary" type="button" onClick={loadData} disabled={loading}>{loading ? "Refreshing…" : "Refresh"}</button></div>
+          <div className="panel-heading"><div><span className="eyebrow">Worker directory</span><h2>Select a worker</h2></div><button className="button button-secondary" type="button" onClick={loadData} disabled={loading}>{loading ? "Refreshing…" : "Refresh"}</button></div>
           <div className="field"><label htmlFor="worker-search">Search workers</label><input id="worker-search" className="input" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Name, phone, or worker ID" /></div>
           {loading ? <div className="loading-card">Loading hospital workers…</div> : filteredWorkers.length === 0 ? <div className="empty-state-card"><span className="empty-icon">W</span><h3>{search ? "No matching workers" : "No workers available"}</h3><p>{search ? "Try another search term." : "Find a worker first to establish the hospital relationship."}</p><button className="button button-primary" type="button" onClick={() => navigate("/hospital/find-worker")}>Find a worker</button></div> : <div className="assignment-list" role="radiogroup" aria-label="Workers">
             {filteredWorkers.map((worker) => {
