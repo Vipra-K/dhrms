@@ -411,3 +411,30 @@
   .role-hospital #worker-qr-reader{margin-top:16px;padding:7px}
   .role-hospital #worker-qr-reader video{max-height:320px}
 }
+
+/* Assignment + visit screens — compact, task-first UI */
+.role-hospital .assignment-title{margin:0;font-size:21px;color:var(--hospital-strong)}
+.role-hospital .assignment-worker-id{margin:4px 0 18px!important;color:var(--hospital-muted)!important;font-size:12px!important}
+.role-hospital .scanner-layout>.card{padding:24px}
+.role-hospital .scanner-layout>.panel{padding:26px}
+.role-hospital .assignment-list{margin-top:12px}
+.role-hospital .assignment-option{min-height:66px}
+.role-hospital .empty-state-card{min-height:240px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+.role-hospital .empty-state-card .empty-icon{margin:0}
+.role-hospital .empty-state-card p{display:none}
+.role-hospital .visit-action{
+  margin-top:14px;
+  padding:18px;
+  border:1px solid var(--hospital-border);
+  border-radius:13px;
+  background:var(--hospital-surface-2);
+}
+.role-hospital .visit-action .field{margin:0}
+.role-hospital .visit-action .modal-actions{margin-top:16px}
+.role-hospital .scan-success{padding:20px}
+.role-hospital .scan-success>.status-badge{justify-self:start}
+.role-hospital .scan-person{padding:2px 0 4px}
+.role-hospital .scan-details{margin-top:0}
+@media(min-width:901px){
+  .role-hospital .scanner-layout>.panel{min-height:460px}
+}
