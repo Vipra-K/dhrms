@@ -43,7 +43,8 @@ export class AdminService {
       totalOfficers,
       workerDistricts,
       workerBloodGroups,
-      officers,
+      officerUsers,
+      officerWorkerGroups,
       hospitals,
       recentWorkers,
     ] = await Promise.all([
@@ -87,13 +88,13 @@ export class AdminService {
       }),
       this.prisma.user.findMany({
         where: { role: 'REGISTRATION_OFFICER' },
-        select: {
-          id: true,
-          email: true,
-          status: true,
-          _count: { select: { registeredWorkers: true } },
-        },
+        select: { id: true, email: true, status: true },
         orderBy: { email: 'asc' },
+      }),
+      this.prisma.worker.groupBy({
+        by: ['registeredById'],
+        where: workerWhere,
+        _count: { _all: true },
       }),
       this.prisma.hospital.findMany({
         where: hospitalWhere,
@@ -149,11 +150,11 @@ export class AdminService {
         bloodGroup: row.bloodGroup || 'Unknown',
         count: row._count._all,
       })),
-      workersByOfficer: officers.map((row) => ({
-        id: Number(row.id),
-        email: row.email,
-        status: row.status,
-        workerCount: row._count.registeredWorkers,
+      workersByOfficer: officerUsers.map((officer) => ({
+        id: Number(officer.id),
+        email: officer.email,
+        status: officer.status,
+        workerCount: officerWorkerGroups.find((row) => row.registeredById === officer.id)?._count._all || 0,
       })),
       hospitalPerformance: hospitals.map((row) => ({
         id: Number(row.id),
