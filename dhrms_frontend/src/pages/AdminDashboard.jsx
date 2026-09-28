@@ -51,10 +51,6 @@ const AdminDashboard = () => {
     [data]
   );
 
-  const averagePerOfficer = data?.metrics?.totalOfficers
-    ? (workerOfficerTotal / data.metrics.totalOfficers).toFixed(1)
-    : "0.0";
-
   const maxDistrict = Math.max(...(data?.workerByDistrict?.map((item) => item.count) || [1]));
   const maxBlood = Math.max(...(data?.workerByBloodGroup?.map((item) => item.count) || [1]));
   const maxMonth = Math.max(...(data?.registrationsByMonth?.map((item) => item.count) || [1]));
