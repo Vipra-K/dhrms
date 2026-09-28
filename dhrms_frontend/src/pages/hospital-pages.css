@@ -328,3 +328,86 @@
   min-width:0;
   max-width:100%;
 }
+
+/* Worker QR scanner — clean operational layout */
+.role-hospital .scanner-panel{
+  min-height:0;
+  padding:26px;
+}
+.role-hospital .scanner-heading{
+  align-items:flex-start;
+  padding-bottom:20px;
+}
+.role-hospital .scanner-heading h2{
+  font-size:22px;
+}
+.role-hospital .scanner-heading p{
+  margin-top:6px;
+  font-size:13px;
+  color:var(--hospital-muted);
+}
+.role-hospital #worker-qr-reader{
+  width:min(100%,560px);
+  margin:22px auto 0;
+  border:1px solid var(--hospital-border);
+  border-radius:16px;
+  overflow:hidden;
+  background:#080d14;
+  padding:10px;
+}
+.role-hospital #worker-qr-reader video{
+  display:block;
+  width:100%!important;
+  max-height:390px;
+  object-fit:cover;
+  border-radius:10px;
+}
+.role-hospital #worker-qr-reader img{
+  max-width:120px;
+  opacity:.7;
+}
+.role-hospital #worker-qr-reader #reader__dashboard_section{
+  padding:8px 4px 2px!important;
+}
+.role-hospital #worker-qr-reader #reader__dashboard_section_csr{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.role-hospital #worker-qr-reader #reader__dashboard_section_csr button,
+.role-hospital #worker-qr-reader #reader__dashboard_section button{
+  min-height:38px;
+  padding:8px 13px!important;
+  border:1px solid var(--hospital-border-strong)!important;
+  border-radius:9px!important;
+  background:var(--hospital-surface-2)!important;
+  color:var(--hospital-strong)!important;
+  font-size:12px!important;
+}
+.role-hospital #worker-qr-reader #reader__dashboard_section_csr span,
+.role-hospital #worker-qr-reader #reader__status_span{
+  color:var(--hospital-muted)!important;
+  font-size:12px!important;
+}
+.role-hospital #worker-qr-reader a{
+  color:#aeb7ff!important;
+  font-size:12px!important;
+}
+.role-hospital .hospital-scan-alt{
+  display:flex;
+  justify-content:center;
+  margin-top:14px;
+}
+.role-hospital .hospital-scan-alt .button{
+  min-width:150px;
+}
+.role-hospital .scanner-panel > .scan-success{
+  margin-top:2px;
+}
+@media(max-width:640px){
+  .role-hospital .scanner-panel{padding:20px}
+  .role-hospital #worker-qr-reader{margin-top:16px;padding:7px}
+  .role-hospital #worker-qr-reader video{max-height:320px}
+}
