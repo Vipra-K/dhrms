@@ -148,6 +148,13 @@
   overflow-wrap:anywhere;
 }
 
+.worker-profile-relationship-actions{
+  display:flex;
+  justify-content:flex-end;
+  align-items:center;
+  padding-top:2px;
+}
+
 .worker-profile-relationship{
   display:flex;
   align-items:center;
