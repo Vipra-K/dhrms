@@ -1,4 +1,83 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
+import { randomUUID } from 'crypto';
+import * as crypto from 'crypto';
+import * as QRCode from 'qrcode';
+import { PrismaService } from '../prisma/prisma.service';
+import { RegisterWorkerDto } from './dto/register-worker.dto';
+
+@Injectable()
+export class WorkerRegistrationService {
+  constructor(private readonly prisma: PrismaService) {}
+
+  private async assertOfficer(registrarId: bigint) {
+    const registrar = await this.prisma.user.findUnique({ where: { id: registrarId } });
+    if (!registrar || registrar.status !== 'ACTIVE' || registrar.role !== 'REGISTRATION_OFFICER') throw new ForbiddenException('Only active registration officers can access registration records');
+  }
+
+  private serializeWorker(worker: any) {
+    return {
+      id: Number(worker.id), workerCode: worker.workerCode, fullName: worker.fullName, dateOfBirth: worker.dateOfBirth,
+      gender: worker.gender, bloodGroup: worker.bloodGroup, phone: worker.phone, address: worker.address,
+      emergencyContactName: worker.emergencyContactName, emergencyContactPhone: worker.emergencyContactPhone,
+      emergencyContactRelation: worker.emergencyContactRelation, employerName: worker.employerName, worksiteName: worker.worksiteName,
+      worksiteAddress: worker.worksiteAddress, worksiteDistrict: worker.worksiteDistrict, jobRole: worker.jobRole,
+      registrationStatus: worker.registrationStatus, active: worker.active, createdAt: worker.createdAt, updatedAt: worker.updatedAt,
+      qrStatus: worker.qrCode?.status || 'NOT_ISSUED', qrContent: worker.qrCode?.qrContent || null, qrImage: null as string | null,
+    };
+  }
+
+  async listRegisteredWorkers(registrarId: bigint, search?: string) {
+    await this.assertOfficer(registrarId);
+    const term = search?.trim();
+    const workers = await this.prisma.worker.findMany({ where: { registeredById: registrarId, ...(term ? { OR: [
+      { fullName: { contains: term, mode: 'insensitive' } }, { workerCode: { contains: term, mode: 'insensitive' } }, { phone: { contains: term, mode: 'insensitive' } },
+    ] } : {}) }, include: { qrCode: true }, orderBy: { createdAt: 'desc' } });
+    return workers.map((worker) => this.serializeWorker(worker));
+  }
+
+  async checkPhone(registrarId: bigint, phone: string) {
+    await this.assertOfficer(registrarId);
+    const normalized = phone.trim();
+    if (!normalized) return { exists: false };
+    const worker = await this.prisma.worker.findFirst({ where: { phone: normalized }, select: { id: true, workerCode: true, fullName: true } });
+    return worker ? { exists: true, worker: { id: Number(worker.id), workerCode: worker.workerCode, fullName: worker.fullName } } : { exists: false };
+  }
+
+  async getRegisteredWorker(registrarId: bigint, workerId: bigint) {
+    await this.assertOfficer(registrarId);
+    const worker = await this.prisma.worker.findFirst({ where: { id: workerId, registeredById: registrarId }, include: { qrCode: true } });
+    if (!worker) throw new NotFoundException('Worker was not found in your registrations');
+    const result = this.serializeWorker(worker);
+    if (result.qrContent) result.qrImage = await QRCode.toDataURL(result.qrContent, { width: 500, margin: 2 });
+    return result;
+  }
+
+  async register(registrarId: bigint, dto: RegisterWorkerDto) {
+    await this.assertOfficer(registrarId);
+    if (!dto.phone || !dto.phone.trim()) throw new BadRequestException('Phone number is required');
+    const cleanPhone = dto.phone.trim();
+    if ((dto.email && !dto.password) || (!dto.email && dto.password)) throw new BadRequestException('Email and password must be provided together');
+    if (dto.email) {
+      const existing = await this.prisma.user.findUnique({ where: { email: dto.email } });
+      if (existing) throw new BadRequestException('Email is already registered');
+    }
+    const existingPhone = await this.prisma.worker.findFirst({ where: { phone: cleanPhone } });
+    if (existingPhone) throw new BadRequestException('A worker with this phone number is already registered');
+
+    let result;
+    try {
+
+    } catch (err) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+        const fields = Array.isArray(err.meta?.target) ? err.meta.target.join(', ') : '';
+        if (fields.includes('phone')) throw new BadRequestException('A worker with this phone number is already registered');
+        if (fields.includes('email')) throw new BadRequestException('Email is already registered');
+      }
+      throw err;
+    } { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { randomUUID } from 'crypto';
 import * as crypto from 'crypto';
