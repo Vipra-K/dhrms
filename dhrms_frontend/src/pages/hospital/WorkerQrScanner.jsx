@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import "./../hospital-pages.css";
 import { Html5QrcodeScanner } from "html5-qrcode";
 import { useNavigate } from "react-router-dom";
 import RoleLayout from "../../components/RoleLayout";
@@ -79,7 +80,7 @@ const WorkerQrScanner = () => {
   return (
     <RoleLayout
       title="Start a worker visit"
-      description="Scan the worker's permanent QR, confirm the hospital relationship, and start care with an active doctor."
+     
       actions={[{ label: "Find by phone", onClick: () => navigate("/hospital/find-worker"), variant: "secondary" }]}
     >
       {error && <div className="alert error" role="alert">{error}</div>}
@@ -87,21 +88,21 @@ const WorkerQrScanner = () => {
         <section className="panel scanner-panel">
           {!worker ? (
             <>
-              <div className="panel-heading"><div><span className="eyebrow">Step 1 · Identify</span><h2>Scan worker QR</h2><p>Ask the worker to show their DHRMS QR card to the camera.</p></div></div>
+              <div className="panel-heading"><div><span className="eyebrow">Worker identification</span><h2>Scan worker QR</h2></div></div>
               <div id="worker-qr-reader" className="qr-reader" aria-busy={scanning} />
-              <div style={{ marginTop: "14px", textAlign: "center" }}><button type="button" className="button button-secondary" onClick={() => navigate("/hospital/find-worker")}>Use phone lookup instead</button></div>
+              <div className="hospital-scan-alt"><button type="button" className="button button-secondary" onClick={() => navigate("/hospital/find-worker")}>Find worker instead</button></div>
             </>
           ) : (
             <>
-              <div className="panel-heading"><div><span className="eyebrow">Worker identified</span><h2>Review before care</h2><p>The scan identifies the worker; the next step depends on their hospital relationship.</p></div></div>
+              <div className="panel-heading"><div><span className="eyebrow">Worker identified</span><h2>Worker details</h2></div></div>
               <div className="scan-success"><span className={`status-badge ${relationshipTone}`}>{relationshipLabel}</span><div className="scan-person"><span className="avatar">{(worker.fullName || "W").charAt(0).toUpperCase()}</span><div><h3>{worker.fullName || "Worker"}</h3><p>{worker.workerCode || "Worker record"}</p></div></div><div className="scan-details"><span><small>Phone</small><strong>{worker.phone || "—"}</strong></span><span><small>Blood group</small><strong>{worker.bloodGroup || "—"}</strong></span></div></div>
-              {relationship === "AVAILABLE" && <div className="panel" style={{ marginTop: "12px" }}><span className="eyebrow">Step 2 · Associate</span><h3>Add to this hospital</h3><p>This establishes the hospital relationship. It does not assign a doctor or start a visit.</p><button type="button" className="button button-primary" onClick={handleAddToHospital} disabled={adding}>{adding ? "Adding…" : "Add to hospital"}</button></div>}
+              {relationship === "AVAILABLE" && <div className="panel" style={{ marginTop: "12px" }}><h3>Add worker</h3><button type="button" className="button button-primary" onClick={handleAddToHospital} disabled={adding}>{adding ? "Adding…" : "Add to hospital"}</button></div>}
               {relationship === "OTHER_HOSPITAL" && <div className="alert error" style={{ marginTop: "12px" }}>This worker is currently associated with another hospital. That hospital must end its relationship before this worker can be added here.</div>}
-              {relationship === "ACTIVE" && <div className="panel" style={{ marginTop: "12px" }}><span className="eyebrow">Step 3 · Start care</span><h3>Choose the clinical doctor</h3><div className="field" style={{ marginTop: "12px" }}><label htmlFor="doctor">Active doctor</label><select id="doctor" className="select" value={doctorId} onChange={(e) => setDoctorId(e.target.value)}><option value="">Select an active doctor</option>{doctors.map((doctor) => <option key={doctor.id} value={doctor.id}>{doctor.fullName}{doctor.specialization ? ` · ${doctor.specialization}` : ""}</option>)}</select></div>{doctors.length === 0 && <div className="alert error" style={{ marginTop: "12px" }}>No active clinical doctor is available at this hospital.</div>}<div className="modal-actions"><button className="button button-secondary" type="button" onClick={startScanner}>Scan another</button><button className="button button-primary" type="button" onClick={handleStartVisit} disabled={starting || !doctorId || doctors.length === 0}>{starting ? "Starting visit…" : "Start visit"}</button></div></div>}
+              {relationship === "ACTIVE" && <div className="panel" style={{ marginTop: "12px" }}><h3>Select doctor</h3><div className="field" style={{ marginTop: "12px" }}><label htmlFor="doctor">Active doctor</label><select id="doctor" className="select" value={doctorId} onChange={(e) => setDoctorId(e.target.value)}><option value="">Select an active doctor</option>{doctors.map((doctor) => <option key={doctor.id} value={doctor.id}>{doctor.fullName}{doctor.specialization ? ` · ${doctor.specialization}` : ""}</option>)}</select></div>{doctors.length === 0 && <div className="alert error" style={{ marginTop: "12px" }}>No active clinical doctor is available at this hospital.</div>}<div className="modal-actions"><button className="button button-secondary" type="button" onClick={startScanner}>Scan another</button><button className="button button-primary" type="button" onClick={handleStartVisit} disabled={starting || !doctorId || doctors.length === 0}>{starting ? "Starting visit…" : "Start visit"}</button></div></div>}
             </>
           )}
         </section>
-        <aside className="card scanner-help"><span className="eyebrow">Quick guide</span><h3>Identify → associate → care</h3><ol><li>Scan the worker's permanent QR.</li><li>Add the worker to this hospital only when the relationship is available.</li><li>Select an active clinical doctor and start the encounter.</li><li>Use Workers later when the hospital needs to end the relationship.</li></ol></aside>
+        
       </div>
     </RoleLayout>
   );
