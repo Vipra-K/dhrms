@@ -81,7 +81,6 @@ const WorkerQrScanner = () => {
     <RoleLayout
       title="Start a worker visit"
      
-      actions={[{ label: "Find by phone", onClick: () => navigate("/hospital/find-worker"), variant: "secondary" }]}
     >
       {error && <div className="alert error" role="alert">{error}</div>}
       <div className="scanner-layout">
