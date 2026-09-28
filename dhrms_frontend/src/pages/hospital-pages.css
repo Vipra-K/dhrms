@@ -1,0 +1,226 @@
+/* Shared hospital workspace UI. Keep this file focused on hierarchy, readability and operational density. */
+.role-hospital{
+  --hospital-text:#e8edf5;
+  --hospital-strong:#f8fafc;
+  --hospital-muted:#a7b1c0;
+  --hospital-subtle:#7f8b9d;
+  --hospital-border:#263244;
+  --hospital-border-strong:#344258;
+  --hospital-surface:#0d141e;
+  --hospital-surface-2:#111a26;
+  --hospital-surface-3:#151f2d;
+  --hospital-accent:#818cf8;
+  --hospital-accent-soft:rgba(99,102,241,.13);
+  --hospital-green:#6ee7a0;
+  --hospital-green-bg:rgba(34,197,94,.09);
+  --hospital-warning:#fbbf72;
+  --hospital-warning-bg:rgba(245,158,11,.08);
+  color:var(--hospital-text);
+}
+
+/* Typography: deliberately larger than the legacy hospital screens. */
+.role-hospital .sidebar-section-label,
+.role-hospital .sidebar-group-label{font-size:11px}
+.role-hospital .sidebar-link{font-size:14px;min-height:44px}
+.role-hospital .sidebar-link .nav-icon{width:19px;height:19px}
+.role-hospital .sidebar-user-copy strong{font-size:13px}
+.role-hospital .sidebar-user-copy small{font-size:11px}
+.role-hospital .page-header h1{font-size:30px;line-height:1.15;letter-spacing:-.035em}
+.role-hospital .page-description{display:none}
+.role-hospital .page-content{font-size:14px}
+.role-hospital .panel,
+.role-hospital .card,
+.role-hospital .table-card,
+.role-hospital .empty-state-card,
+.role-hospital .loading-card{
+  background:var(--hospital-surface);
+  border-color:var(--hospital-border);
+  box-shadow:0 10px 30px rgba(0,0,0,.14);
+}
+.role-hospital .panel h2,
+.role-hospital .card h3,
+.role-hospital .section-toolbar h2,
+.role-hospital .panel-heading h2{
+  color:var(--hospital-strong);
+  font-size:20px;
+  line-height:1.25;
+  letter-spacing:-.025em;
+}
+.role-hospital .panel p,
+.role-hospital .card p,
+.role-hospital .section-toolbar p,
+.role-hospital .panel-heading p{
+  color:var(--hospital-muted);
+  font-size:13px;
+  line-height:1.5;
+}
+.role-hospital .eyebrow{
+  color:#9ea8ff;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.08em;
+}
+.role-hospital .button{font-size:13px;min-height:40px}
+.role-hospital .button-small{font-size:12px;min-height:34px}
+.role-hospital .input,
+.role-hospital .select,
+.role-hospital .textarea{
+  min-height:44px;
+  background:#0a111a;
+  border-color:var(--hospital-border-strong);
+  color:var(--hospital-strong);
+  font-size:14px;
+}
+.role-hospital .input::placeholder{color:#738096}
+.role-hospital .field label{
+  color:#c4ccd8;
+  font-size:12px;
+  font-weight:700;
+  margin-bottom:7px;
+}
+.role-hospital .status-badge{
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.04em;
+  padding:6px 9px;
+}
+.role-hospital .status-active{color:var(--hospital-green);background:var(--hospital-green-bg)}
+.role-hospital .muted-note{font-size:12px;color:var(--hospital-subtle)}
+.role-hospital .table{font-size:13px}
+.role-hospital .table th{
+  padding:13px 16px;
+  color:#9da8b8;
+  background:var(--hospital-surface-2);
+  font-size:10px;
+  letter-spacing:.08em;
+}
+.role-hospital .table td{
+  padding:15px 16px;
+  color:#cbd3df;
+  font-size:13px;
+}
+.role-hospital .person-cell strong{font-size:14px;color:var(--hospital-strong)}
+.role-hospital .person-cell small{font-size:11px;color:var(--hospital-muted);margin-top:4px}
+.role-hospital .avatar{width:36px;height:36px;font-size:13px}
+.role-hospital .row-actions{gap:7px;flex-wrap:wrap}
+.role-hospital .section-toolbar,
+.role-hospital .panel-heading{
+  gap:18px;
+  padding-bottom:18px;
+}
+.role-hospital .toolbar-actions{gap:9px}
+.role-hospital .search-input{min-width:260px}
+.role-hospital .empty-state-card{padding:56px 24px}
+.role-hospital .empty-state-card h3{font-size:18px;color:var(--hospital-strong)}
+.role-hospital .empty-state-card p{font-size:13px}
+.role-hospital .loading-card{padding:34px;font-size:13px;color:var(--hospital-muted)}
+.role-hospital .alert{font-size:13px;line-height:1.5}
+.role-hospital .modal{background:var(--hospital-surface);border-color:var(--hospital-border-strong)}
+.role-hospital .modal-header h2{font-size:22px;color:var(--hospital-strong)}
+.role-hospital .modal-header p{font-size:13px;color:var(--hospital-muted)}
+.role-hospital .modal-close{font-size:22px}
+.role-hospital .modal-actions{gap:9px}
+.role-hospital .sidebar-quick-action small{display:none}
+.role-hospital .sidebar-quick-action{min-height:48px}
+.role-hospital .sidebar-quick-action strong{font-size:13px}
+
+/* Workers */
+.hospital-directory{display:grid;gap:18px}
+.hospital-directory-toolbar{display:flex;align-items:flex-end;justify-content:space-between;gap:18px}
+.hospital-directory-toolbar .toolbar-actions{align-items:center}
+.hospital-directory-search{flex:1;min-width:260px}
+.hospital-directory-table{overflow:auto}
+.hospital-directory-table .table{min-width:860px}
+
+/* QR / visit start */
+.hospital-scan-layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px;align-items:start}
+.hospital-scan-panel{min-height:600px}
+.hospital-scan-panel .panel-heading{border-bottom:1px solid var(--hospital-border)}
+.hospital-qr-reader{max-width:520px;margin:28px auto 0}
+.hospital-qr-reader #reader__dashboard_section_csr button,
+.hospital-qr-reader button{font-size:13px!important}
+.hospital-scan-result{display:grid;gap:18px}
+.hospital-worker-summary{display:flex;align-items:center;gap:14px;padding:18px;border:1px solid var(--hospital-border);border-radius:14px;background:var(--hospital-surface-2)}
+.hospital-worker-summary .avatar{width:48px;height:48px;font-size:16px}
+.hospital-worker-summary h3{font-size:19px;color:var(--hospital-strong)}
+.hospital-worker-summary p{margin-top:4px;font-size:12px;color:var(--hospital-muted)}
+.hospital-worker-facts{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.hospital-worker-facts>div{padding:13px;border:1px solid var(--hospital-border);border-radius:11px;background:var(--hospital-surface-2)}
+.hospital-worker-facts small{display:block;color:var(--hospital-subtle);font-size:10px;text-transform:uppercase;letter-spacing:.06em}
+.hospital-worker-facts strong{display:block;margin-top:5px;color:var(--hospital-strong);font-size:13px}
+.hospital-scan-actions{display:flex;justify-content:flex-end;gap:9px;flex-wrap:wrap}
+.hospital-scan-side{position:sticky;top:20px}
+.hospital-scan-side h3{font-size:18px}
+.hospital-scan-side p{font-size:13px}
+
+/* Active visits */
+.hospital-live-list{display:grid;gap:0;overflow:hidden;border:1px solid var(--hospital-border);border-radius:14px}
+.hospital-live-head,.hospital-live-row{display:grid;grid-template-columns:minmax(220px,1.4fr) minmax(190px,1fr) minmax(180px,.8fr) 100px;gap:18px;align-items:center}
+.hospital-live-head{padding:12px 18px;background:var(--hospital-surface-2);color:#9da8b8;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.hospital-live-row{padding:15px 18px;border-top:1px solid var(--hospital-border);min-height:76px}
+.hospital-live-row:hover{background:var(--hospital-surface-2)}
+.hospital-live-row strong{font-size:14px;color:var(--hospital-strong)}
+.hospital-live-row small{display:block;margin-top:4px;color:var(--hospital-muted);font-size:11px}
+.hospital-live-empty{text-align:center;padding:58px 24px}
+
+/* Doctors */
+.hospital-doctor-table .table{min-width:940px}
+.hospital-doctor-meta{display:flex;align-items:center;gap:10px}
+.hospital-doctor-meta .avatar{width:38px;height:38px}
+.hospital-doctor-role{font-size:11px;color:var(--hospital-muted)}
+.hospital-doctor-actions{display:flex;gap:7px;flex-wrap:wrap}
+
+/* Assignment */
+.hospital-assignment-layout{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(320px,.65fr);gap:18px;align-items:start}
+.hospital-worker-picker{display:grid;gap:8px;max-height:560px;overflow:auto;margin-top:16px;padding-right:3px}
+.hospital-worker-option{width:100%;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;padding:13px 14px;border:1px solid var(--hospital-border);border-radius:12px;background:var(--hospital-surface-2);color:inherit;text-align:left;transition:.16s}
+.hospital-worker-option:hover{border-color:var(--hospital-border-strong);background:var(--hospital-surface-3)}
+.hospital-worker-option.selected{border-color:rgba(129,140,248,.55);background:var(--hospital-accent-soft);box-shadow:0 0 0 2px rgba(129,140,248,.08)}
+.hospital-worker-option strong{display:block;color:var(--hospital-strong);font-size:14px}
+.hospital-worker-option small{display:block;margin-top:4px;color:var(--hospital-muted);font-size:11px}
+.hospital-worker-current{color:#b7c0ff;font-size:11px;font-weight:700;text-align:right}
+.hospital-assignment-card{position:sticky;top:20px}
+.hospital-assignment-card h3{font-size:20px;color:var(--hospital-strong)}
+.hospital-current-assignment{margin-top:14px;padding:14px;border:1px solid var(--hospital-border);border-radius:11px;background:var(--hospital-surface-2)}
+.hospital-current-assignment small{display:block;color:var(--hospital-subtle);font-size:10px;text-transform:uppercase;letter-spacing:.06em}
+.hospital-current-assignment strong{display:block;margin-top:5px;color:var(--hospital-strong);font-size:14px}
+
+/* Keep the new overview readable as well. */
+.hospital-dashboard .hospital-dashboard-header h1{font-size:32px}
+.hospital-dashboard .hospital-dashboard-header p{font-size:14px}
+.hospital-dashboard .hospital-metric>div>span{font-size:11px}
+.hospital-dashboard .hospital-metric strong{font-size:29px}
+.hospital-dashboard .hospital-metric small{font-size:11px}
+.hospital-dashboard .hospital-section-heading h2{font-size:20px}
+.hospital-dashboard .hospital-section-heading span{font-size:12px}
+.hospital-dashboard .hospital-visits-head{font-size:10px}
+.hospital-dashboard .hospital-worker strong,
+.hospital-dashboard .hospital-doctor strong{font-size:13px}
+.hospital-dashboard .hospital-worker small,
+.hospital-dashboard .hospital-doctor small{font-size:11px}
+.hospital-dashboard .hospital-started{font-size:12px}
+.hospital-dashboard .status-badge{font-size:10px}
+
+@media(max-width:1050px){
+  .hospital-scan-layout,.hospital-assignment-layout{grid-template-columns:1fr}
+  .hospital-scan-side,.hospital-assignment-card{position:static}
+}
+@media(max-width:760px){
+  .role-hospital .page-header{padding:18px}
+  .role-hospital .page-header h1{font-size:26px}
+  .role-hospital .page-content{padding:14px}
+  .hospital-directory-toolbar{align-items:stretch;flex-direction:column}
+  .hospital-directory-search{min-width:0;width:100%}
+  .hospital-scan-panel{min-height:auto}
+  .hospital-worker-facts{grid-template-columns:1fr 1fr}
+  .hospital-live-list{overflow-x:auto}
+  .hospital-live-head,.hospital-live-row{min-width:720px}
+  .hospital-dashboard .hospital-dashboard-header h1{font-size:28px}
+}
+@media(max-width:520px){
+  .role-hospital .button{width:100%}
+  .role-hospital .header-actions{width:100%;display:grid;grid-template-columns:1fr}
+  .hospital-worker-facts{grid-template-columns:1fr}
+  .hospital-scan-actions{display:grid}
+  .hospital-scan-actions .button{width:100%}
+}
