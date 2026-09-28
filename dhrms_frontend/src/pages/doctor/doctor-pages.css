@@ -1,0 +1,41 @@
+/* Unified doctor workspace UI */
+.role-doctor .page-content{max-width:1480px;margin:0 auto;padding:28px 34px 40px}
+.role-doctor .doctor-page{display:grid;gap:20px}
+.role-doctor .doctor-page .panel,.role-doctor .doctor-page .card{border:1px solid rgba(148,163,184,.15);border-radius:18px;background:#0b1119;box-shadow:0 18px 45px rgba(0,0,0,.14)}
+.role-doctor .doctor-page .page-card{padding:22px}
+.role-doctor .doctor-page h2{color:#f8fafc;font-size:22px;letter-spacing:-.03em}
+.role-doctor .doctor-page h3{color:#f8fafc;font-size:16px}
+.role-doctor .doctor-page .muted{color:#8491a4}
+.role-doctor .doctor-page .toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.role-doctor .doctor-page .toolbar-actions{display:flex;gap:10px;flex-wrap:wrap}
+.role-doctor .doctor-page .worker-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.role-doctor .doctor-page .worker-card{padding:20px;border:1px solid rgba(148,163,184,.14);border-radius:16px;background:#101722;transition:border-color .18s,transform .18s}
+.role-doctor .doctor-page .worker-card:hover{border-color:rgba(129,140,248,.35);transform:translateY(-1px)}
+.role-doctor .doctor-page .worker-card-head{display:flex;align-items:center;gap:12px}
+.role-doctor .doctor-page .worker-avatar{width:44px;height:44px;display:grid;place-items:center;border-radius:13px;background:rgba(99,102,241,.13);border:1px solid rgba(129,140,248,.2);color:#c7d2fe;font-weight:800}
+.role-doctor .doctor-page .worker-name{color:#f8fafc;font-size:15px;font-weight:750}
+.role-doctor .doctor-page .worker-code{margin-top:3px;color:#738198;font-size:10px}
+.role-doctor .doctor-page .worker-details{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:18px}
+.role-doctor .doctor-page .worker-detail{padding:10px 12px;border:1px solid rgba(148,163,184,.1);border-radius:10px;background:#0c131d}
+.role-doctor .doctor-page .worker-detail small{display:block;color:#69778b;font-size:8px;text-transform:uppercase;letter-spacing:.08em}
+.role-doctor .doctor-page .worker-detail strong{display:block;margin-top:4px;color:#dce3ec;font-size:11px}
+.role-doctor .doctor-page .worker-card-footer{display:flex;justify-content:flex-end;margin-top:16px}
+.role-doctor .doctor-page .profile-hero{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:24px}
+.role-doctor .doctor-page .profile-info{display:flex;align-items:center;gap:15px;min-width:0}
+.role-doctor .doctor-page .profile-avatar{width:58px;height:58px;display:grid;place-items:center;border-radius:17px;background:rgba(99,102,241,.14);border:1px solid rgba(129,140,248,.25);color:#c7d2fe;font-size:21px;font-weight:800;flex:none}
+.role-doctor .doctor-page .profile-info h2{margin:0;font-size:25px}
+.role-doctor .doctor-page .profile-info p{margin-top:4px;color:#8290a4;font-size:11px}
+.role-doctor .doctor-page .info-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.role-doctor .doctor-page .info-item{padding:16px;border:1px solid rgba(148,163,184,.13);border-radius:14px;background:#101722}
+.role-doctor .doctor-page .info-item small{display:block;color:#69778b;font-size:8px;text-transform:uppercase;letter-spacing:.09em}
+.role-doctor .doctor-page .info-item strong{display:block;margin-top:7px;color:#e7edf5;font-size:12px;overflow-wrap:anywhere}
+.role-doctor .doctor-page .visit-hero{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:22px}
+.role-doctor .doctor-page .visit-actions{display:flex;gap:9px;flex-wrap:wrap}
+.role-doctor .doctor-page .clinical-panel{padding:20px}
+.role-doctor .doctor-page .clinical-panel .section-toolbar{margin-bottom:0}
+.role-doctor .doctor-page .clinical-panel .section-toolbar h2{font-size:18px}
+.role-doctor .doctor-page .empty-state-card{border:1px dashed rgba(148,163,184,.18);border-radius:15px;background:#0b1119;text-align:center;padding:46px 24px}
+.role-doctor .doctor-page .empty-state-card h3{font-size:15px}
+.role-doctor .doctor-page .empty-state-card p{margin-top:6px;color:#77859a;font-size:11px}
+@media(max-width:1050px){.role-doctor .doctor-page .worker-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.role-doctor .doctor-page .info-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){.role-doctor .page-content{padding:20px 16px 32px}.role-doctor .doctor-page .worker-grid,.role-doctor .doctor-page .info-grid{grid-template-columns:1fr}.role-doctor .doctor-page .profile-hero,.role-doctor .doctor-page .visit-hero{align-items:flex-start;flex-direction:column}.role-doctor .doctor-page .toolbar{align-items:flex-start;flex-direction:column}.role-doctor .doctor-page .toolbar-actions{width:100%}.role-doctor .doctor-page .toolbar-actions .button{flex:1}}
