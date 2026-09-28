@@ -147,16 +147,11 @@ const WorkerProfile = () => {
           </section>
         </div>
 
-        <section className="worker-profile-relationship">
-          <div className="worker-profile-relationship-copy">
-            <div>
-              <h2>Hospital association</h2>
-            </div>
-          </div>
+        <div className="worker-profile-relationship-actions">
           <button className="button button-secondary worker-profile-end-button" onClick={handleTerminateRelationship} disabled={terminating}>
             {terminating ? "Ending…" : "End relationship"}
           </button>
-        </section>
+        </div>
       </div>
     </RoleLayout>
   );
