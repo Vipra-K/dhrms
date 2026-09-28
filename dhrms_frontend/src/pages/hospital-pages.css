@@ -449,3 +449,84 @@
 .role-hospital .scanner-help{
   display:none!important;
 }
+
+/* Worker pages — clean, task-first UI */
+.role-hospital .worker-count{
+  display:block;
+  margin-top:4px;
+  color:var(--hospital-muted);
+  font-size:12px;
+}
+.role-hospital .hospital-directory-toolbar .section-toolbar,
+.role-hospital .hospital-directory .section-toolbar{
+  align-items:flex-end;
+}
+.role-hospital .table-card{
+  overflow:auto;
+}
+.role-hospital .table{
+  min-width:980px;
+}
+.role-hospital .row-actions{
+  align-items:center;
+}
+.role-hospital .row-actions .button{
+  white-space:nowrap;
+}
+.role-hospital .scanner-layout .panel{
+  border-radius:16px;
+}
+.role-hospital .scanner-panel{
+  padding:30px;
+}
+.role-hospital .scanner-heading{
+  padding-bottom:22px;
+  border-bottom:1px solid var(--hospital-border);
+}
+.role-hospital .scanner-heading h2{
+  font-size:23px;
+}
+.role-hospital .scanner-panel .field{
+  margin-top:4px;
+}
+.role-hospital .scan-success{
+  margin-top:18px;
+  padding:24px;
+  border-radius:14px;
+}
+.role-hospital .scan-person h3{
+  font-size:21px;
+}
+.role-hospital .scan-details>span{
+  padding:16px;
+}
+.role-hospital .scan-details strong{
+  font-size:14px;
+}
+.role-hospital .visit-action{
+  margin-top:16px;
+  padding:20px;
+}
+.role-hospital .visit-action .modal-actions{
+  justify-content:flex-end;
+}
+.role-hospital .scanner-panel .worker-code{
+  display:block;
+  margin-top:5px;
+  color:var(--hospital-muted);
+  font-size:13px;
+}
+.role-hospital .scanner-panel .panel-heading h2{
+  margin-bottom:0;
+}
+.role-hospital .scanner-panel .panel-heading p{
+  display:none;
+}
+@media(max-width:900px){
+  .role-hospital .scanner-panel{padding:22px}
+}
+@media(max-width:640px){
+  .role-hospital .scanner-panel{padding:18px}
+  .role-hospital .scan-success{padding:18px}
+  .role-hospital .row-actions .button{flex:1}
+}
